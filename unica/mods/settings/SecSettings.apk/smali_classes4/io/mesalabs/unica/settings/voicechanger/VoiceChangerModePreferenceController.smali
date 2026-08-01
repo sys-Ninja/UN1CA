@@ -99,24 +99,44 @@
 
     iput-object v1, p1, Landroidx/preference/ListPreference;->mEntryValues:[Ljava/lang/CharSequence;
 
-    iget-object p1, p0, Lio/mesalabs/unica/settings/voicechanger/VoiceChangerModePreferenceController;->mPreference:Landroidx/preference/SecDropDownPreference;
-
     const-string v0, "persist.sys.unica.vc.mode"
 
     invoke-static {v0}, Landroid/os/SemSystemProperties;->get(Ljava/lang/String;)Ljava/lang/String;
 
     move-result-object v0
 
-    invoke-static {v0}, Landroid/text/TextUtils;->isEmpty(Ljava/lang/CharSequence;)Z
+    const/4 v2, 0x0
 
-    move-result v1
+    const/4 v3, 0x0
 
-    if-eqz v1, :cond_0
+    :goto_0
+    array-length v4, v1
 
-    const-string v0, "auto"
+    if-ge v3, v4, :cond_1
+
+    aget-object v4, v1, v3
+
+    invoke-virtual {v4}, Ljava/lang/Object;->toString()Ljava/lang/String;
+
+    move-result-object v4
+
+    invoke-virtual {v4, v0}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+
+    move-result v4
+
+    if-eqz v4, :cond_0
+
+    move v2, v3
 
     :cond_0
-    invoke-virtual {p1, v0}, Landroidx/preference/ListPreference;->setValue(Ljava/lang/String;)V
+    add-int/lit8 v3, v3, 0x1
+
+    goto :goto_0
+
+    :cond_1
+    iget-object p1, p0, Lio/mesalabs/unica/settings/voicechanger/VoiceChangerModePreferenceController;->mPreference:Landroidx/preference/SecDropDownPreference;
+
+    invoke-virtual {p1, v2}, Landroidx/preference/DropDownPreference;->setValueIndex(I)V
 
     iget-object p1, p0, Lio/mesalabs/unica/settings/voicechanger/VoiceChangerModePreferenceController;->mPreference:Landroidx/preference/SecDropDownPreference;
 
