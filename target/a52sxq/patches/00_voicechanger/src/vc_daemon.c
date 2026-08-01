@@ -23,7 +23,7 @@
  *   persist.unica.vc.enabled    bool   master switch
  *   persist.unica.vc.mode       auto|manual
  *   sys.unica.vc.active         bool   per-call trigger, only read in manual mode
- *   persist.unica.vc.preset     int    index into kPresets, kCustomPreset = slider
+ *   persist.sys.unica.vc.preset  string preset name (or legacy index) from kPresets
  *   persist.sys.unica.vc.semitones  float  used when preset == kCustomPreset
  *   persist.unica.vc.agc        bool   default true
  */
@@ -37,6 +37,7 @@
 #include <math.h>
 #include <errno.h>
 #include <stdarg.h>
+#include <time.h>
 #include <sys/system_properties.h>
 #include <android/log.h>
 
@@ -197,15 +198,6 @@ static int prop_bool(const char *key, int def)
     return !strcmp(v, "true") || !strcmp(v, "1") || !strcmp(v, "on");
 }
 
-static int prop_int(const char *key, int def)
-{
-    char v[PROP_VALUE_MAX];
-    char d[16];
-    snprintf(d, sizeof(d), "%d", def);
-    prop_get(key, v, sizeof(v), d);
-    return atoi(v);
-}
-
 static float prop_float(const char *key, float def)
 {
     char v[PROP_VALUE_MAX];
@@ -264,15 +256,19 @@ static int ctl_get_int(const char *name, int def)
     return c ? alsa.mixer_ctl_get_value(c, 0) : def;
 }
 
-/* A VoLTE call is up once the modem's TX mixer is routed. Probing this is free
- * and has no side effects, unlike opening the capture PCM (which only succeeds
- * mid-call because the AFE topology id is 0 otherwise). */
+/* A VoLTE call is up once the modem's voice TX mixer is routed. Probing this is
+ * free and has no side effects, unlike opening the capture PCM (which only
+ * succeeds mid-call because the AFE topology id is 0 otherwise).
+ *
+ * Only the VoiceMMode mixers are trustworthy. "TX_AIF1_CAP Mixer DEC0" is also
+ * On for any ordinary recording, and the HAL leaves it On for a while after a
+ * hang-up — using it as a probe made the daemon reopen a dead session once a
+ * second after every call. */
 static int call_is_active(void)
 {
     static const char *probes[] = {
         "VoiceMMode1_Tx Mixer TX_CDC_DMA_TX_3_MMode1",
         "VoiceMMode2_Tx Mixer TX_CDC_DMA_TX_3_MMode2",
-        "TX_AIF1_CAP Mixer DEC0",
     };
     for (size_t i = 0; i < sizeof(probes) / sizeof(probes[0]); i++) {
         struct mixer_ctl *c = alsa.mixer_get_ctl_by_name(g_mixer, probes[i]);
@@ -304,11 +300,29 @@ static int should_run(void)
 
 /* ── Session ──────────────────────────────────────────────────────────────── */
 
+/* The Settings UI stores the preset by name; older builds stored the index.
+   Accept both. */
+static int preset_index(void)
+{
+    char v[PROP_VALUE_MAX];
+    prop_get(PROP_PRESET, v, sizeof(v), kPresets[0].name);
+
+    for (int i = 0; i < NUM_PRESETS; i++)
+        if (!strcmp(v, kPresets[i].name))
+            return i;
+
+    char *end;
+    long n = strtol(v, &end, 10);
+    if (end != v && *end == '\0' && n >= 0 && n < NUM_PRESETS)
+        return (int)n;
+
+    LOGW("unknown preset \"%s\", falling back to %s", v, kPresets[0].name);
+    return 0;
+}
+
 static void apply_preset(sonicStream stream, int *cur_preset, float *cur_semi)
 {
-    int preset = prop_int(PROP_PRESET, 0);
-    if (preset < 0 || preset >= NUM_PRESETS)
-        preset = 0;
+    int preset = preset_index();
 
     float semi = prop_float(PROP_SEMITONES, 0.0f);
     if (semi < -24.0f) semi = -24.0f;
@@ -579,15 +593,29 @@ int main(int argc, char **argv)
     LOGI("READY %u mixer controls, %d presets",
             alsa.mixer_get_num_ctls(g_mixer), NUM_PRESETS);
 
+    int backoff = 1;
+
     while (g_running) {
         if (should_run() && call_is_active()) {
+            time_t started = time(NULL);
             run_session();
+            /* A session that dies within a second or two means the route is
+             * already gone even though the mixer still claims otherwise. Back
+             * off instead of hammering the HAL once a second. */
+            if (time(NULL) - started < 2) {
+                if (backoff < 32)
+                    backoff *= 2;
+            } else {
+                backoff = 1;
+            }
             if (once)
                 break;
+        } else {
+            backoff = 1;
         }
-        /* Nothing to do: 1 s polling is far cheaper than a telephony listener
+        /* Nothing to do: polling is far cheaper than a telephony listener
          * and costs nothing while idle. */
-        sleep(1);
+        sleep(backoff);
     }
 
     route_teardown();
