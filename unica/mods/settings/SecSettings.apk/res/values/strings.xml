@@ -40,7 +40,7 @@
     <string name="unica_ca_model_title">Model</string>
     <string name="unica_ca_not_set">Not set</string>
     <string name="unica_ca_notification_text">Answering the call for you</string>
-    <string name="unica_ca_persona_default">A polite personal assistant answering on the owner\'s behalf.</string>
+    <string name="unica_ca_persona_default">"A polite personal assistant answering on the owner's behalf."</string>
     <string name="unica_ca_persona_title">Assistant role</string>
     <string name="unica_ca_provider_deepseek">DeepSeek</string>
     <string name="unica_ca_provider_gemini">Google Gemini</string>
