@@ -56,4 +56,24 @@
     <string name="unica_updates_title">تحديثات UN1CA</string>
     <string name="unica_vulkan_summary">هذا غير مستقر وقد يسبب مشاكل!</string>
     <string name="unica_vulkan_title">تمكين عرض Vulkan</string>
+    <string name="unica_vc_active_summary">غيّر الصوت في المكالمة القادمة.</string>
+    <string name="unica_vc_active_title">غيّر الصوت الآن</string>
+    <string name="unica_vc_agc_summary">حافظ على مستوى صوت ثابت عند التحدث بصوت منخفض.</string>
+    <string name="unica_vc_agc_title">ضبط الصوت تلقائيًا</string>
+    <string name="unica_vc_enabled_summary">يسمع الطرف الآخر الصوت المُعدَّل بدلًا من صوتك.</string>
+    <string name="unica_vc_enabled_title">تغيير صوتي في المكالمات</string>
+    <string name="unica_vc_mode_auto">تلقائي</string>
+    <string name="unica_vc_mode_manual">يدوي</string>
+    <string name="unica_vc_mode_title">متى يتم تغيير الصوت</string>
+    <string name="unica_vc_preset_child">طفل</string>
+    <string name="unica_vc_preset_chipmunk">سنجاب</string>
+    <string name="unica_vc_preset_female">أنثى</string>
+    <string name="unica_vc_preset_giant">عملاق</string>
+    <string name="unica_vc_preset_helium">هيليوم</string>
+    <string name="unica_vc_preset_male">ذكر</string>
+    <string name="unica_vc_preset_normal">عادي</string>
+    <string name="unica_vc_preset_old_man">رجل مسن</string>
+    <string name="unica_vc_preset_old_woman">امرأة مسنة</string>
+    <string name="unica_vc_preset_title">الصوت</string>
+    <string name="unica_vc_settings_title">مُغيّر الصوت في المكالمات</string>
 </resources>

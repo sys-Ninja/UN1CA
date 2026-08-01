@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen android:title="@string/unica_vc_settings_title" settings:hierarchicalParentFragment="io.mesalabs.unica.settings.UnicaSettingsFragment" settings:topLevelPreferenceKey="unica_vc_settings"
+  xmlns:android="http://schemas.android.com/apk/res/android" xmlns:settings="http://schemas.android.com/apk/res-auto">
+    <SecSwitchPreference android:title="@string/unica_vc_enabled_title" android:key="unica_vc_enabled" android:summary="@string/unica_vc_enabled_summary" settings:controller="io.mesalabs.unica.settings.voicechanger.VoiceChangerEnabledPreferenceController" />
+    <com.samsung.android.settings.widget.SecInsetCategoryPreference />
+    <SecDropDownPreference android:title="@string/unica_vc_preset_title" android:key="unica_vc_preset" android:summary="%s" settings:controller="io.mesalabs.unica.settings.voicechanger.VoiceChangerPresetPreferenceController" />
+    <com.samsung.android.settings.widget.SecInsetCategoryPreference />
+    <SecDropDownPreference android:title="@string/unica_vc_mode_title" android:key="unica_vc_mode" android:summary="%s" settings:controller="io.mesalabs.unica.settings.voicechanger.VoiceChangerModePreferenceController" />
+    <SecSwitchPreference android:title="@string/unica_vc_active_title" android:key="unica_vc_active" android:summary="@string/unica_vc_active_summary" settings:controller="io.mesalabs.unica.settings.voicechanger.VoiceChangerActivePreferenceController" />
+    <com.samsung.android.settings.widget.SecInsetCategoryPreference />
+    <SecSwitchPreference android:title="@string/unica_vc_agc_title" android:key="unica_vc_agc" android:summary="@string/unica_vc_agc_summary" settings:controller="io.mesalabs.unica.settings.voicechanger.VoiceChangerAgcPreferenceController" />
+</PreferenceScreen>

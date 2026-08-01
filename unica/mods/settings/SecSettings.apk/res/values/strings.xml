@@ -58,4 +58,24 @@
     <string name="unica_updates_title">UN1CA Updates</string>
     <string name="unica_vulkan_summary">This is unstable and might cause issues!</string>
     <string name="unica_vulkan_title">Enable Vulkan renderer</string>
+    <string name="unica_vc_active_summary">Change the voice on the next call.</string>
+    <string name="unica_vc_active_title">Change voice now</string>
+    <string name="unica_vc_agc_summary">Keep the volume steady when you speak softly.</string>
+    <string name="unica_vc_agc_title">Automatic volume</string>
+    <string name="unica_vc_enabled_summary">The other party hears the changed voice instead of your own.</string>
+    <string name="unica_vc_enabled_title">Change my voice on calls</string>
+    <string name="unica_vc_mode_auto">Automatic</string>
+    <string name="unica_vc_mode_manual">Manual</string>
+    <string name="unica_vc_mode_title">When to change the voice</string>
+    <string name="unica_vc_preset_child">Child</string>
+    <string name="unica_vc_preset_chipmunk">Chipmunk</string>
+    <string name="unica_vc_preset_female">Female</string>
+    <string name="unica_vc_preset_giant">Giant</string>
+    <string name="unica_vc_preset_helium">Helium</string>
+    <string name="unica_vc_preset_male">Male</string>
+    <string name="unica_vc_preset_normal">Normal</string>
+    <string name="unica_vc_preset_old_man">Old man</string>
+    <string name="unica_vc_preset_old_woman">Old woman</string>
+    <string name="unica_vc_preset_title">Voice</string>
+    <string name="unica_vc_settings_title">Call voice changer</string>
 </resources>

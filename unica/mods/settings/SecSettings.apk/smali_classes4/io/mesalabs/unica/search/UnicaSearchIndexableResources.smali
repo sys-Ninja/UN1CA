@@ -49,5 +49,15 @@
 
     invoke-virtual {p0, v0}, Lio/mesalabs/unica/search/UnicaSearchIndexableResources;->addIndex(Lcom/android/settingslib/search/SearchIndexableData;)V
 
+    new-instance v0, Lcom/android/settingslib/search/SearchIndexableData;
+
+    const-class v1, Lio/mesalabs/unica/settings/voicechanger/VoiceChangerSettingsFragment;
+
+    sget-object v2, Lio/mesalabs/unica/settings/voicechanger/VoiceChangerSettingsFragment;->SEARCH_INDEX_DATA_PROVIDER:Lcom/android/settings/search/BaseSearchIndexProvider;
+
+    invoke-direct {v0, v1, v2}, Lcom/android/settingslib/search/SearchIndexableData;-><init>(Ljava/lang/Class;Lcom/android/settingslib/search/Indexable$SearchIndexProvider;)V
+
+    invoke-virtual {p0, v0}, Lio/mesalabs/unica/search/UnicaSearchIndexableResources;->addIndex(Lcom/android/settingslib/search/SearchIndexableData;)V
+
     return-void
 .end method
