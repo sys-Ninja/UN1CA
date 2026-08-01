@@ -28,41 +28,46 @@ jobs:
           done < <(find platform scripts target unica -name "*.sh" -not -name "*ssi.sh" -not -name "config.sh" -not -name "sff.sh")
           exit $CODE
 
-  generate-matrix:
-    name: Generate matrix
+  daemon:
+    name: Build vc_daemon
     needs: shellcheck
     runs-on: ubuntu-24.04
-
-    outputs:
-      matrix: ${{ steps.generate-matrix.outputs.matrix }}
 
     steps:
       - name: Checkout repo
         uses: actions/checkout@v7
 
-      - name: Generate CI matrix
-        id: generate-matrix
-        run: |
-          matrix="$(find target -mindepth 1 -maxdepth 1 -type d -printf '%f\n' \
-            | sort | jq -R -s -c 'split("\n") | map(select(length > 0))')"
-          echo "$matrix"
-          echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
+      - name: Build vc_daemon
+        run: ANDROID_NDK_HOME="$ANDROID_NDK_LATEST_HOME" ./scripts/build_vc_daemon.sh
+
+      - name: Upload vc_daemon
+        uses: actions/upload-artifact@v4
+        with:
+          name: vc_daemon
+          path: target/a52sxq/patches/00_voicechanger/system/bin/vc_daemon
+          if-no-files-found: error
 
   build:
     name: Build
-    needs: [shellcheck, generate-matrix]
+    needs: [shellcheck, daemon]
     runs-on: ubuntu-24.04
 
     strategy:
       fail-fast: false
       matrix:
-        target: ${{ fromJSON(needs.generate-matrix.outputs.matrix) }}
+        target: [a52sxq]
 
     steps:
       - name: Checkout repo
         uses: actions/checkout@v7
         with:
           submodules: 'recursive'
+
+      - name: Download vc_daemon
+        uses: actions/download-artifact@v4
+        with:
+          name: vc_daemon
+          path: target/a52sxq/patches/00_voicechanger/system/bin
 
       - name: Free disk space (1/3)
         run: |
@@ -90,6 +95,8 @@ jobs:
           sudo modprobe erofs f2fs
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # Forks have no signing secrets: leave the files empty so
+          # IS_UNICA_CERT_AVAILABLE reports false and the AOSP keys are used.
           echo -n "${{ secrets.PLATFORM_KEY_PK8 }}" | base64 --decode > security/unica_platform.pk8
           echo -n "${{ secrets.PLATFORM_KEY_PEM }}" | base64 --decode > security/unica_platform.x509.pem
 
@@ -132,4 +139,14 @@ jobs:
         run: ./scripts/extract_fw.sh
 
       - name: Build ROM
-        run: ./scripts/make_rom.sh
+        run: |
+          chmod 755 target/a52sxq/patches/00_voicechanger/system/bin/vc_daemon
+          ./scripts/make_rom.sh --build-rom-zip
+
+      - name: Upload flashable zip
+        uses: actions/upload-artifact@v4
+        with:
+          name: UN1CA-${{ matrix.target }}
+          path: ${{ env.OUT_DIR }}/UN1CA_*.zip
+          if-no-files-found: error
+          compression-level: 0
