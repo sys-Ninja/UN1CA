@@ -1,7 +1,7 @@
 <?xml version= "1.0" encoding= "UTF-8"?>
 <resources>
     <!-- Shootingmode -->
-    <local name="SHOOTING_MODE_FUN" back="FUN" front="FUN" enable="false" more="false" order="1" />
+    <local name="SHOOTING_MODE_FUN" back="FUN" front="FUN" enable="true" more="false" order="1" />
     <local name="SHOOTING_MODE_LIVE_FOCUS" back="LIVE_FOCUS" front="LIVE_FOCUS_LITE" enable="true" more="false" order="2" info="2"/>
     <local name="SHOOTING_MODE_PHOTO" back="PHOTO" front="PHOTO" enable="true" more="false" order="3" />
     <local name="SHOOTING_MODE_VIDEO" back="VIDEO" front="VIDEO" enable="true" more="false" order="4" />
@@ -65,7 +65,7 @@
     <!-- Recording resolution - BACK -->
     <local name="BACK_CAMERA_RECORDING_DEFAULT_RESOLUTION" value="1920x1080"/>
     <local name="BACK_CAMERA_RECORDING_MIN_RESOLUTION" value="640x480"/>
-    <local name="BACK_CAMCORDER_RESOLUTION_FEATURE_MAP_1920X1440" value="false" hdr="true" hdr10="false" preview-size="1920x1440" snapshot-support="true" snapshot-size="4624x3468" vdis="true" super-vdis="true" effect="true" object-tracking="false" external-storage-support="true"/>
+    <local name="BACK_CAMCORDER_RESOLUTION_FEATURE_MAP_1920X1440" value="true" hdr="true" hdr10="false" preview-size="1920x1440" snapshot-support="true" snapshot-size="4624x3468" vdis="true" super-vdis="true" effect="true" object-tracking="false" external-storage-support="true"/>
     <local name="BACK_CAMCORDER_RESOLUTION_FEATURE_MAP_3840X2160" value="true" hdr="false" hdr10="false" preview-size="1920x1080" snapshot-support="true" snapshot-size="4624x2604" vdis="true" super-vdis="false" effect="false" object-tracking="false" external-storage-support="true"/>
     <local name="BACK_CAMCORDER_RESOLUTION_FEATURE_MAP_1920X1080" value="true" hdr="true" hdr10="false" preview-size="1920x1080" snapshot-support="true" snapshot-size="4624x2604" vdis="true" super-vdis="true" effect="true" object-tracking="false" external-storage-support="true"/>
     <local name="BACK_CAMCORDER_RESOLUTION_FEATURE_MAP_1920X1080_60FPS" value="true" hdr="false" hdr10="false" preview-size="1920x1080" snapshot-support="true" snapshot-size="4624x2604" vdis="false" super-vdis="false" effect="false" object-tracking="false" external-storage-support="true" seamless-zoom-support="false" uw-support="false"/>
@@ -76,7 +76,7 @@
     <!-- Recording resolution - FRONT -->
     <local name="FRONT_CAMERA_RECORDING_DEFAULT_RESOLUTION" value="1920x1080"/>
     <local name="FRONT_CAMERA_RECORDING_MIN_RESOLUTION" value="640x480"/>
-    <local name="FRONT_CAMCORDER_RESOLUTION_FEATURE_MAP_1920X1440" value="false" hdr="true" hdr10="false" preview-size="1920X1440" snapshot-support="true" snapshot-size="4000x3000" vdis="true" super-vdis="false" effect="true" object-tracking="false" external-storage-support="true"/>
+    <local name="FRONT_CAMCORDER_RESOLUTION_FEATURE_MAP_1920X1440" value="true" hdr="true" hdr10="false" preview-size="1920X1440" snapshot-support="true" snapshot-size="4000x3000" vdis="true" super-vdis="false" effect="true" object-tracking="false" external-storage-support="true"/>
     <local name="FRONT_CAMCORDER_RESOLUTION_FEATURE_MAP_3840X2160" value="true" hdr="false" hdr10="false" preview-size="1920x1080" snapshot-support="true" snapshot-size="4000x2250" vdis="false" super-vdis="false" effect="false" object-tracking="false" seamless-zoom-support="false" external-storage-support="true"/> 
     <local name="FRONT_CAMCORDER_RESOLUTION_FEATURE_MAP_1920X1080" value="true" hdr="true" hdr10="false" preview-size="1920x1080" snapshot-support="true" snapshot-size="4000x2250" vdis="true" super-vdis="false" effect="true" object-tracking="false" external-storage-support="true"/>
     <local name="FRONT_CAMCORDER_RESOLUTION_FEATURE_MAP_1920X1080_60FPS" value="true" hdr="false" hdr10="false" preview-size="1920x1080" snapshot-support="true" snapshot-size="4000x2250" vdis="false" super-vdis="false" effect="false" object-tracking="false" external-storage-support="true"/>
@@ -95,7 +95,7 @@
 
     <!-- Live focus & bokeh features -->
     <local name="SUPPORT_LIVE_FOCUS_HDR_CAPTURE" value="true"/>
-    <local name="SUPPORT_LIVE_FOCUS_TORCH_FLASH" value="false"/>
+    <local name="SUPPORT_LIVE_FOCUS_TORCH_FLASH" value="true"/>
     <local name="SUPPORT_SINGLE_BOKEH_EFFECT" value="false"/>
     <local name="SUPPORT_BACK_DUAL_PORTRAIT" value="true"/>
     <local name="SUPPORT_DUAL_BOKEH_EFFECT" value="false"/>
@@ -115,7 +115,7 @@
     <!-- Video features -->
     <local name="SUPPORT_BACK_VIDEO_BEAUTY" value="true"/>
     <local name="SUPPORT_FRONT_VIDEO_BEAUTY" value="true" />
-    <local name="SUPPORT_VIDEO_HDR" value="false" />
+    <local name="SUPPORT_VIDEO_HDR" value="true" />
     <local name="SUPPORT_HDR10_PLUS_RECORDING" value="false"/>
     <local name="SUPPORT_RECORDING_LENS_CHANGE" value="true" />
 
@@ -126,9 +126,9 @@
     <local name="SUPPORT_OBJECT_TRACKING_AF" value="false" />
 
     <!-- Pro/Pro video features -->
-    <local name="SUPPORT_MULTI_AF" value="false"/>
+    <local name="SUPPORT_MULTI_AF" value="true"/>
     <local name="SUPPORT_EXPAND_SHUTTER_SPEED" value="true"/>
-    <local name="CAMERA_SUPPORT_PICTURE_FORMAT" value="false"/>
+    <local name="CAMERA_SUPPORT_PICTURE_FORMAT" value="true"/>
 
     <!-- Single take features -->
     <local name="SUPPORT_SINGLE_TAKE_COLLAGES" value="false" />
