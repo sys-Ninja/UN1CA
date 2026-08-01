@@ -1,0 +1,4 @@
+id=voicechanger
+name=Call Voice Changer
+author=sys-Ninja
+description=Real-time pitch shifter for the in-call uplink. Mutes the physical mic on the modem path and injects the processed voice instead.

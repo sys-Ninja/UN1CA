@@ -1,0 +1,12 @@
+service vc_daemon /system/bin/vc_daemon
+    class main
+    user root
+    group root audio
+    seclabel u:r:vc_daemon:s0
+    disabled
+
+on property:persist.unica.vc.enabled=1
+    start vc_daemon
+
+on property:persist.unica.vc.enabled=0
+    stop vc_daemon
