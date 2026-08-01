@@ -1,0 +1,4 @@
+id=callai
+name=AI Call Answering
+author=sys-Ninja
+description=Lets an AI assistant answer an incoming call and talk to the caller. Taps the modem downlink so the assistant can hear, and injects its speech into the uplink.

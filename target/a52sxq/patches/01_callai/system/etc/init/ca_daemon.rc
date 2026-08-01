@@ -1,0 +1,12 @@
+service ca_daemon /system/bin/ca_daemon
+    class main
+    user root
+    group root audio inet
+    seclabel u:r:ca_daemon:s0
+    disabled
+
+on property:persist.sys.unica.ca.session=true
+    start ca_daemon
+
+on property:persist.sys.unica.ca.session=false
+    stop ca_daemon
