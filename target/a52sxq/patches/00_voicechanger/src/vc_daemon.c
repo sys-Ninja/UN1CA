@@ -38,6 +38,7 @@
 #include <errno.h>
 #include <stdarg.h>
 #include <time.h>
+#include <sched.h>
 #include <sys/system_properties.h>
 #include <android/log.h>
 
@@ -140,37 +141,55 @@ static struct {
 #define CAP_IN_FRAMES   (CAP_FRAMES * DECIM)
 #define INJ_FRAMES      1024                 /* 128 ms period, matches vc_inject */
 
+#define CHUNKS_PER_SEC  (OUT_RATE / CAP_FRAMES)   /* 31 */
+#define HK_CHUNKS       8                         /* ~256 ms */
+
 #define TX_DEC_MUTED    0
 #define TX_DEC_DEFAULT  96
-/* 84 gives peaks of ~110 (unusably quiet), 110+ clips on loud speech. */
-#define TX_DEC2_GAIN    108
+/* Measured peak on normal speech: 96 → ~1900, 104 → ~3700, 108/110 → clipped at
+ * full scale. 108 was shipped and clipped on every loud syllable. */
+#define TX_DEC2_GAIN    104
 #define TX_DEC2_DEFAULT 84
 
-/* Envelope-follower AGC: instant attack, ~300 ms release over 32 ms chunks. */
-#define AGC_TARGET      20000.0f
-#define AGC_MAX_GAIN    10.0f
-#define AGC_RELEASE     0.90f
-#define AGC_NOISE_FLOOR 150.0f
+/* Anti-alias filter before the 6:1 decimation. A plain boxcar average of 6 is
+ * only -11 dB at 6 kHz and -16 dB at 20 kHz, so most of the 4..24 kHz band
+ * folded straight back on top of the speech and came out as harsh noise. */
+#define AA_CUTOFF       3200.0f
+#define AA_SECTIONS     3
+
+/* Envelope-follower AGC. The shipped values pinned the gain at the ×10 maximum
+ * for 70% of a call (measured live) because the noise floor was set to 150
+ * while the real room floor is 350..800 — the gate never engaged and the
+ * background got amplified along with the voice. */
+#define AGC_TARGET      18000.0f
+#define AGC_MAX_GAIN    6.0f
+#define AGC_ENV_RELEASE 0.94f   /* ~500 ms over 32 ms chunks */
+#define AGC_NOISE_FLOOR 700.0f  /* below this the gain is frozen, not reset */
+#define AGC_ATTACK      0.60f   /* come down fast, so peaks do not clip */
+#define AGC_RECOVER     0.06f   /* go up slowly, so noise is not pumped */
 
 /* ── Voice presets ────────────────────────────────────────────────────────── */
 
+/* Pitch only, deliberately no tempo. Sonic's rate divides the output length by
+ * the same factor, but this sink is a fixed 8 kHz stream feeding the modem, so
+ * rate=0.95 produced 5.3% more samples than real time (measured: +5.16% over a
+ * 70 s call) until the injection ring overflowed — a hiccup every 6.7 s. */
 struct preset {
     const char *name;
     float pitch;   /* frequency multiplier; 2^(semitones/12) */
-    float rate;    /* tempo multiplier */
 };
 
 static const struct preset kPresets[] = {
-    { "normal",     1.00f, 1.00f },
-    { "female",     1.26f, 1.00f },  /* +4 st */
-    { "male",       0.79f, 1.00f },  /* -4 st */
-    { "child",      1.68f, 1.00f },  /* +9 st */
-    { "old_man",    0.84f, 0.95f },  /* -3 st, slower */
-    { "old_woman",  1.12f, 0.97f },  /* +2 st, slower */
-    { "chipmunk",   2.00f, 1.00f },  /* +12 st */
-    { "giant",      0.63f, 0.95f },  /* -8 st, slower */
-    { "helium",     1.50f, 1.05f },  /* +7 st, faster */
-    { "custom",     1.00f, 1.00f },  /* driven by persist.sys.unica.vc.semitones */
+    { "normal",     1.00f },
+    { "female",     1.26f },  /* +4 st */
+    { "male",       0.79f },  /* -4 st */
+    { "child",      1.68f },  /* +9 st */
+    { "old_man",    0.87f },  /* -2.5 st */
+    { "old_woman",  1.12f },  /* +2 st */
+    { "chipmunk",   2.00f },  /* +12 st */
+    { "giant",      0.63f },  /* -8 st */
+    { "helium",     1.50f },  /* +7 st */
+    { "custom",     1.00f },  /* driven by persist.sys.unica.vc.semitones */
 };
 #define NUM_PRESETS   ((int)(sizeof(kPresets) / sizeof(kPresets[0])))
 #define CUSTOM_PRESET (NUM_PRESETS - 1)
@@ -298,6 +317,34 @@ static int should_run(void)
     return 1;
 }
 
+/* ── Anti-alias filter ────────────────────────────────────────────────────── */
+
+struct biquad { float b0, b1, b2, a1, a2, z1, z2; };
+
+static void biquad_lowpass(struct biquad *f, float fs, float fc, float q)
+{
+    float w     = 2.0f * (float)M_PI * fc / fs;
+    float cw    = cosf(w);
+    float alpha = sinf(w) / (2.0f * q);
+    float a0    = 1.0f + alpha;
+
+    f->b0 = ((1.0f - cw) * 0.5f) / a0;
+    f->b1 = (1.0f - cw) / a0;
+    f->b2 = f->b0;
+    f->a1 = (-2.0f * cw) / a0;
+    f->a2 = (1.0f - alpha) / a0;
+    f->z1 = f->z2 = 0.0f;
+}
+
+/* Transposed direct form II — two state words, no history buffer. */
+static inline float biquad_run(struct biquad *f, float x)
+{
+    float y = f->b0 * x + f->z1;
+    f->z1 = f->b1 * x - f->a1 * y + f->z2;
+    f->z2 = f->b2 * x - f->a2 * y;
+    return y;
+}
+
 /* ── Session ──────────────────────────────────────────────────────────────── */
 
 /* The Settings UI stores the preset by name; older builds stored the index.
@@ -332,17 +379,14 @@ static void apply_preset(sonicStream stream, int *cur_preset, float *cur_semi)
         return;
 
     float pitch = kPresets[preset].pitch;
-    float rate  = kPresets[preset].rate;
     if (preset == CUSTOM_PRESET)
         pitch = powf(2.0f, semi / 12.0f);
 
     sonicSetPitch(stream, pitch);
-    sonicSetRate(stream, rate);
     *cur_preset = preset;
     *cur_semi   = semi;
 
-    LOGI("PRESET %s pitch=%.3f rate=%.3f",
-            kPresets[preset].name, pitch, rate);
+    LOGI("PRESET %s pitch=%.3f", kPresets[preset].name, pitch);
 }
 
 static void route_teardown(void)
@@ -356,6 +400,49 @@ static void route_teardown(void)
     ctl_set_enum("TX SMIC MUX2", "ZERO");
     ctl_set_int("TX_DEC2 Volume", TX_DEC2_DEFAULT);
     ctl_set_int("Incall_Music Audio Mixer MultiMedia1", 0);
+}
+
+/* Re-assert every control the private channel depends on.
+ *
+ * The HAL reloads the whole voicemmode1-call mixer path from its XML whenever
+ * the call route is torn down and rebuilt, which happens mid-call on its own:
+ * telephony reports g_call_state 514 → 257, the HAL does adev_set_mode 2 → 0
+ * and disable_audio_route/enable_audio_route on voicemmode1-call, all while the
+ * call is still up. Observed twice in a two-minute call. Only TX_DEC0/1 used to
+ * be re-checked, so after a rebuild the other five controls stayed at their
+ * stock values and the capture stream went dead or silent. */
+static int route_verify(void)
+{
+    int fixed = 0;
+
+    if (ctl_get_int("Incall_Music Audio Mixer MultiMedia1", 1) != 1) {
+        ctl_set_int("Incall_Music Audio Mixer MultiMedia1", 1);
+        ctl_set_int("Playback 0 Volume", 8192);
+        fixed++;
+    }
+    if (ctl_get_int("TX_AIF2_CAP Mixer DEC2", 1) != 1) {
+        ctl_set_enum("TX SMIC MUX2", "SWR_MIC0");
+        ctl_set_int("TX_AIF2_CAP Mixer DEC2", 1);
+        fixed++;
+    }
+    if (ctl_get_int("MultiMedia5 Mixer TX_CDC_DMA_TX_4", 1) != 1) {
+        ctl_set_enum("TX_CDC_DMA_TX_4 Channels", "One");
+        ctl_set_int("MultiMedia5 Mixer TX_CDC_DMA_TX_4", 1);
+        fixed++;
+    }
+    if (ctl_get_int("TX_DEC2 Volume", TX_DEC2_GAIN) != TX_DEC2_GAIN) {
+        ctl_set_int("TX_DEC2 Volume", TX_DEC2_GAIN);
+        fixed++;
+    }
+    /* Muting comes last: never silence the mic while the private channel that
+     * replaces it is still broken. */
+    if (ctl_get_int("TX_DEC0 Volume", 0) != TX_DEC_MUTED ||
+        ctl_get_int("TX_DEC1 Volume", 0) != TX_DEC_MUTED) {
+        ctl_set_int("TX_DEC0 Volume", TX_DEC_MUTED);
+        ctl_set_int("TX_DEC1 Volume", TX_DEC_MUTED);
+        fixed++;
+    }
+    return fixed;
 }
 
 /* Runs one call's worth of audio. Returns when the call ends, the feature is
@@ -373,7 +460,14 @@ static void run_session(void)
     float agc_env = 0.0f, agc_gain = 1.0f;
     int use_agc = prop_bool(PROP_AGC, 1);
     long chunks = 0;
-    int peak_in = 0, resets = 0;
+    int peak_in = 0, resets = 0, clipped = 0, dropped = 0;
+    struct biquad aa[AA_SECTIONS];
+
+    /* 6th-order Butterworth = three cascaded biquads with these Q values.
+     * Measured: -1.6 dB at 3 kHz, -35 dB at 6 kHz, -56 dB at 9 kHz. */
+    static const float kAaQ[AA_SECTIONS] = { 0.51764f, 0.70711f, 1.93185f };
+    for (int i = 0; i < AA_SECTIONS; i++)
+        biquad_lowpass(&aa[i], (float)CAP_RATE, AA_CUTOFF, kAaQ[i]);
 
     LOGI("SESSION start");
 
@@ -433,6 +527,7 @@ static void run_session(void)
         goto out;
     }
     sonicSetSpeed(stream, 1.0f);
+    sonicSetRate(stream, 1.0f);
     sonicSetVolume(stream, 1.0f);
     apply_preset(stream, &cur_preset, &cur_semi);
 
@@ -450,13 +545,18 @@ static void run_session(void)
             break;
         }
 
-        /* 48 kHz → 8 kHz. A boxcar average of 6 puts its first null exactly on
-         * 8 kHz, which is all the anti-aliasing this band needs. */
+        /* 48 kHz → 8 kHz: run every input sample through the anti-alias
+         * cascade, then keep the last of each group of 6. */
         for (int i = 0; i < CAP_FRAMES; i++) {
-            int acc = 0;
-            for (int k = 0; k < DECIM; k++)
-                acc += cap_buf[i * DECIM + k];
-            int s = acc / DECIM;
+            float y = 0.0f;
+            for (int k = 0; k < DECIM; k++) {
+                y = (float)cap_buf[i * DECIM + k];
+                for (int sec = 0; sec < AA_SECTIONS; sec++)
+                    y = biquad_run(&aa[sec], y);
+            }
+            int s = (int)y;
+            if (s >  32767) s =  32767;
+            if (s < -32768) s = -32768;
             pcm_in[i] = (short)s;
             int a = s < 0 ? -s : s;
             if (a > chunk_peak)
@@ -464,15 +564,25 @@ static void run_session(void)
         }
         if (chunk_peak > peak_in)
             peak_in = chunk_peak;
+        if (chunk_peak >= 32000)
+            clipped++;
 
-        /* DEC2 lands ~19 dBFS below full scale. Making that up with more
-         * TX_DEC2 gain clips on loud speech, so do it here instead. */
+        /* DEC2 lands well below full scale, so the level has to be made up
+         * here — more TX_DEC2 gain clips in the codec, before we can see it. */
         if (use_agc) {
-            agc_env = fmaxf((float)chunk_peak, agc_env * AGC_RELEASE);
-            float wanted = (agc_env > AGC_NOISE_FLOOR) ? AGC_TARGET / agc_env : 1.0f;
-            if (wanted < 1.0f)          wanted = 1.0f;
-            if (wanted > AGC_MAX_GAIN)  wanted = AGC_MAX_GAIN;
-            agc_gain += (wanted - agc_gain) * 0.25f;
+            agc_env = fmaxf((float)chunk_peak, agc_env * AGC_ENV_RELEASE);
+
+            /* Below the room noise floor the gain is held, not driven back to
+             * unity: resetting it made the first syllable after every pause
+             * come out quiet and then swell. */
+            if (agc_env > AGC_NOISE_FLOOR) {
+                float wanted = AGC_TARGET / agc_env;
+                if (wanted < 1.0f)         wanted = 1.0f;
+                if (wanted > AGC_MAX_GAIN) wanted = AGC_MAX_GAIN;
+                float step = (wanted < agc_gain) ? AGC_ATTACK : AGC_RECOVER;
+                agc_gain += (wanted - agc_gain) * step;
+            }
+
             for (int i = 0; i < CAP_FRAMES; i++) {
                 int v = (int)(pcm_in[i] * agc_gain);
                 if (v >  32000) v =  32000;
@@ -482,6 +592,14 @@ static void run_session(void)
         }
 
         sonicWriteShortToStream(stream, pcm_in, CAP_FRAMES);
+
+        /* Sonic's WSOLA emits in bursts, so a little backlog is normal. More
+         * than three injection periods of it is latency that will never be
+         * paid back — drop it rather than let the delay grow all call. */
+        while (sonicSamplesAvailable(stream) > INJ_FRAMES * 3) {
+            sonicReadShortFromStream(stream, sonic_out, CAP_FRAMES * 4);
+            dropped++;
+        }
 
         int avail = sonicSamplesAvailable(stream);
         if (avail > CAP_FRAMES * 4)
@@ -499,21 +617,24 @@ static void run_session(void)
             }
         }
 
-        /* Housekeeping once a second: the HAL restores TX_DEC0 to its default
-         * after route changes, and the user may have picked another voice. */
-        if (++chunks % (OUT_RATE / CAP_FRAMES) == 0) {
-            if (ctl_get_int("TX_DEC0 Volume", 0) != TX_DEC_MUTED ||
-                ctl_get_int("TX_DEC1 Volume", 0) != TX_DEC_MUTED) {
-                ctl_set_int("TX_DEC0 Volume", TX_DEC_MUTED);
-                ctl_set_int("TX_DEC1 Volume", TX_DEC_MUTED);
-                resets++;
-            }
+        chunks++;
+
+        /* Four times a second, because a mid-call route rebuild takes about
+         * half a second end to end — checking once a second let a whole rebuild
+         * pass unnoticed. Reading a mixer value is a cheap ioctl. */
+        if (chunks % HK_CHUNKS == 0)
+            resets += route_verify();
+
+        if (chunks % CHUNKS_PER_SEC == 0) {
             apply_preset(stream, &cur_preset, &cur_semi);
             use_agc = prop_bool(PROP_AGC, 1);
 
-            LOGI("STAT %lds peak=%d gain=%.1f muteResets=%d",
-                    chunks * CAP_FRAMES / OUT_RATE, peak_in, agc_gain, resets);
+            LOGI("STAT %lds peak=%d gain=%.1f fixups=%d clip=%d drop=%d",
+                    chunks * CAP_FRAMES / OUT_RATE, peak_in, agc_gain,
+                    resets, clipped, dropped);
             peak_in = 0;
+            clipped = 0;
+            dropped = 0;
 
             if (!should_run() || !call_is_active())
                 break;
@@ -593,7 +714,15 @@ int main(int argc, char **argv)
     LOGI("READY %u mixer controls, %d presets",
             alsa.mixer_get_num_ctls(g_mixer), NUM_PRESETS);
 
-    int backoff = 1;
+    /* The loop has one 32 ms capture period of slack, and the whole point is to
+     * never miss one. A low real-time priority is enough to win against
+     * ordinary threads without ever competing with the HAL's own (which run far
+     * higher), and init gives this service none of its own. */
+    struct sched_param sp = { .sched_priority = 2 };
+    if (sched_setscheduler(0, SCHED_FIFO, &sp) != 0)
+        LOGW("sched_setscheduler SCHED_FIFO: %s", strerror(errno));
+
+    int backoff_ms = 1000;
 
     while (g_running) {
         if (should_run() && call_is_active()) {
@@ -603,19 +732,23 @@ int main(int argc, char **argv)
              * already gone even though the mixer still claims otherwise. Back
              * off instead of hammering the HAL once a second. */
             if (time(NULL) - started < 2) {
-                if (backoff < 32)
-                    backoff *= 2;
+                if (backoff_ms < 32000)
+                    backoff_ms *= 2;
             } else {
-                backoff = 1;
+                /* It ran, so the call is real and the session died under us —
+                 * most likely the HAL rebuilding the route. Come back fast:
+                 * every millisecond here is a millisecond of the real voice
+                 * going out unmuted. */
+                backoff_ms = 200;
             }
             if (once)
                 break;
         } else {
-            backoff = 1;
+            backoff_ms = 1000;
         }
         /* Nothing to do: polling is far cheaper than a telephony listener
          * and costs nothing while idle. */
-        sleep(backoff);
+        usleep((useconds_t)backoff_ms * 1000);
     }
 
     route_teardown();
