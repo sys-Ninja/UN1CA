@@ -18,8 +18,9 @@ cat >> "$WORK_DIR/vendor/etc/selinux/vendor_sepolicy.cil" << 'CIL'
 (type vc_daemon_exec)
 (typeattributeset file_type (vc_daemon_exec))
 (typeattributeset exec_type (vc_daemon_exec))
+(roletype object_r vc_daemon_exec)
 (allow init_30_0 vc_daemon_exec (file (read getattr open map execute)))
-(allow init_30_0 vc_daemon (process (transition noatsecure siginh rlimitinh)))
+(allow init_30_0 vc_daemon (process (transition noatsecure siginh rlimitinh sigkill signal sigstop)))
 (typepermissive vc_daemon)
 CIL
 
