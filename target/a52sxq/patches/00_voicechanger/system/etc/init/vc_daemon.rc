@@ -5,8 +5,8 @@ service vc_daemon /system/bin/vc_daemon
     seclabel u:r:vc_daemon:s0
     disabled
 
-on property:persist.unica.vc.enabled=1
+on property:persist.sys.unica.vc.enabled=true
     start vc_daemon
 
-on property:persist.unica.vc.enabled=0
+on property:persist.sys.unica.vc.enabled=false
     stop vc_daemon

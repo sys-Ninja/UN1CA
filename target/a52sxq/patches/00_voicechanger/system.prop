@@ -1,5 +1,5 @@
-persist.unica.vc.enabled=0
-persist.unica.vc.mode=auto
-persist.unica.vc.preset=normal
-persist.unica.vc.semitones=0
-persist.unica.vc.agc=1
+persist.sys.unica.vc.enabled=false
+persist.sys.unica.vc.mode=auto
+persist.sys.unica.vc.preset=normal
+persist.sys.unica.vc.semitones=0
+persist.sys.unica.vc.agc=true

@@ -24,7 +24,7 @@
  *   persist.unica.vc.mode       auto|manual
  *   sys.unica.vc.active         bool   per-call trigger, only read in manual mode
  *   persist.unica.vc.preset     int    index into kPresets, kCustomPreset = slider
- *   persist.unica.vc.semitones  float  used when preset == kCustomPreset
+ *   persist.sys.unica.vc.semitones  float  used when preset == kCustomPreset
  *   persist.unica.vc.agc        bool   default true
  */
 
@@ -169,19 +169,19 @@ static const struct preset kPresets[] = {
     { "chipmunk",   2.00f, 1.00f },  /* +12 st */
     { "giant",      0.63f, 0.95f },  /* -8 st, slower */
     { "helium",     1.50f, 1.05f },  /* +7 st, faster */
-    { "custom",     1.00f, 1.00f },  /* driven by persist.unica.vc.semitones */
+    { "custom",     1.00f, 1.00f },  /* driven by persist.sys.unica.vc.semitones */
 };
 #define NUM_PRESETS   ((int)(sizeof(kPresets) / sizeof(kPresets[0])))
 #define CUSTOM_PRESET (NUM_PRESETS - 1)
 
 /* ── Properties ───────────────────────────────────────────────────────────── */
 
-#define PROP_ENABLED   "persist.unica.vc.enabled"
-#define PROP_MODE      "persist.unica.vc.mode"
-#define PROP_ACTIVE    "sys.unica.vc.active"
-#define PROP_PRESET    "persist.unica.vc.preset"
-#define PROP_SEMITONES "persist.unica.vc.semitones"
-#define PROP_AGC       "persist.unica.vc.agc"
+#define PROP_ENABLED   "persist.sys.unica.vc.enabled"
+#define PROP_MODE      "persist.sys.unica.vc.mode"
+#define PROP_ACTIVE    "persist.sys.unica.vc.active"
+#define PROP_PRESET    "persist.sys.unica.vc.preset"
+#define PROP_SEMITONES "persist.sys.unica.vc.semitones"
+#define PROP_AGC       "persist.sys.unica.vc.agc"
 
 static void prop_get(const char *key, char *out, size_t out_len, const char *def)
 {
