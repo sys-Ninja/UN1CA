@@ -253,9 +253,9 @@
     invoke-virtual {v9, v0, v12}, Landroid/content/Intent;->putExtra(Ljava/lang/String;I)Landroid/content/Intent;
 
     .line 93
-    new-array v7, v12, [Ljava/lang/String;
+    filled-new-array {v1}, [Ljava/lang/String;
 
-    aput-object v1, v7, v10
+    move-result-object v7
 
     .line 94
     new-instance v8, Ljava/util/concurrent/CountDownLatch;

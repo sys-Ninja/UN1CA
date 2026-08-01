@@ -124,7 +124,7 @@
         }
     .end annotation
 
-    .line 265
+    .line 248
     new-instance v0, Ljava/util/ArrayList;
 
     invoke-direct {v0}, Ljava/util/ArrayList;-><init>()V
@@ -135,15 +135,15 @@
 .method static trimReply(Ljava/lang/String;)Ljava/lang/String;
     .registers 4
 
-    .line 92
+    .line 75
     const-string v0, ""
 
     if-nez p0, :cond_5
 
-    .line 93
+    .line 76
     return-object v0
 
-    .line 95
+    .line 78
     :cond_5
     const-string v1, "*"
 
@@ -161,14 +161,14 @@
 
     move-result-object p0
 
-    .line 97
+    .line 80
     const/16 v0, 0x3a
 
     invoke-virtual {p0, v0}, Ljava/lang/String;->indexOf(I)I
 
     move-result v0
 
-    .line 98
+    .line 81
     if-lez v0, :cond_38
 
     const/16 v1, 0x10
@@ -189,7 +189,7 @@
 
     if-nez v1, :cond_38
 
-    .line 99
+    .line 82
     add-int/lit8 v0, v0, 0x1
 
     invoke-virtual {p0, v0}, Ljava/lang/String;->substring(I)Ljava/lang/String;
@@ -200,7 +200,7 @@
 
     move-result-object p0
 
-    .line 101
+    .line 84
     :cond_38
     return-object p0
 .end method
@@ -256,90 +256,12 @@
 .end method
 
 .method systemPrompt()Ljava/lang/String;
-    .registers 5
+    .registers 2
 
-    .line 70
+    .line 71
     iget-object v0, p0, Lio/mesalabs/unica/settings/callai/LlmClient;->mContext:Landroid/content/Context;
 
-    const-string v1, "unica_ca_persona"
-
-    const-string v2, "A polite personal assistant answering on behalf of the phone\'s owner."
-
-    invoke-static {v0, v1, v2}, Lio/mesalabs/unica/settings/callai/CallAiConfig;->get(Landroid/content/Context;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
-
-    move-result-object v0
-
-    .line 72
-    iget-object v1, p0, Lio/mesalabs/unica/settings/callai/LlmClient;->mContext:Landroid/content/Context;
-
-    const-string v2, "unica_ca_language"
-
-    const-string v3, "ar"
-
-    invoke-static {v1, v2, v3}, Lio/mesalabs/unica/settings/callai/CallAiConfig;->get(Landroid/content/Context;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
-
-    move-result-object v1
-
-    .line 74
-    const-string v2, "en"
-
-    invoke-virtual {v2, v1}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
-
-    move-result v2
-
-    if-eqz v2, :cond_1f
-
-    .line 75
-    const-string v1, "English"
-
-    goto :goto_2c
-
-    .line 76
-    :cond_1f
-    const-string v2, "ar_eg"
-
-    invoke-virtual {v2, v1}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
-
-    move-result v1
-
-    if-eqz v1, :cond_2a
-
-    .line 77
-    const-string v1, "Egyptian Arabic dialect"
-
-    goto :goto_2c
-
-    .line 79
-    :cond_2a
-    const-string v1, "Arabic"
-
-    .line 81
-    :goto_2c
-    new-instance v2, Ljava/lang/StringBuilder;
-
-    invoke-direct {v2}, Ljava/lang/StringBuilder;-><init>()V
-
-    invoke-virtual {v2, v0}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
-
-    move-result-object v0
-
-    const-string v2, "\n\nYou are speaking on a live phone call on behalf of the phone\'s owner.\nReply in "
-
-    invoke-virtual {v0, v2}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
-
-    move-result-object v0
-
-    invoke-virtual {v0, v1}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
-
-    move-result-object v0
-
-    const-string v1, " only.\nKeep every reply to one or two short spoken sentences.\nNever mention that you are an AI unless you are asked directly.\nDo not use lists, markdown, emoji or any text that cannot be spoken aloud.\nIf the caller wants something only the owner can decide, say you will pass the message on."
-
-    invoke-virtual {v0, v1}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
-
-    move-result-object v0
-
-    invoke-virtual {v0}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
+    invoke-static {v0}, Lio/mesalabs/unica/settings/callai/Prompt;->build(Landroid/content/Context;)Ljava/lang/String;
 
     move-result-object v0
 

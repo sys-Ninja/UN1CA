@@ -41,13 +41,11 @@
 
     move-result-object v1
 
-    new-array v3, p1, [Ljava/lang/String;
-
     const-string p0, "_id"
 
-    const/4 v0, 0x0
+    filled-new-array {p0}, [Ljava/lang/String;
 
-    aput-object p0, v3, v0
+    move-result-object v3
 
     const/4 v5, 0x0
 
@@ -58,60 +56,63 @@
     invoke-virtual/range {v1 .. v6}, Landroid/content/ContentResolver;->query(Landroid/net/Uri;[Ljava/lang/String;Ljava/lang/String;[Ljava/lang/String;Ljava/lang/String;)Landroid/database/Cursor;
 
     move-result-object p0
-    :try_end_1d
-    .catch Ljava/lang/Exception; {:try_start_b .. :try_end_1d} :catch_3b
+    :try_end_1c
+    .catch Ljava/lang/Exception; {:try_start_b .. :try_end_1c} :catch_3b
 
     .line 20
-    if-eqz p0, :cond_35
+    if-eqz p0, :cond_34
 
-    :try_start_1f
+    :try_start_1e
     invoke-interface {p0}, Landroid/database/Cursor;->moveToFirst()Z
 
-    move-result v1
-    :try_end_23
-    .catchall {:try_start_1f .. :try_end_23} :catchall_27
+    move-result v0
+    :try_end_22
+    .catchall {:try_start_1e .. :try_end_22} :catchall_26
 
-    if-eqz v1, :cond_35
+    if-eqz v0, :cond_34
 
     move v0, p1
 
     goto :goto_35
 
     .line 18
-    :catchall_27
+    :catchall_26
     move-exception v0
 
     move-object v1, v0
 
-    if-eqz p0, :cond_34
+    if-eqz p0, :cond_33
 
-    :try_start_2b
+    :try_start_2a
     invoke-interface {p0}, Landroid/database/Cursor;->close()V
-    :try_end_2e
-    .catchall {:try_start_2b .. :try_end_2e} :catchall_2f
+    :try_end_2d
+    .catchall {:try_start_2a .. :try_end_2d} :catchall_2e
 
-    goto :goto_34
+    goto :goto_33
 
-    :catchall_2f
+    :catchall_2e
     move-exception v0
 
     move-object p0, v0
 
-    :try_start_31
+    :try_start_30
     invoke-virtual {v1, p0}, Ljava/lang/Throwable;->addSuppressed(Ljava/lang/Throwable;)V
 
-    :cond_34
-    :goto_34
+    :cond_33
+    :goto_33
     throw v1
 
+    .line 20
+    :cond_34
+    const/4 v0, 0x0
+
     .line 21
-    :cond_35
     :goto_35
     if-eqz p0, :cond_3a
 
     invoke-interface {p0}, Landroid/database/Cursor;->close()V
     :try_end_3a
-    .catch Ljava/lang/Exception; {:try_start_31 .. :try_end_3a} :catch_3b
+    .catch Ljava/lang/Exception; {:try_start_30 .. :try_end_3a} :catch_3b
 
     .line 20
     :cond_3a

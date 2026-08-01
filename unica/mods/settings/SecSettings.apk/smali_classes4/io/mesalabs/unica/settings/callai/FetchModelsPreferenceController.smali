@@ -591,7 +591,7 @@
 .end method
 
 .method public onFetched(Ljava/util/List;)V
-    .registers 7
+    .registers 6
     .annotation system Ldalvik/annotation/Signature;
         value = {
             "(",
@@ -694,27 +694,32 @@
     .line 109
     iget-object v0, p0, Lio/mesalabs/unica/settings/callai/FetchModelsPreferenceController;->mPreference:Landroidx/preference/Preference;
 
-    new-instance v1, Ljava/lang/StringBuilder;
-
-    invoke-direct {v1}, Ljava/lang/StringBuilder;-><init>()V
-
-    iget-object v2, p0, Lio/mesalabs/unica/settings/callai/FetchModelsPreferenceController;->mContext:Landroid/content/Context;
+    iget-object v1, p0, Lio/mesalabs/unica/settings/callai/FetchModelsPreferenceController;->mContext:Landroid/content/Context;
 
     .line 110
-    const-string v3, "string"
+    const-string v2, "string"
 
-    const-string v4, "unica_ca_fetch_done"
+    const-string v3, "unica_ca_fetch_done"
 
-    invoke-static {v3, v4}, Lio/mesalabs/unica/utils/Utils;->getResourceId(Ljava/lang/String;Ljava/lang/String;)I
+    invoke-static {v2, v3}, Lio/mesalabs/unica/utils/Utils;->getResourceId(Ljava/lang/String;Ljava/lang/String;)I
 
-    move-result v3
+    move-result v2
 
     .line 109
-    invoke-virtual {v2, v3}, Landroid/content/Context;->getString(I)Ljava/lang/String;
+    invoke-virtual {v1, v2}, Landroid/content/Context;->getString(I)Ljava/lang/String;
 
-    move-result-object v2
+    move-result-object v1
 
-    invoke-virtual {v1, v2}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+    .line 111
+    invoke-interface {p1}, Ljava/util/List;->size()I
+
+    move-result p1
+
+    new-instance v2, Ljava/lang/StringBuilder;
+
+    invoke-direct {v2}, Ljava/lang/StringBuilder;-><init>()V
+
+    invoke-virtual {v2, v1}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     move-result-object v1
 
@@ -723,11 +728,6 @@
     invoke-virtual {v1, v2}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     move-result-object v1
-
-    .line 111
-    invoke-interface {p1}, Ljava/util/List;->size()I
-
-    move-result p1
 
     invoke-virtual {v1, p1}, Ljava/lang/StringBuilder;->append(I)Ljava/lang/StringBuilder;
 

@@ -22,10 +22,10 @@
 .method constructor <init>(Landroid/content/Context;)V
     .registers 2
 
-    .line 109
+    .line 92
     invoke-direct {p0, p1}, Lio/mesalabs/unica/settings/callai/LlmClient;-><init>(Landroid/content/Context;)V
 
-    .line 110
+    .line 93
     return-void
 .end method
 
@@ -37,7 +37,7 @@
         }
     .end annotation
 
-    .line 196
+    .line 179
     new-instance v0, Lorg/json/JSONObject;
 
     invoke-direct {v0, p0}, Lorg/json/JSONObject;-><init>(Ljava/lang/String;)V
@@ -48,7 +48,7 @@
 
     move-result-object p0
 
-    .line 197
+    .line 180
     const-string v0, ""
 
     if-eqz p0, :cond_4e
@@ -61,7 +61,7 @@
 
     goto :goto_4e
 
-    .line 200
+    .line 183
     :cond_16
     const/4 v1, 0x0
 
@@ -75,13 +75,13 @@
 
     move-result-object p0
 
-    .line 201
+    .line 184
     if-nez p0, :cond_24
 
-    .line 202
+    .line 185
     return-object v0
 
-    .line 204
+    .line 187
     :cond_24
     const-string v2, "parts"
 
@@ -89,19 +89,19 @@
 
     move-result-object p0
 
-    .line 205
+    .line 188
     if-nez p0, :cond_2d
 
-    .line 206
+    .line 189
     return-object v0
 
-    .line 208
+    .line 191
     :cond_2d
     new-instance v2, Ljava/lang/StringBuilder;
 
     invoke-direct {v2}, Ljava/lang/StringBuilder;-><init>()V
 
-    .line 209
+    .line 192
     nop
 
     :goto_33
@@ -111,7 +111,7 @@
 
     if-ge v1, v3, :cond_49
 
-    .line 210
+    .line 193
     invoke-virtual {p0, v1}, Lorg/json/JSONArray;->getJSONObject(I)Lorg/json/JSONObject;
 
     move-result-object v3
@@ -124,12 +124,12 @@
 
     invoke-virtual {v2, v3}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
-    .line 209
+    .line 192
     add-int/lit8 v1, v1, 0x1
 
     goto :goto_33
 
-    .line 212
+    .line 195
     :cond_49
     invoke-virtual {v2}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
 
@@ -137,7 +137,7 @@
 
     return-object p0
 
-    .line 198
+    .line 181
     :cond_4e
     :goto_4e
     return-object v0
@@ -151,48 +151,48 @@
         }
     .end annotation
 
-    .line 124
+    .line 107
     new-instance v0, Lorg/json/JSONObject;
 
     invoke-direct {v0}, Lorg/json/JSONObject;-><init>()V
 
-    .line 125
+    .line 108
     const-string v1, "temperature"
 
     const-wide v2, 0x3fe6666666666666L    # 0.7
 
     invoke-virtual {v0, v1, v2, v3}, Lorg/json/JSONObject;->put(Ljava/lang/String;D)Lorg/json/JSONObject;
 
-    .line 126
+    .line 109
     const-string v1, "maxOutputTokens"
 
     const/16 v2, 0x100
 
     invoke-virtual {v0, v1, v2}, Lorg/json/JSONObject;->put(Ljava/lang/String;I)Lorg/json/JSONObject;
 
-    .line 127
+    .line 110
     iget-boolean v1, p0, Lio/mesalabs/unica/settings/callai/LlmClient$Gemini;->mThinking:Z
 
     if-nez v1, :cond_2a
 
-    .line 129
+    .line 112
     new-instance v1, Lorg/json/JSONObject;
 
     invoke-direct {v1}, Lorg/json/JSONObject;-><init>()V
 
-    .line 130
+    .line 113
     const-string v2, "thinkingBudget"
 
     const/4 v3, 0x0
 
     invoke-virtual {v1, v2, v3}, Lorg/json/JSONObject;->put(Ljava/lang/String;I)Lorg/json/JSONObject;
 
-    .line 131
+    .line 114
     const-string v2, "thinkingConfig"
 
     invoke-virtual {v0, v2, v1}, Lorg/json/JSONObject;->put(Ljava/lang/String;Ljava/lang/Object;)Lorg/json/JSONObject;
 
-    .line 133
+    .line 116
     :cond_2a
     return-object v0
 .end method
@@ -209,19 +209,19 @@
         }
     .end annotation
 
-    .line 118
+    .line 101
     new-instance v0, Ljava/util/HashMap;
 
     invoke-direct {v0}, Ljava/util/HashMap;-><init>()V
 
-    .line 119
+    .line 102
     const-string v1, "x-goog-api-key"
 
     iget-object v2, p0, Lio/mesalabs/unica/settings/callai/LlmClient$Gemini;->mKey:Ljava/lang/String;
 
     invoke-interface {v0, v1, v2}, Ljava/util/Map;->put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 
-    .line 120
+    .line 103
     return-object v0
 .end method
 
@@ -245,12 +245,12 @@
         }
     .end annotation
 
-    .line 138
+    .line 121
     new-instance v0, Lorg/json/JSONArray;
 
     invoke-direct {v0}, Lorg/json/JSONArray;-><init>()V
 
-    .line 139
+    .line 122
     invoke-interface {p1}, Ljava/util/List;->iterator()Ljava/util/Iterator;
 
     move-result-object p1
@@ -272,29 +272,29 @@
 
     check-cast v1, Lio/mesalabs/unica/settings/callai/LlmClient$Turn;
 
-    .line 140
+    .line 123
     new-instance v4, Lorg/json/JSONObject;
 
     invoke-direct {v4}, Lorg/json/JSONObject;-><init>()V
 
-    .line 141
+    .line 124
     iget-object v5, v1, Lio/mesalabs/unica/settings/callai/LlmClient$Turn;->text:Ljava/lang/String;
 
     invoke-virtual {v4, v2, v5}, Lorg/json/JSONObject;->put(Ljava/lang/String;Ljava/lang/Object;)Lorg/json/JSONObject;
 
-    .line 142
+    .line 125
     new-instance v2, Lorg/json/JSONObject;
 
     invoke-direct {v2}, Lorg/json/JSONObject;-><init>()V
 
-    .line 143
+    .line 126
     const-string v5, "role"
 
     iget-object v1, v1, Lio/mesalabs/unica/settings/callai/LlmClient$Turn;->role:Ljava/lang/String;
 
     invoke-virtual {v2, v5, v1}, Lorg/json/JSONObject;->put(Ljava/lang/String;Ljava/lang/Object;)Lorg/json/JSONObject;
 
-    .line 144
+    .line 127
     new-instance v1, Lorg/json/JSONArray;
 
     invoke-direct {v1}, Lorg/json/JSONArray;-><init>()V
@@ -305,24 +305,24 @@
 
     invoke-virtual {v2, v3, v1}, Lorg/json/JSONObject;->put(Ljava/lang/String;Ljava/lang/Object;)Lorg/json/JSONObject;
 
-    .line 145
+    .line 128
     invoke-virtual {v0, v2}, Lorg/json/JSONArray;->put(Ljava/lang/Object;)Lorg/json/JSONArray;
 
-    .line 146
+    .line 129
     goto :goto_9
 
-    .line 148
+    .line 131
     :cond_3f
     new-instance p1, Lorg/json/JSONObject;
 
     invoke-direct {p1}, Lorg/json/JSONObject;-><init>()V
 
-    .line 149
+    .line 132
     const-string v1, "contents"
 
     invoke-virtual {p1, v1, v0}, Lorg/json/JSONObject;->put(Ljava/lang/String;Ljava/lang/Object;)Lorg/json/JSONObject;
 
-    .line 150
+    .line 133
     const-string v0, "generationConfig"
 
     invoke-direct {p0}, Lio/mesalabs/unica/settings/callai/LlmClient$Gemini;->generationConfig()Lorg/json/JSONObject;
@@ -331,12 +331,12 @@
 
     invoke-virtual {p1, v0, v1}, Lorg/json/JSONObject;->put(Ljava/lang/String;Ljava/lang/Object;)Lorg/json/JSONObject;
 
-    .line 151
+    .line 134
     new-instance v0, Lorg/json/JSONObject;
 
     invoke-direct {v0}, Lorg/json/JSONObject;-><init>()V
 
-    .line 152
+    .line 135
     new-instance v1, Lorg/json/JSONArray;
 
     invoke-direct {v1}, Lorg/json/JSONArray;-><init>()V
@@ -359,12 +359,12 @@
 
     invoke-virtual {v0, v3, v1}, Lorg/json/JSONObject;->put(Ljava/lang/String;Ljava/lang/Object;)Lorg/json/JSONObject;
 
-    .line 153
+    .line 136
     const-string v1, "systemInstruction"
 
     invoke-virtual {p1, v1, v0}, Lorg/json/JSONObject;->put(Ljava/lang/String;Ljava/lang/Object;)Lorg/json/JSONObject;
 
-    .line 155
+    .line 138
     iget-object v0, p0, Lio/mesalabs/unica/settings/callai/LlmClient$Gemini;->mModel:Ljava/lang/String;
 
     new-instance v1, Ljava/lang/StringBuilder;
@@ -395,26 +395,26 @@
 
     move-result-object v1
 
-    .line 156
+    .line 139
     invoke-virtual {p1}, Lorg/json/JSONObject;->toString()Ljava/lang/String;
 
     move-result-object p1
 
-    .line 155
+    .line 138
     const/16 v2, 0x4e20
 
     invoke-static {v0, v1, p1, v2}, Lio/mesalabs/unica/settings/callai/Http;->postJson(Ljava/lang/String;Ljava/util/Map;Ljava/lang/String;I)Lio/mesalabs/unica/settings/callai/Http$Response;
 
     move-result-object p1
 
-    .line 157
+    .line 140
     invoke-virtual {p1}, Lio/mesalabs/unica/settings/callai/Http$Response;->ok()Z
 
     move-result v0
 
     if-eqz v0, :cond_b1
 
-    .line 160
+    .line 143
     invoke-virtual {p1}, Lio/mesalabs/unica/settings/callai/Http$Response;->text()Ljava/lang/String;
 
     move-result-object p1
@@ -429,7 +429,7 @@
 
     return-object p1
 
-    .line 158
+    .line 141
     :cond_b1
     new-instance v0, Ljava/lang/Exception;
 
@@ -475,7 +475,7 @@
 .method supportsAudio()Z
     .registers 2
 
-    .line 114
+    .line 97
     const/4 v0, 0x1
 
     return v0
@@ -489,7 +489,7 @@
         }
     .end annotation
 
-    .line 165
+    .line 148
     invoke-static {p1, p2, p3}, Lio/mesalabs/unica/settings/callai/Pcm;->toWav([SII)[B
 
     move-result-object p1
@@ -500,29 +500,29 @@
 
     move-result-object p1
 
-    .line 166
+    .line 149
     new-instance p2, Lorg/json/JSONObject;
 
     invoke-direct {p2}, Lorg/json/JSONObject;-><init>()V
 
-    .line 167
+    .line 150
     const-string p3, "mimeType"
 
     const-string v0, "audio/wav"
 
     invoke-virtual {p2, p3, v0}, Lorg/json/JSONObject;->put(Ljava/lang/String;Ljava/lang/Object;)Lorg/json/JSONObject;
 
-    .line 168
+    .line 151
     const-string p3, "data"
 
     invoke-virtual {p2, p3, p1}, Lorg/json/JSONObject;->put(Ljava/lang/String;Ljava/lang/Object;)Lorg/json/JSONObject;
 
-    .line 170
+    .line 153
     new-instance p1, Lorg/json/JSONArray;
 
     invoke-direct {p1}, Lorg/json/JSONArray;-><init>()V
 
-    .line 171
+    .line 154
     new-instance p3, Lorg/json/JSONObject;
 
     invoke-direct {p3}, Lorg/json/JSONObject;-><init>()V
@@ -537,7 +537,7 @@
 
     invoke-virtual {p1, p3}, Lorg/json/JSONArray;->put(Ljava/lang/Object;)Lorg/json/JSONArray;
 
-    .line 174
+    .line 157
     new-instance p3, Lorg/json/JSONObject;
 
     invoke-direct {p3}, Lorg/json/JSONObject;-><init>()V
@@ -550,12 +550,12 @@
 
     invoke-virtual {p1, p2}, Lorg/json/JSONArray;->put(Ljava/lang/Object;)Lorg/json/JSONArray;
 
-    .line 176
+    .line 159
     new-instance p2, Lorg/json/JSONObject;
 
     invoke-direct {p2}, Lorg/json/JSONObject;-><init>()V
 
-    .line 177
+    .line 160
     new-instance p3, Lorg/json/JSONArray;
 
     invoke-direct {p3}, Lorg/json/JSONArray;-><init>()V
@@ -578,49 +578,49 @@
 
     invoke-virtual {p2, p3, p1}, Lorg/json/JSONObject;->put(Ljava/lang/String;Ljava/lang/Object;)Lorg/json/JSONObject;
 
-    .line 178
+    .line 161
     new-instance p1, Lorg/json/JSONObject;
 
     invoke-direct {p1}, Lorg/json/JSONObject;-><init>()V
 
-    .line 179
+    .line 162
     const-string p3, "temperature"
 
     const/4 v0, 0x0
 
     invoke-virtual {p1, p3, v0}, Lorg/json/JSONObject;->put(Ljava/lang/String;I)Lorg/json/JSONObject;
 
-    .line 180
+    .line 163
     new-instance p3, Lorg/json/JSONObject;
 
     invoke-direct {p3}, Lorg/json/JSONObject;-><init>()V
 
-    .line 181
+    .line 164
     const-string v1, "thinkingBudget"
 
     invoke-virtual {p3, v1, v0}, Lorg/json/JSONObject;->put(Ljava/lang/String;I)Lorg/json/JSONObject;
 
-    .line 182
+    .line 165
     const-string v0, "thinkingConfig"
 
     invoke-virtual {p1, v0, p3}, Lorg/json/JSONObject;->put(Ljava/lang/String;Ljava/lang/Object;)Lorg/json/JSONObject;
 
-    .line 183
+    .line 166
     const-string p3, "generationConfig"
 
     invoke-virtual {p2, p3, p1}, Lorg/json/JSONObject;->put(Ljava/lang/String;Ljava/lang/Object;)Lorg/json/JSONObject;
 
-    .line 187
+    .line 170
     invoke-direct {p0}, Lio/mesalabs/unica/settings/callai/LlmClient$Gemini;->headers()Ljava/util/Map;
 
     move-result-object p1
 
-    .line 188
+    .line 171
     invoke-virtual {p2}, Lorg/json/JSONObject;->toString()Ljava/lang/String;
 
     move-result-object p2
 
-    .line 187
+    .line 170
     const-string p3, "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent"
 
     const/16 v0, 0x4e20
@@ -629,14 +629,14 @@
 
     move-result-object p1
 
-    .line 189
+    .line 172
     invoke-virtual {p1}, Lio/mesalabs/unica/settings/callai/Http$Response;->ok()Z
 
     move-result p2
 
     if-eqz p2, :cond_9d
 
-    .line 192
+    .line 175
     invoke-virtual {p1}, Lio/mesalabs/unica/settings/callai/Http$Response;->text()Ljava/lang/String;
 
     move-result-object p1
@@ -651,7 +651,7 @@
 
     return-object p1
 
-    .line 190
+    .line 173
     :cond_9d
     new-instance p2, Ljava/lang/Exception;
 

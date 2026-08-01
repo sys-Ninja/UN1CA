@@ -22,10 +22,10 @@
 .method constructor <init>(Landroid/content/Context;)V
     .registers 2
 
-    .line 221
+    .line 204
     invoke-direct {p0, p1}, Lio/mesalabs/unica/settings/callai/LlmClient;-><init>(Landroid/content/Context;)V
 
-    .line 222
+    .line 205
     return-void
 .end method
 
@@ -49,12 +49,12 @@
         }
     .end annotation
 
-    .line 231
+    .line 214
     new-instance v0, Lorg/json/JSONArray;
 
     invoke-direct {v0}, Lorg/json/JSONArray;-><init>()V
 
-    .line 232
+    .line 215
     new-instance v1, Lorg/json/JSONObject;
 
     invoke-direct {v1}, Lorg/json/JSONObject;-><init>()V
@@ -79,7 +79,7 @@
 
     invoke-virtual {v0, v1}, Lorg/json/JSONArray;->put(Ljava/lang/Object;)Lorg/json/JSONArray;
 
-    .line 233
+    .line 216
     invoke-interface {p1}, Ljava/util/List;->iterator()Ljava/util/Iterator;
 
     move-result-object p1
@@ -99,12 +99,12 @@
 
     check-cast v1, Lio/mesalabs/unica/settings/callai/LlmClient$Turn;
 
-    .line 234
+    .line 217
     new-instance v5, Lorg/json/JSONObject;
 
     invoke-direct {v5}, Lorg/json/JSONObject;-><init>()V
 
-    .line 235
+    .line 218
     iget-object v6, v1, Lio/mesalabs/unica/settings/callai/LlmClient$Turn;->role:Ljava/lang/String;
 
     invoke-virtual {v2, v6}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
@@ -127,53 +127,53 @@
 
     iget-object v1, v1, Lio/mesalabs/unica/settings/callai/LlmClient$Turn;->text:Ljava/lang/String;
 
-    .line 236
+    .line 219
     invoke-virtual {v2, v4, v1}, Lorg/json/JSONObject;->put(Ljava/lang/String;Ljava/lang/Object;)Lorg/json/JSONObject;
 
     move-result-object v1
 
-    .line 234
+    .line 217
     invoke-virtual {v0, v1}, Lorg/json/JSONArray;->put(Ljava/lang/Object;)Lorg/json/JSONArray;
 
-    .line 237
+    .line 220
     goto :goto_23
 
-    .line 239
+    .line 222
     :cond_51
     new-instance p1, Lorg/json/JSONObject;
 
     invoke-direct {p1}, Lorg/json/JSONObject;-><init>()V
 
-    .line 243
+    .line 226
     iget-object v1, p0, Lio/mesalabs/unica/settings/callai/LlmClient$DeepSeek;->mModel:Ljava/lang/String;
 
     invoke-virtual {p1, v2, v1}, Lorg/json/JSONObject;->put(Ljava/lang/String;Ljava/lang/Object;)Lorg/json/JSONObject;
 
-    .line 244
+    .line 227
     const-string v1, "messages"
 
     invoke-virtual {p1, v1, v0}, Lorg/json/JSONObject;->put(Ljava/lang/String;Ljava/lang/Object;)Lorg/json/JSONObject;
 
-    .line 245
+    .line 228
     const-string v0, "max_tokens"
 
     const/16 v1, 0x100
 
     invoke-virtual {p1, v0, v1}, Lorg/json/JSONObject;->put(Ljava/lang/String;I)Lorg/json/JSONObject;
 
-    .line 246
+    .line 229
     const-string v0, "temperature"
 
     const-wide v1, 0x3fe6666666666666L    # 0.7
 
     invoke-virtual {p1, v0, v1, v2}, Lorg/json/JSONObject;->put(Ljava/lang/String;D)Lorg/json/JSONObject;
 
-    .line 248
+    .line 231
     new-instance v0, Ljava/util/HashMap;
 
     invoke-direct {v0}, Ljava/util/HashMap;-><init>()V
 
-    .line 249
+    .line 232
     iget-object v1, p0, Lio/mesalabs/unica/settings/callai/LlmClient$DeepSeek;->mKey:Ljava/lang/String;
 
     new-instance v2, Ljava/lang/StringBuilder;
@@ -198,7 +198,7 @@
 
     invoke-interface {v0, v2, v1}, Ljava/util/Map;->put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 
-    .line 251
+    .line 234
     invoke-virtual {p1}, Lorg/json/JSONObject;->toString()Ljava/lang/String;
 
     move-result-object p1
@@ -211,14 +211,14 @@
 
     move-result-object p1
 
-    .line 252
+    .line 235
     invoke-virtual {p1}, Lio/mesalabs/unica/settings/callai/Http$Response;->ok()Z
 
     move-result v0
 
     if-eqz v0, :cond_d4
 
-    .line 255
+    .line 238
     new-instance v0, Lorg/json/JSONObject;
 
     invoke-virtual {p1}, Lio/mesalabs/unica/settings/callai/Http$Response;->text()Ljava/lang/String;
@@ -233,7 +233,7 @@
 
     move-result-object p1
 
-    .line 256
+    .line 239
     const-string v0, ""
 
     if-eqz p1, :cond_d3
@@ -246,7 +246,7 @@
 
     goto :goto_d3
 
-    .line 259
+    .line 242
     :cond_bc
     const/4 v1, 0x0
 
@@ -260,7 +260,7 @@
 
     move-result-object p1
 
-    .line 260
+    .line 243
     if-nez p1, :cond_ca
 
     goto :goto_d2
@@ -277,12 +277,12 @@
     :goto_d2
     return-object v0
 
-    .line 257
+    .line 240
     :cond_d3
     :goto_d3
     return-object v0
 
-    .line 253
+    .line 236
     :cond_d4
     new-instance v0, Ljava/lang/Exception;
 
@@ -328,7 +328,7 @@
 .method supportsAudio()Z
     .registers 2
 
-    .line 226
+    .line 209
     const/4 v0, 0x0
 
     return v0
