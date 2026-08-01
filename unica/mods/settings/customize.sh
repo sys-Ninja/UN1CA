@@ -69,6 +69,17 @@ while IFS= read -r f; do
     fi
 done < <(find "$MODPATH/SecSettings.apk" -type f)
 
+# The AI call answering service uses the platform speech recogniser, which
+# checks RECORD_AUDIO on its caller. Stock Settings never records anything so it
+# does not request it, and the manifest above only has a single sed anchor,
+# hence the separate insert here.
+UNICA_MANIFEST="$APKTOOL_DIR/system/priv-app/SecSettings/SecSettings.apk/AndroidManifest.xml"
+if ! grep -q "android.permission.RECORD_AUDIO" "$UNICA_MANIFEST"; then
+    LOG "- Adding RECORD_AUDIO to /system/system/priv-app/SecSettings.apk"
+    sed -i "0,/<uses-permission /s|<uses-permission |<uses-permission android:name=\"android.permission.RECORD_AUDIO\"/>\n    <uses-permission |" \
+        "$UNICA_MANIFEST"
+fi
+
 # Add UN1CA Settings SearchIndexableData registrations
 LOG "- Patching \"smali/com/android/settingslib/search/SearchIndexableResourcesMobile.smali\" in /system/system/priv-app/SecSettings.apk"
 SMALI_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" \

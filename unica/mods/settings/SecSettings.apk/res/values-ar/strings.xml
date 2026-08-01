@@ -29,6 +29,7 @@
     <string name="unica_ca_language_title">لغة المحادثة</string>
     <string name="unica_ca_model_title">الموديل</string>
     <string name="unica_ca_not_set">غير محدد</string>
+    <string name="unica_ca_notification_text">جارٍ الرد على المكالمة نيابةً عنك</string>
     <string name="unica_ca_persona_default">مساعد شخصي مهذب يرد نيابةً عن صاحب الهاتف.</string>
     <string name="unica_ca_persona_title">تعليمات المساعد</string>
     <string name="unica_ca_provider_deepseek">DeepSeek</string>
