@@ -7,6 +7,14 @@
             <meta-data android:name="com.android.settings.FRAGMENT_CLASS" android:value="io.mesalabs.unica.settings.UnicaSettingsFragment"/>
             <meta-data android:name="com.android.settings.HIGHLIGHT_MENU_KEY" android:value="@string/menu_key_unica_top_settings"/>
         </activity>
+        <activity android:configChanges="keyboardHidden|orientation|screenSize" android:exported="true" android:label="@string/unica_ca_settings_title" android:name="com.android.settings.Settings$UnicaCallAISettingsActivity" android:parentActivityName="com.android.settings.Settings$UnicaSettingsActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+            <meta-data android:name="com.android.settings.FRAGMENT_CLASS" android:value="io.mesalabs.unica.settings.callai.CallAiSettingsFragment"/>
+            <meta-data android:name="com.android.settings.HIGHLIGHT_MENU_KEY" android:value="@string/menu_key_unica_top_settings"/>
+        </activity>
         <activity android:configChanges="keyboardHidden|orientation|screenSize" android:exported="true" android:label="@string/unica_extra_settings_title" android:name="com.android.settings.Settings$UnicaExtraSettingsActivity" android:parentActivityName="com.android.settings.Settings$UnicaSettingsActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>

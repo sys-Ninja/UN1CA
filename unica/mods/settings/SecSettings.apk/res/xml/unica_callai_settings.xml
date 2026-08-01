@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen android:title="@string/unica_ca_settings_title" settings:hierarchicalParentFragment="io.mesalabs.unica.settings.UnicaSettingsFragment" settings:topLevelPreferenceKey="unica_ca_settings"
+  xmlns:android="http://schemas.android.com/apk/res/android" xmlns:settings="http://schemas.android.com/apk/res-auto">
+    <SecSwitchPreference android:title="@string/unica_ca_enabled_title" android:key="unica_ca_enabled" android:summary="@string/unica_ca_enabled_summary" settings:controller="io.mesalabs.unica.settings.callai.EnabledPreferenceController" />
+    <com.samsung.android.settings.widget.SecInsetCategoryPreference />
+    <SecDropDownPreference android:title="@string/unica_ca_trigger_title" android:key="unica_ca_trigger" android:summary="%s" settings:controller="io.mesalabs.unica.settings.callai.TriggerPreferenceController" />
+    <SecDropDownPreference android:title="@string/unica_ca_delay_title" android:key="unica_ca_delay" android:summary="%s" settings:controller="io.mesalabs.unica.settings.callai.DelayPreferenceController" />
+    <com.samsung.android.settings.widget.SecInsetCategoryPreference />
+    <SecDropDownPreference android:title="@string/unica_ca_provider_title" android:key="unica_ca_provider" android:summary="%s" settings:controller="io.mesalabs.unica.settings.callai.ProviderPreferenceController" />
+    <SecEditTextPreference android:title="@string/unica_ca_gemini_key_title" android:key="unica_ca_gemini_key" android:summary="@string/unica_ca_not_set" android:dialogTitle="@string/unica_ca_gemini_key_title" settings:controller="io.mesalabs.unica.settings.callai.GeminiKeyPreferenceController" />
+    <SecEditTextPreference android:title="@string/unica_ca_deepseek_key_title" android:key="unica_ca_deepseek_key" android:summary="@string/unica_ca_not_set" android:dialogTitle="@string/unica_ca_deepseek_key_title" settings:controller="io.mesalabs.unica.settings.callai.DeepSeekKeyPreferenceController" />
+    <Preference android:title="@string/unica_ca_fetch_title" android:key="unica_ca_fetch" android:summary="@string/unica_ca_fetch_summary" settings:controller="io.mesalabs.unica.settings.callai.FetchModelsPreferenceController" />
+    <SecDropDownPreference android:title="@string/unica_ca_model_title" android:key="unica_ca_model" android:summary="%s" settings:controller="io.mesalabs.unica.settings.callai.ModelPreferenceController" />
+    <SecSwitchPreference android:title="@string/unica_ca_thinking_title" android:key="unica_ca_thinking" android:summary="@string/unica_ca_thinking_summary" settings:controller="io.mesalabs.unica.settings.callai.ThinkingPreferenceController" />
+    <com.samsung.android.settings.widget.SecInsetCategoryPreference />
+    <SecDropDownPreference android:title="@string/unica_ca_language_title" android:key="unica_ca_language" android:summary="%s" settings:controller="io.mesalabs.unica.settings.callai.LanguagePreferenceController" />
+    <SecDropDownPreference android:title="@string/unica_ca_stt_title" android:key="unica_ca_stt" android:summary="%s" settings:controller="io.mesalabs.unica.settings.callai.SttPreferenceController" />
+    <com.samsung.android.settings.widget.SecInsetCategoryPreference />
+    <SecDropDownPreference android:title="@string/unica_ca_tts_title" android:key="unica_ca_tts" android:summary="%s" settings:controller="io.mesalabs.unica.settings.callai.TtsPreferenceController" />
+    <SecEditTextPreference android:title="@string/unica_ca_eleven_key_title" android:key="unica_ca_eleven_key" android:summary="@string/unica_ca_not_set" android:dialogTitle="@string/unica_ca_eleven_key_title" settings:controller="io.mesalabs.unica.settings.callai.ElevenKeyPreferenceController" />
+    <SecEditTextPreference android:title="@string/unica_ca_eleven_voice_title" android:key="unica_ca_eleven_voice" android:summary="@string/unica_ca_not_set" android:dialogTitle="@string/unica_ca_eleven_voice_title" settings:controller="io.mesalabs.unica.settings.callai.ElevenVoicePreferenceController" />
+    <com.samsung.android.settings.widget.SecInsetCategoryPreference />
+    <SecEditTextPreference android:title="@string/unica_ca_greeting_title" android:key="unica_ca_greeting" android:summary="@string/unica_ca_greeting_default" android:dialogTitle="@string/unica_ca_greeting_title" settings:controller="io.mesalabs.unica.settings.callai.GreetingPreferenceController" />
+    <SecEditTextPreference android:title="@string/unica_ca_persona_title" android:key="unica_ca_persona" android:summary="@string/unica_ca_persona_default" android:dialogTitle="@string/unica_ca_persona_title" settings:controller="io.mesalabs.unica.settings.callai.PersonaPreferenceController" />
+</PreferenceScreen>
