@@ -12,6 +12,7 @@
     <string name="unica_ca_delay_20">After 20 seconds</string>
     <string name="unica_ca_delay_5">After 5 seconds</string>
     <string name="unica_ca_delay_title">Wait before answering</string>
+    <string name="unica_ca_delete">Delete</string>
     <string name="unica_ca_eleven_key_title">ElevenLabs API key</string>
     <string name="unica_ca_eleven_voice_title">ElevenLabs voice ID</string>
     <string name="unica_ca_enabled_summary">Let the assistant pick up and talk to the caller for you.</string>
@@ -34,6 +35,11 @@
     <string name="unica_ca_live_model_default">gemini-3.1-flash-live-preview</string>
     <string name="unica_ca_live_model_title">Live model</string>
     <string name="unica_ca_live_voice_title">Assistant voice</string>
+    <string name="unica_ca_log_empty">No AI answered calls yet.</string>
+    <string name="unica_ca_log_missing">Recording not found</string>
+    <string name="unica_ca_log_summary">Listen to calls the assistant answered and get a summary.</string>
+    <string name="unica_ca_log_title">Answered call log</string>
+    <string name="unica_ca_log_unknown">Unknown number</string>
     <string name="unica_ca_mode_classic">Recognise, think, speak</string>
     <string name="unica_ca_mode_live">Live conversation</string>
     <string name="unica_ca_mode_title">Conversation engine</string>
@@ -42,6 +48,7 @@
     <string name="unica_ca_notification_text">Answering the call for you</string>
     <string name="unica_ca_persona_default">"A polite personal assistant answering on the owner's behalf."</string>
     <string name="unica_ca_persona_title">Assistant role</string>
+    <string name="unica_ca_play">Play</string>
     <string name="unica_ca_provider_deepseek">DeepSeek</string>
     <string name="unica_ca_provider_gemini">Google Gemini</string>
     <string name="unica_ca_provider_title">AI provider</string>
@@ -50,6 +57,10 @@
     <string name="unica_ca_stt_local">On device</string>
     <string name="unica_ca_stt_provider">AI provider</string>
     <string name="unica_ca_stt_title">Speech recognition</string>
+    <string name="unica_ca_summarize">Summarise</string>
+    <string name="unica_ca_summarizing">Summarising…</string>
+    <string name="unica_ca_summary_failed">Could not summarise the call</string>
+    <string name="unica_ca_summary_prompt">Summarise this phone call in the language it was spoken in, using at most four short bullet points: who called, what they wanted, what was agreed, and anything that needs following up.</string>
     <string name="unica_ca_thinking_summary">Slower but better answers. Off keeps the call natural.</string>
     <string name="unica_ca_thinking_title">Thinking</string>
     <string name="unica_ca_trigger_all">Every call</string>
@@ -63,12 +74,17 @@
     <string name="unica_ca_voice_algieba">Male · Algieba (smooth)</string>
     <string name="unica_ca_voice_aoede">Female · Aoede (breezy)</string>
     <string name="unica_ca_voice_charon">Male · Charon (informative)</string>
+    <string name="unica_ca_voice_failed">Could not load the voice sample</string>
     <string name="unica_ca_voice_fenrir">Male · Fenrir (excitable)</string>
     <string name="unica_ca_voice_kore">Female · Kore (firm)</string>
     <string name="unica_ca_voice_leda">Female · Leda (youthful)</string>
+    <string name="unica_ca_voice_no_key">Enter the Gemini API key first</string>
     <string name="unica_ca_voice_orus">Male · Orus (firm)</string>
+    <string name="unica_ca_voice_preview_summary">Hear every voice before you pick one.</string>
+    <string name="unica_ca_voice_preview_title">Preview voices</string>
     <string name="unica_ca_voice_puck">Male · Puck (upbeat)</string>
     <string name="unica_ca_voice_sadaltager">Male · Sadaltager (knowledgeable)</string>
+    <string name="unica_ca_voice_sample_text">Hello, this is the smart assistant. How can I help you?</string>
     <string name="unica_ca_voice_sulafat">Female · Sulafat (warm)</string>
     <string name="unica_ca_voice_zephyr">Female · Zephyr (bright)</string>
     <string name="unica_device_name_title">Device name</string>

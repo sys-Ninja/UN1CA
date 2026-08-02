@@ -92,61 +92,12 @@
 .end method
 
 .method private static logTranscript(Lorg/json/JSONObject;)V
-    .registers 3
+    .registers 1
 
     .line 189
-    const-string v0, "inputTranscription"
-
-    invoke-virtual {p0, v0}, Lorg/json/JSONObject;->optJSONObject(Ljava/lang/String;)Lorg/json/JSONObject;
-
-    move-result-object p0
+    invoke-static {p0}, Lio/mesalabs/unica/settings/callai/CallRecorder;->transcript(Lorg/json/JSONObject;)V
 
     .line 190
-    if-eqz p0, :cond_32
-
-    .line 191
-    const-string v0, "text"
-
-    const-string v1, ""
-
-    invoke-virtual {p0, v0, v1}, Lorg/json/JSONObject;->optString(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
-
-    move-result-object p0
-
-    invoke-virtual {p0}, Ljava/lang/String;->length()I
-
-    move-result p0
-
-    new-instance v0, Ljava/lang/StringBuilder;
-
-    invoke-direct {v0}, Ljava/lang/StringBuilder;-><init>()V
-
-    const-string v1, "caller: "
-
-    invoke-virtual {v0, v1}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
-
-    move-result-object v0
-
-    invoke-virtual {v0, p0}, Ljava/lang/StringBuilder;->append(I)Ljava/lang/StringBuilder;
-
-    move-result-object p0
-
-    const-string v0, " chars"
-
-    invoke-virtual {p0, v0}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
-
-    move-result-object p0
-
-    invoke-virtual {p0}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
-
-    move-result-object p0
-
-    const-string v0, "UnicaCallAi"
-
-    invoke-static {v0, p0}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
-
-    .line 193
-    :cond_32
     return-void
 .end method
 

@@ -356,6 +356,8 @@
 
     .line 94
     :cond_34
+    invoke-static {p1, p2}, Lio/mesalabs/unica/settings/callai/CallRecorder;->caller([SI)V
+
     return p2
 .end method
 
@@ -372,6 +374,8 @@
 
     .line 102
     :cond_5
+    invoke-static {p1, p2}, Lio/mesalabs/unica/settings/callai/CallRecorder;->ai([SI)V
+
     mul-int/lit8 v0, p2, 0x2
 
     new-array v0, v0, [B

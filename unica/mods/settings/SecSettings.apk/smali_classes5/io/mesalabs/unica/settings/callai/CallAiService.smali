@@ -742,6 +742,8 @@
 .method private run(Ljava/lang/String;Z)V
     .registers 4
 
+    invoke-static {p0, p1}, Lio/mesalabs/unica/settings/callai/CallRecorder;->start(Landroid/content/Context;Ljava/lang/String;)V
+
     .line 99
     :try_start_0
     invoke-direct {p0, p1, p2}, Lio/mesalabs/unica/settings/callai/CallAiService;->session(Ljava/lang/String;Z)V
@@ -1250,6 +1252,8 @@
 
     .line 309
     invoke-virtual {p0}, Lio/mesalabs/unica/settings/callai/CallAiService;->stopSelf()V
+
+    invoke-static {}, Lio/mesalabs/unica/settings/callai/CallRecorder;->stop()V
 
     .line 310
     return-void

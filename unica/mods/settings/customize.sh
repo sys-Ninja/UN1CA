@@ -69,16 +69,21 @@ while IFS= read -r f; do
     fi
 done < <(find "$MODPATH/SecSettings.apk" -type f)
 
-# The AI call answering service uses the platform speech recogniser, which
-# checks RECORD_AUDIO on its caller. Stock Settings never records anything so it
-# does not request it, and the manifest above only has a single sed anchor,
-# hence the separate insert here.
+# Permissions the AI call answering feature needs that stock Settings does not
+# request. The manifest mod above only has a single sed anchor, hence the
+# separate inserts here.
+# - RECORD_AUDIO: the platform speech recogniser checks it on its caller.
+# - READ_CALL_LOG: without it PHONE_STATE carries no EXTRA_INCOMING_NUMBER since
+#   Android 9, which silently breaks the "unknown numbers" trigger.
 UNICA_MANIFEST="$APKTOOL_DIR/system/priv-app/SecSettings/SecSettings.apk/AndroidManifest.xml"
-if ! grep -q "android.permission.RECORD_AUDIO" "$UNICA_MANIFEST"; then
-    LOG "- Adding RECORD_AUDIO to /system/system/priv-app/SecSettings.apk"
-    sed -i "0,/<uses-permission /s|<uses-permission |<uses-permission android:name=\"android.permission.RECORD_AUDIO\"/>\n    <uses-permission |" \
-        "$UNICA_MANIFEST"
-fi
+for UNICA_PERM in RECORD_AUDIO READ_CALL_LOG; do
+    if ! grep -q "android.permission.$UNICA_PERM" "$UNICA_MANIFEST"; then
+        LOG "- Adding $UNICA_PERM to /system/system/priv-app/SecSettings.apk"
+        sed -i "0,/<uses-permission /s|<uses-permission |<uses-permission android:name=\"android.permission.$UNICA_PERM\"/>\n    <uses-permission |" \
+            "$UNICA_MANIFEST"
+    fi
+done
+unset UNICA_PERM
 
 # Add UN1CA Settings SearchIndexableData registrations
 LOG "- Patching \"smali/com/android/settingslib/search/SearchIndexableResourcesMobile.smali\" in /system/system/priv-app/SecSettings.apk"

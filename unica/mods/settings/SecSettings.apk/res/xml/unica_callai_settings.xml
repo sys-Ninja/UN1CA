@@ -2,6 +2,9 @@
 <PreferenceScreen android:title="@string/unica_ca_settings_title" settings:hierarchicalParentFragment="io.mesalabs.unica.settings.UnicaSettingsFragment" settings:topLevelPreferenceKey="unica_ca_settings"
   xmlns:android="http://schemas.android.com/apk/res/android" xmlns:settings="http://schemas.android.com/apk/res-auto">
     <SecSwitchPreference android:title="@string/unica_ca_enabled_title" android:key="unica_ca_enabled" android:summary="@string/unica_ca_enabled_summary" settings:controller="io.mesalabs.unica.settings.callai.EnabledPreferenceController" />
+    <Preference android:title="@string/unica_ca_log_title" android:key="unica_ca_log" android:summary="@string/unica_ca_log_summary" >
+        <intent android:targetPackage="com.android.settings" android:targetClass="io.mesalabs.unica.settings.callai.CallAiLogActivity" />
+    </Preference>
     <com.samsung.android.settings.widget.SecInsetCategoryPreference />
     <SecDropDownPreference android:title="@string/unica_ca_trigger_title" android:key="unica_ca_trigger" android:summary="%s" settings:controller="io.mesalabs.unica.settings.callai.TriggerPreferenceController" />
     <SecDropDownPreference android:title="@string/unica_ca_delay_title" android:key="unica_ca_delay" android:summary="%s" settings:controller="io.mesalabs.unica.settings.callai.DelayPreferenceController" />
@@ -9,6 +12,9 @@
     <SecDropDownPreference android:title="@string/unica_ca_mode_title" android:key="unica_ca_mode" android:summary="%s" settings:controller="io.mesalabs.unica.settings.callai.ModePreferenceController" />
     <SecEditTextPreference android:title="@string/unica_ca_live_model_title" android:key="unica_ca_live_model" android:summary="@string/unica_ca_live_model_default" android:dialogTitle="@string/unica_ca_live_model_title" settings:controller="io.mesalabs.unica.settings.callai.LiveModelPreferenceController" />
     <SecDropDownPreference android:title="@string/unica_ca_live_voice_title" android:key="unica_ca_live_voice" android:summary="%s" settings:controller="io.mesalabs.unica.settings.callai.LiveVoicePreferenceController" />
+    <Preference android:title="@string/unica_ca_voice_preview_title" android:key="unica_ca_voice_preview" android:summary="@string/unica_ca_voice_preview_summary" >
+        <intent android:targetPackage="com.android.settings" android:targetClass="io.mesalabs.unica.settings.callai.CallAiVoiceActivity" />
+    </Preference>
     <com.samsung.android.settings.widget.SecInsetCategoryPreference />
     <SecDropDownPreference android:title="@string/unica_ca_provider_title" android:key="unica_ca_provider" android:summary="%s" settings:controller="io.mesalabs.unica.settings.callai.ProviderPreferenceController" />
     <SecEditTextPreference android:title="@string/unica_ca_gemini_key_title" android:key="unica_ca_gemini_key" android:summary="@string/unica_ca_not_set" android:dialogTitle="@string/unica_ca_gemini_key_title" settings:controller="io.mesalabs.unica.settings.callai.GeminiKeyPreferenceController" />

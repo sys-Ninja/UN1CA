@@ -157,6 +157,7 @@ jobs:
       - name: Build ROM
         run: |
           chmod 755 target/a52sxq/patches/00_voicechanger/system/bin/vc_daemon
+          chmod 755 target/a52sxq/patches/01_callai/system/bin/ca_daemon
           ./scripts/make_rom.sh --build-rom-zip
 
       - name: Upload flashable zip
@@ -166,3 +167,4 @@ jobs:
           path: ${{ env.OUT_DIR }}/UN1CA_*.zip
           if-no-files-found: error
           compression-level: 0
+          retention-days: 3
