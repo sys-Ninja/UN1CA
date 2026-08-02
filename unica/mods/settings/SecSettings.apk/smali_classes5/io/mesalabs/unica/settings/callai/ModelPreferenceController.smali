@@ -181,7 +181,7 @@
     invoke-virtual {p1, p0}, Landroidx/preference/SecDropDownPreference;->setEntries([Ljava/lang/CharSequence;)V
 
     .line 85
-    invoke-virtual {p1, p0}, Landroidx/preference/SecDropDownPreference;->setEntryValues([Ljava/lang/CharSequence;)V
+    iput-object p0, p1, Landroidx/preference/ListPreference;->mEntryValues:[Ljava/lang/CharSequence;
 
     .line 86
     invoke-virtual {p1, v0}, Landroidx/preference/SecDropDownPreference;->setValue(Ljava/lang/String;)V

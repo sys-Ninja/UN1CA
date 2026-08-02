@@ -134,7 +134,7 @@
     :cond_4a
     iget-object p1, p0, Lio/mesalabs/unica/settings/callai/BaseListPreferenceController;->mPreference:Landroidx/preference/SecDropDownPreference;
 
-    invoke-virtual {p1, v0}, Landroidx/preference/SecDropDownPreference;->setEntryValues([Ljava/lang/CharSequence;)V
+    iput-object v0, p1, Landroidx/preference/ListPreference;->mEntryValues:[Ljava/lang/CharSequence;
 
     .line 64
     iget-object p1, p0, Lio/mesalabs/unica/settings/callai/BaseListPreferenceController;->mPreference:Landroidx/preference/SecDropDownPreference;

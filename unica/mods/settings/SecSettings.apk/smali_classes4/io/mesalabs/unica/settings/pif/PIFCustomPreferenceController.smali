@@ -13,7 +13,7 @@
 
 # direct methods
 .method public constructor <init>(Landroid/content/Context;Ljava/lang/String;Landroidx/fragment/app/Fragment;)V
-    .locals 0
+    .locals 1
 
     invoke-direct {p0, p1, p2}, Lcom/android/settings/core/BasePreferenceController;-><init>(Landroid/content/Context;Ljava/lang/String;)V
 
@@ -23,7 +23,9 @@
 
     new-instance p1, Landroidx/activity/result/contract/ActivityResultContracts$StartActivityForResult;
 
-    invoke-direct {p1}, Landroidx/activity/result/contract/ActivityResultContracts$StartActivityForResult;-><init>()V
+    const/4 v0, 0x0
+
+    invoke-direct {p1, v0}, Landroidx/activity/result/contract/ActivityResultContracts$StartActivityForResult;-><init>(I)V
 
     new-instance p2, Lio/mesalabs/unica/settings/pif/PIFCustomPreferenceController$$ExternalSyntheticLambda0;
 
