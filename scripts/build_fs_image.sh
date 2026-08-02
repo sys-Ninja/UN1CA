@@ -43,8 +43,12 @@ BUILD_IMAGE_MKFS()
             BUILD_CMD+="\"$IMAGE_SIZE\" "
             # https://android.googlesource.com/platform/build/+/refs/tags/android-15.0.0_r1/tools/releasetools/build_image.py#808
             BUILD_CMD+="-j \"0\" "
-            # https://android.googlesource.com/platform/build/+/refs/tags/android-15.0.0_r1/tools/releasetools/build_image.py#49
-            BUILD_CMD+="-T \"1230735600\" "
+            # PackageManager caches the parsed manifest of every APK in
+            # /data/system/package_cache and only re-parses when the APK is newer
+            # than the cache entry. A fixed timestamp means a reflash never looks
+            # newer, so the stale manifest is kept forever and any component we
+            # add is invisible until /data is wiped. Stamp the build time instead.
+            BUILD_CMD+="-T \"${ROM_BUILD_TIMESTAMP:-1230735600}\" "
             BUILD_CMD+="-C \"$FS_CONFIG_FILE\" "
             if $MAP_FILE; then
                 BUILD_CMD+="-B \"${OUTPUT_FILE//.img/.map}\" "
@@ -84,8 +88,12 @@ BUILD_IMAGE_MKFS()
             BUILD_CMD+="--mount-point \"$MOUNT_POINT\" "
             BUILD_CMD+="--fs-config-file \"$FS_CONFIG_FILE\" "
             BUILD_CMD+="--file-contexts \"$FILE_CONTEXT_FILE\" "
-            # Samsung uses a different default fixed timestamp for erofs/f2fs
-            BUILD_CMD+="-T \"1640995200\" "
+            # PackageManager caches the parsed manifest of every APK in
+            # /data/system/package_cache and only re-parses when the APK is newer
+            # than the cache entry. A fixed timestamp means a reflash never looks
+            # newer, so the stale manifest is kept forever and any component we
+            # add is invisible until /data is wiped. Stamp the build time instead.
+            BUILD_CMD+="-T \"${ROM_BUILD_TIMESTAMP:-1640995200}\" "
             if $MAP_FILE; then
                 BUILD_CMD+="--block-list-file \"${OUTPUT_FILE//.img/.map}\" "
             fi
@@ -106,8 +114,12 @@ BUILD_IMAGE_MKFS()
             BUILD_CMD+="-f \"$INPUT_DIR\" "
             BUILD_CMD+="-s \"$FILE_CONTEXT_FILE\" "
             BUILD_CMD+="-t \"$MOUNT_POINT\" "
-            # Samsung uses a different default fixed timestamp for erofs/f2fs
-            BUILD_CMD+="-T \"1640995200\" "
+            # PackageManager caches the parsed manifest of every APK in
+            # /data/system/package_cache and only re-parses when the APK is newer
+            # than the cache entry. A fixed timestamp means a reflash never looks
+            # newer, so the stale manifest is kept forever and any component we
+            # add is invisible until /data is wiped. Stamp the build time instead.
+            BUILD_CMD+="-T \"${ROM_BUILD_TIMESTAMP:-1640995200}\" "
             if $MAP_FILE; then
                 BUILD_CMD+="-B \"${OUTPUT_FILE//.img/.map}\" "
             fi

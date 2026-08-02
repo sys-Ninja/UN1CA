@@ -31,7 +31,7 @@
     <string name="unica_ca_lang_ar_eg">Arabic (Egypt)</string>
     <string name="unica_ca_lang_en">English</string>
     <string name="unica_ca_language_title">Conversation language</string>
-    <string name="unica_ca_live_model_default">gemini-live-2.5-flash-preview</string>
+    <string name="unica_ca_live_model_default">gemini-3.1-flash-live-preview</string>
     <string name="unica_ca_live_model_title">Live model</string>
     <string name="unica_ca_live_voice_title">Assistant voice</string>
     <string name="unica_ca_mode_classic">Recognise, think, speak</string>
