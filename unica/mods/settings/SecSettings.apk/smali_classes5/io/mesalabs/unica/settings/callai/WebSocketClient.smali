@@ -460,7 +460,7 @@
 
     invoke-direct {p0, v1, v0}, Lio/mesalabs/unica/settings/callai/WebSocketClient;->sendFrame(I[B)V
     :try_end_8
-    .catch Ljava/io/IOException; {:try_start_1 .. :try_end_8} :catch_9
+    .catch Ljava/lang/Exception; {:try_start_1 .. :try_end_8} :catch_9
 
     .line 270
     goto :goto_a
@@ -491,7 +491,7 @@
     :try_start_15
     invoke-virtual {v0}, Ljava/net/Socket;->close()V
     :try_end_18
-    .catch Ljava/io/IOException; {:try_start_15 .. :try_end_18} :catch_19
+    .catch Ljava/lang/Exception; {:try_start_15 .. :try_end_18} :catch_19
 
     .line 280
     goto :goto_1a

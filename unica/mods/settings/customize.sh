@@ -75,8 +75,12 @@ done < <(find "$MODPATH/SecSettings.apk" -type f)
 # - RECORD_AUDIO: the platform speech recogniser checks it on its caller.
 # - READ_CALL_LOG: without it PHONE_STATE carries no EXTRA_INCOMING_NUMBER since
 #   Android 9, which silently breaks the "unknown numbers" trigger.
+# - FOREGROUND_SERVICE_PHONE_CALL/_MICROPHONE + MANAGE_OWN_CALLS: required by
+#   the phoneCall|microphone FGS type. The old dataSync type hit the FGS
+#   timeout, ActivityManager killed the service mid-call, teardown() never ran
+#   and ca.session stayed true — muting the mic on every following call.
 UNICA_MANIFEST="$APKTOOL_DIR/system/priv-app/SecSettings/SecSettings.apk/AndroidManifest.xml"
-for UNICA_PERM in RECORD_AUDIO READ_CALL_LOG; do
+for UNICA_PERM in RECORD_AUDIO READ_CALL_LOG FOREGROUND_SERVICE_PHONE_CALL FOREGROUND_SERVICE_MICROPHONE MANAGE_OWN_CALLS; do
     if ! grep -q "android.permission.$UNICA_PERM" "$UNICA_MANIFEST"; then
         LOG "- Adding $UNICA_PERM to /system/system/priv-app/SecSettings.apk"
         sed -i "0,/<uses-permission /s|<uses-permission |<uses-permission android:name=\"android.permission.$UNICA_PERM\"/>\n    <uses-permission |" \

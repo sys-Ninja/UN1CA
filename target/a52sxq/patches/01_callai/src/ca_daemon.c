@@ -169,6 +169,18 @@ static int prop_bool(const char *key, int def)
     return !strcmp(v, "true") || !strcmp(v, "1") || !strcmp(v, "on");
 }
 
+/* The engine is the one that flips ca.session, but if it crashes (or the
+ * platform kills its process) mid-call the property stays true forever and
+ * this daemon keeps muting the mic on every later call. Whenever a session
+ * ends for any reason other than the engine asking, clear it ourselves. */
+static void prop_clear_session(void)
+{
+    if (prop_bool(PROP_SESSION, 0)) {
+        LOGW("clearing stale %s", PROP_SESSION);
+        __system_property_set(PROP_SESSION, "false");
+    }
+}
+
 /* ── Mixer helpers ────────────────────────────────────────────────────────── */
 
 static struct mixer *g_mixer;
@@ -332,6 +344,14 @@ static void drop_client(int *slot)
         *slot = -1;
     }
     pthread_mutex_unlock(&g_client_lock);
+}
+
+static int engine_connected(void)
+{
+    pthread_mutex_lock(&g_client_lock);
+    int up = (g_ul_client >= 0) || (g_dl_client >= 0);
+    pthread_mutex_unlock(&g_client_lock);
+    return up;
 }
 
 /* One thread accepts on both listeners and drains the uplink client, so the
@@ -520,8 +540,17 @@ static void run_session(void)
         /* Deaf but able to speak: still useful for a fixed announcement, and
          * the loop below has nothing to read, so just idle. */
         LOGW("no downlink capture; uplink only");
-        while (g_running && prop_bool(PROP_SESSION, 0) && call_is_active())
+        int idle = 0;
+        while (g_running && prop_bool(PROP_SESSION, 0) && call_is_active()) {
+            if (engine_connected())
+                idle = 0;
+            else if (++idle >= 10) {
+                LOGW("engine gone for %ds; ending session", idle);
+                prop_clear_session();
+                break;
+            }
             sleep(1);
+        }
         goto out;
     }
 
@@ -534,6 +563,8 @@ static void run_session(void)
     }
 
     LOGI("OK downlink=%u bytes/period", cap_bytes);
+
+    int idle = 0;
 
     while (g_running) {
         if (alsa.pcm_read(cap, cap_buf, cap_bytes) != 0) {
@@ -569,6 +600,14 @@ static void run_session(void)
             LOGI("STAT %lds peak=%d muteResets=%d", chunks * STT_FRAMES / STT_RATE,
                     peak, resets);
             peak = 0;
+
+            if (engine_connected())
+                idle = 0;
+            else if (++idle >= 10) {
+                LOGW("engine gone for %ds; ending session", idle);
+                prop_clear_session();
+                break;
+            }
 
             if (!prop_bool(PROP_SESSION, 0) || !call_is_active())
                 break;
@@ -681,6 +720,10 @@ int main(int argc, char **argv)
             if (once)
                 break;
         } else {
+            /* Call over but the engine never flipped the property back — the
+             * exact state that used to mute the mic on every following call. */
+            if (prop_bool(PROP_SESSION, 0) && !call_is_active())
+                prop_clear_session();
             backoff = 1;
         }
         sleep(backoff);

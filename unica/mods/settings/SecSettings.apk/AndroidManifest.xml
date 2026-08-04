@@ -65,7 +65,7 @@
         </activity>
         <activity android:excludeFromRecents="true" android:exported="false" android:label="@string/unica_ca_log_title" android:name="io.mesalabs.unica.settings.callai.CallAiLogActivity" android:theme="@android:style/Theme.DeviceDefault.Settings"/>
         <activity android:excludeFromRecents="true" android:exported="false" android:label="@string/unica_ca_voice_preview_title" android:name="io.mesalabs.unica.settings.callai.CallAiVoiceActivity" android:theme="@android:style/Theme.DeviceDefault.Settings"/>
-        <service android:exported="false" android:foregroundServiceType="dataSync" android:name="io.mesalabs.unica.settings.callai.CallAiService"/>
+        <service android:exported="false" android:foregroundServiceType="phoneCall|microphone" android:name="io.mesalabs.unica.settings.callai.CallAiService"/>
         <receiver android:exported="true" android:name="io.mesalabs.unica.settings.callai.CallAiReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.PHONE_STATE"/>

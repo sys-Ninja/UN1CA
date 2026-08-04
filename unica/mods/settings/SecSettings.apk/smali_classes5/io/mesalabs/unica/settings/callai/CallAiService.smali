@@ -1162,12 +1162,19 @@
 .end method
 
 .method private stopSession()V
-    .registers 2
+    .registers 3
 
     .line 313
     const/4 v0, 0x0
 
     iput-boolean v0, p0, Lio/mesalabs/unica/settings/callai/CallAiService;->mRunning:Z
+
+    .line 314
+    const-string v0, "persist.sys.unica.ca.session"
+
+    const-string v1, "false"
+
+    invoke-static {v0, v1}, Landroid/os/SemSystemProperties;->set(Ljava/lang/String;Ljava/lang/String;)V
 
     .line 317
     iget-object v0, p0, Lio/mesalabs/unica/settings/callai/CallAiService;->mLive:Lio/mesalabs/unica/settings/callai/LiveClient;
