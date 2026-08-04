@@ -130,7 +130,7 @@ static struct {
 
 #define CARD            0
 #define DEV_INJECT      0      /* MultiMedia1 → Incall_Music, proven by vc_daemon */
-#define DEV_DOWNLINK    34     /* MultiMedia6, the frontend vc_daemon leaves free */
+#define DEV_DOWNLINK    23     /* MultiMedia9, the stock incall-rec-downlink usecase */
 
 #define CAP_RATE        48000
 #define STT_RATE        16000  /* what every speech recogniser wants */
@@ -248,6 +248,7 @@ static const char *g_dl_ctl;
 static const char *find_downlink_ctl(void)
 {
     static const char *candidates[] = {
+        "MultiMedia9 Mixer VOC_REC_DL",
         "MultiMedia6 Mixer INCALL_RECORD_RX",
         "MultiMedia6 Mixer VOC_REC_DL",
         "MultiMedia6 Mixer SLIM_6_TX",
@@ -704,9 +705,11 @@ int main(int argc, char **argv)
     LOGI("READY %u mixer controls", alsa.mixer_get_num_ctls(g_mixer));
 
     int backoff = 1;
+    int stale = 0;
 
     while (g_running) {
         if (prop_bool(PROP_SESSION, 0) && call_is_active()) {
+            stale = 0;
             time_t started = time(NULL);
             run_session();
             /* A session that dies immediately means the route is already gone
@@ -721,9 +724,19 @@ int main(int argc, char **argv)
                 break;
         } else {
             /* Call over but the engine never flipped the property back — the
-             * exact state that used to mute the mic on every following call. */
-            if (prop_bool(PROP_SESSION, 0) && !call_is_active())
-                prop_clear_session();
+             * exact state that used to mute the mic on every following call.
+             * The VoiceMMode mixers only go live a few seconds after the
+             * engine answers, so a fresh session looks stale for a moment;
+             * clearing it instantly here killed the greeting (init stops the
+             * daemon on the prop). Only clear once the state has persisted
+             * and the engine is not connected. */
+            if (prop_bool(PROP_SESSION, 0) && !call_is_active() &&
+                !engine_connected()) {
+                if (++stale >= 15)
+                    prop_clear_session();
+            } else {
+                stale = 0;
+            }
             backoff = 1;
         }
         sleep(backoff);
