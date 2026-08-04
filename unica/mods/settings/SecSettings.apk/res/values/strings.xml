@@ -61,6 +61,7 @@
     <string name="unica_ca_summarizing">Summarising…</string>
     <string name="unica_ca_summary_failed">Could not summarise the call</string>
     <string name="unica_ca_summary_prompt">Summarise this phone call in the language it was spoken in, using at most four short bullet points: who called, what they wanted, what was agreed, and anything that needs following up.</string>
+    <string name="unica_ca_takeover">Answer myself</string>
     <string name="unica_ca_thinking_summary">Slower but better answers. Off keeps the call natural.</string>
     <string name="unica_ca_thinking_title">Thinking</string>
     <string name="unica_ca_trigger_all">Every call</string>

@@ -80,7 +80,7 @@ done < <(find "$MODPATH/SecSettings.apk" -type f)
 #   timeout, ActivityManager killed the service mid-call, teardown() never ran
 #   and ca.session stayed true — muting the mic on every following call.
 UNICA_MANIFEST="$APKTOOL_DIR/system/priv-app/SecSettings/SecSettings.apk/AndroidManifest.xml"
-for UNICA_PERM in RECORD_AUDIO READ_CALL_LOG FOREGROUND_SERVICE_PHONE_CALL FOREGROUND_SERVICE_MICROPHONE MANAGE_OWN_CALLS; do
+for UNICA_PERM in RECORD_AUDIO READ_CALL_LOG FOREGROUND_SERVICE_PHONE_CALL FOREGROUND_SERVICE_MICROPHONE MANAGE_OWN_CALLS SYSTEM_ALERT_WINDOW; do
     if ! grep -q "android.permission.$UNICA_PERM" "$UNICA_MANIFEST"; then
         LOG "- Adding $UNICA_PERM to /system/system/priv-app/SecSettings.apk"
         sed -i "0,/<uses-permission /s|<uses-permission |<uses-permission android:name=\"android.permission.$UNICA_PERM\"/>\n    <uses-permission |" \

@@ -59,6 +59,7 @@
     <string name="unica_ca_summarizing">جارٍ التلخيص…</string>
     <string name="unica_ca_summary_failed">تعذر تلخيص المكالمة</string>
     <string name="unica_ca_summary_prompt">لخّص هذه المكالمة بنفس لغة الحديث في أربع نقاط قصيرة على الأكثر: مَن اتصل، وماذا أراد، وما تم الاتفاق عليه، وما يحتاج متابعة.</string>
+    <string name="unica_ca_takeover">سأرد بنفسي</string>
     <string name="unica_ca_thinking_summary">إجابات أفضل لكن أبطأ. إيقافه يجعل المكالمة طبيعية.</string>
     <string name="unica_ca_thinking_title">التفكير</string>
     <string name="unica_ca_trigger_all">كل المكالمات</string>
