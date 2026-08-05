@@ -1377,13 +1377,15 @@
 
     const/4 v2, -0x2
 
-    const/16 v3, 0x7f6
+    const/4 v3, -0x2
 
-    const/16 v4, 0x8
+    const/16 v4, 0x7f6
 
-    const/4 v5, -0x3
+    const/16 v5, 0x8
 
-    invoke-direct {v1, v2, v2, v3, v4, v5}, Landroid/view/WindowManager$LayoutParams;-><init>(IIIII)V
+    const/4 v6, -0x3
+
+    invoke-direct/range {v1 .. v6}, Landroid/view/WindowManager$LayoutParams;-><init>(IIIII)V
 
     const/16 v2, 0x51
 
