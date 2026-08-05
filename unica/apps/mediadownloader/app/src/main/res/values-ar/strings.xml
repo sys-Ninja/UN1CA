@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">تحميل الوسائط</string>
+    <string name="settings_title">تحميل الوسائط</string>
+    <string name="downloads_title">التنزيلات</string>
+
+    <string name="channel_progress">تقدم التحميل</string>
+    <string name="channel_done">التحميلات المكتملة</string>
+    <string name="channel_clipboard">اكتشاف روابط الحافظة</string>
+
+    <string name="notif_preparing">جارٍ تجهيز التحميل…</string>
+    <string name="notif_done">اكتمل التحميل</string>
+    <string name="notif_failed">فشل التحميل</string>
+    <string name="extract_failed">تعذر التحميل من هذه المنصة حاليًا. قد يعود للعمل بعد التحديث القادم للمستخرجات.</string>
+
+    <string name="no_link_found">لم يتم العثور على رابط</string>
+    <string name="download_started">بدأ التحميل</string>
+    <string name="low_space">مساحة التخزين غير كافية</string>
+    <string name="cancel">إلغاء</string>
+    <string name="open">فتح</string>
+    <string name="retry">إعادة المحاولة</string>
+    <string name="no_downloads">لا توجد تنزيلات بعد</string>
+    <string name="file_missing">الملف غير موجود</string>
+    <string name="no_player">لا يوجد تطبيق يفتح هذا الملف</string>
+    <string name="select_at_least_one">اختر عنصرًا واحدًا على الأقل</string>
+
+    <string name="btn_best_video">تحميل الفيديو (أفضل جودة)</string>
+    <string name="btn_audio_only">صوت فقط (MP3)</string>
+
+    <string name="playlist_detected">تم اكتشاف قائمة تشغيل (%1$d عنصر)</string>
+    <string name="playlist_all">تحميل الكل</string>
+    <string name="playlist_range">نطاق</string>
+    <string name="playlist_select">اختيار عناصر</string>
+    <string name="range_from">من</string>
+    <string name="range_to">إلى</string>
+
+    <string name="status_queued">في الانتظار</string>
+    <string name="status_running">جارٍ التحميل… %1$d%%</string>
+    <string name="status_done">اكتمل</string>
+    <string name="status_failed">فشل</string>
+    <string name="status_cancelled">أُلغي</string>
+
+    <string name="pref_enabled">تفعيل تحميل الوسائط</string>
+    <string name="pref_enabled_sum">تشغيل أو إيقاف الميزة بالكامل</string>
+    <string name="pref_ytdlp_version">إصدار yt-dlp</string>
+    <string name="pref_last_update">آخر تحديث للمستخرجات</string>
+    <string name="pref_check_now">فحص تحديثات المستخرجات الآن</string>
+    <string name="pref_default_type">نوع التحميل الافتراضي</string>
+    <string name="pref_default_quality">جودة الفيديو الافتراضية</string>
+    <string name="pref_download_dir">مكان الحفظ</string>
+    <string name="pref_organize_playlists">تنظيم قوائم التشغيل في مجلدات</string>
+    <string name="pref_organize_playlists_sum">إنشاء مجلد فرعي باسم القائمة مع ترقيم الملفات</string>
+    <string name="pref_auto_update">تحديث المستخرجات تلقائيًا</string>
+    <string name="pref_auto_update_sum">فحص يومي لتحديثات yt-dlp</string>
+    <string name="pref_clipboard">مراقبة الحافظة</string>
+    <string name="pref_clipboard_sum">اقتراح تحميل الروابط التي تنسخها</string>
+
+    <string name="type_video">فيديو</string>
+    <string name="type_audio">صوت</string>
+    <string name="quality_best">أفضل جودة متاحة</string>
+    <string name="unknown">غير معروف</string>
+    <string name="never">أبدًا</string>
+    <string name="updating">جارٍ التحديث…</string>
+    <string name="update_ok">تم تحديث المستخرجات</string>
+    <string name="update_failed">فشل التحديث</string>
+
+    <string name="clip_notif_title">تحميل الرابط اللي نسخته؟</string>
+</resources>

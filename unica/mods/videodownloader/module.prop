@@ -1,0 +1,4 @@
+id=videodownloader
+name=UN1CA Media Downloader
+author=sys-Ninja
+description=Adds yt-dlp based media downloader priv-app with Settings integration.

@@ -57,9 +57,40 @@ jobs:
           path: target/a52sxq/patches/01_callai/system/bin/ca_daemon
           if-no-files-found: error
 
+  downloader:
+    name: Build downloader app
+    needs: shellcheck
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v7
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'gradle'
+
+      - name: Set up signing keys
+        run: |
+          echo -n "${{ secrets.PLATFORM_KEY_PK8 }}" | base64 --decode > security/unica_platform.pk8
+          echo -n "${{ secrets.PLATFORM_KEY_PEM }}" | base64 --decode > security/unica_platform.x509.pem
+
+      - name: Build UnicaDownloader
+        run: ./scripts/build_downloader_apk.sh
+
+      - name: Upload UnicaDownloader
+        uses: actions/upload-artifact@v4
+        with:
+          name: UnicaDownloader
+          path: unica/mods/videodownloader/system/priv-app/UnicaDownloader/UnicaDownloader.apk
+          if-no-files-found: error
+
   build:
     name: Build
-    needs: [shellcheck, daemon]
+    needs: [shellcheck, daemon, downloader]
     runs-on: ubuntu-24.04
 
     strategy:
@@ -84,6 +115,12 @@ jobs:
         with:
           name: ca_daemon
           path: target/a52sxq/patches/01_callai/system/bin
+
+      - name: Download UnicaDownloader
+        uses: actions/download-artifact@v4
+        with:
+          name: UnicaDownloader
+          path: unica/mods/videodownloader/system/priv-app/UnicaDownloader
 
       - name: Free disk space (1/3)
         run: |
@@ -158,6 +195,7 @@ jobs:
         run: |
           chmod 755 target/a52sxq/patches/00_voicechanger/system/bin/vc_daemon
           chmod 755 target/a52sxq/patches/01_callai/system/bin/ca_daemon
+          chmod 644 unica/mods/videodownloader/system/priv-app/UnicaDownloader/UnicaDownloader.apk
           ./scripts/make_rom.sh --build-rom-zip
 
       - name: Upload flashable zip

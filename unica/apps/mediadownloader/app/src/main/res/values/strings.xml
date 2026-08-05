@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Media Downloader</string>
+    <string name="settings_title">Media Downloader</string>
+    <string name="downloads_title">Downloads</string>
+
+    <string name="channel_progress">Download progress</string>
+    <string name="channel_done">Completed downloads</string>
+    <string name="channel_clipboard">Clipboard link detection</string>
+
+    <string name="notif_preparing">Preparing download…</string>
+    <string name="notif_done">Download complete</string>
+    <string name="notif_failed">Download failed</string>
+    <string name="extract_failed">Downloading from this platform is not available right now. It may work again after the next extractor update.</string>
+
+    <string name="no_link_found">No link found</string>
+    <string name="download_started">Download started</string>
+    <string name="low_space">Not enough storage space</string>
+    <string name="cancel">Cancel</string>
+    <string name="open">Open</string>
+    <string name="retry">Retry</string>
+    <string name="no_downloads">No downloads yet</string>
+    <string name="file_missing">File not found</string>
+    <string name="no_player">No app can open this file</string>
+    <string name="select_at_least_one">Select at least one item</string>
+
+    <string name="btn_best_video">Download video (best quality)</string>
+    <string name="btn_audio_only">Audio only (MP3)</string>
+
+    <string name="playlist_detected">Playlist detected (%1$d items)</string>
+    <string name="playlist_all">Download all</string>
+    <string name="playlist_range">Range</string>
+    <string name="playlist_select">Select items</string>
+    <string name="range_from">From</string>
+    <string name="range_to">To</string>
+
+    <string name="status_queued">Queued</string>
+    <string name="status_running">Downloading… %1$d%%</string>
+    <string name="status_done">Completed</string>
+    <string name="status_failed">Failed</string>
+    <string name="status_cancelled">Cancelled</string>
+
+    <string name="pref_enabled">Enable Media Downloader</string>
+    <string name="pref_enabled_sum">Turn the whole feature on or off</string>
+    <string name="pref_ytdlp_version">yt-dlp version</string>
+    <string name="pref_last_update">Last extractor update</string>
+    <string name="pref_check_now">Check for extractor updates now</string>
+    <string name="pref_default_type">Default download type</string>
+    <string name="pref_default_quality">Default video quality</string>
+    <string name="pref_download_dir">Save location</string>
+    <string name="pref_organize_playlists">Organize playlists into folders</string>
+    <string name="pref_organize_playlists_sum">Create a subfolder named after the playlist with numbered files</string>
+    <string name="pref_auto_update">Auto-update extractors</string>
+    <string name="pref_auto_update_sum">Check daily for yt-dlp updates</string>
+    <string name="pref_clipboard">Clipboard monitor</string>
+    <string name="pref_clipboard_sum">Offer to download links you copy</string>
+
+    <string name="type_video">Video</string>
+    <string name="type_audio">Audio</string>
+    <string name="quality_best">Best available</string>
+    <string name="unknown">Unknown</string>
+    <string name="never">Never</string>
+    <string name="updating">Updating…</string>
+    <string name="update_ok">Extractors updated</string>
+    <string name="update_failed">Update failed</string>
+
+    <string name="clip_notif_title">Download the link you copied?</string>
+</resources>

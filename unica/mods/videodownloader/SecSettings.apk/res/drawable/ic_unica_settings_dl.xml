@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector android:height="28.0dp" android:width="28.0dp" android:viewportWidth="28.0" android:viewportHeight="28.0"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <path android:fillColor="@color/unica_settings_ic_dl_color" android:pathData="M14,14m-14,0a14,14 0,1 1,28 0a14,14 0,1 1,-28 0" android:strokeColor="#00000000" android:strokeWidth="1.0" android:fillType="evenOdd" />
+    <group android:scaleX="0.58" android:scaleY="0.58" android:translateX="7.04" android:translateY="7.04">
+        <path android:fillColor="#ffffff" android:pathData="M12,3c0.55,0 1,0.45 1,1v8.17l2.59,-2.58c0.39,-0.39 1.02,-0.39 1.41,0 0.39,0.39 0.39,1.02 0,1.41l-4.29,4.29c-0.39,0.39 -1.02,0.39 -1.41,0L7,11c-0.39,-0.39 -0.39,-1.02 0,-1.41 0.39,-0.39 1.02,-0.39 1.41,0L11,12.17V4c0,-0.55 0.45,-1 1,-1zM5,18h14c0.55,0 1,0.45 1,1s-0.45,1 -1,1H5c-0.55,0 -1,-0.45 -1,-1s0.45,-1 1,-1z" android:strokeColor="#00000000" android:strokeWidth="1.0" android:fillType="nonZero" />
+    </group>
+    <path android:fillColor="@color/sec_dashboard_layer_color" android:pathData="M14,14m-14,0a14,14 0,1 1,28 0a14,14 0,1 1,-28 0" android:strokeColor="#00000000" android:strokeWidth="1.0" android:fillType="evenOdd" />
+</vector>
