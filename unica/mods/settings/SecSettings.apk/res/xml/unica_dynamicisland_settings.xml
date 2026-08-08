@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen android:title="@string/unica_dynamicisland_settings_title" settings:hierarchicalParentFragment="io.mesalabs.unica.settings.UnicaSettingsFragment" settings:topLevelPreferenceKey="unica_dynamicisland_settings"
+  xmlns:android="http://schemas.android.com/apk/res/android" xmlns:settings="http://schemas.android.com/apk/res-auto">
+    <SecSwitchPreference android:title="@string/unica_di_enabled_title" android:key="unica_di_enabled" android:summary="@string/unica_di_enabled_summary" settings:controller="io.mesalabs.unica.settings.dynamicisland.EnabledPreferenceController" />
+    <com.samsung.android.settings.widget.SecInsetCategoryPreference />
+    <SecSwitchPreference android:title="@string/unica_di_calls_title" android:key="unica_di_calls" android:summary="@string/unica_di_calls_summary" android:dependency="unica_di_enabled" settings:controller="io.mesalabs.unica.settings.dynamicisland.CallsToggleController" />
+    <SecSwitchPreference android:title="@string/unica_di_music_title" android:key="unica_di_music" android:summary="@string/unica_di_music_summary" android:dependency="unica_di_enabled" settings:controller="io.mesalabs.unica.settings.dynamicisland.MusicToggleController" />
+    <SecSwitchPreference android:title="@string/unica_di_notifications_title" android:key="unica_di_notifications" android:summary="@string/unica_di_notifications_summary" android:dependency="unica_di_enabled" settings:controller="io.mesalabs.unica.settings.dynamicisland.NotificationsToggleController" />
+    <SecSwitchPreference android:title="@string/unica_di_progress_title" android:key="unica_di_progress" android:summary="@string/unica_di_progress_summary" android:dependency="unica_di_enabled" settings:controller="io.mesalabs.unica.settings.dynamicisland.ProgressToggleController" />
+    <com.samsung.android.settings.widget.SecInsetCategoryPreference />
+    <Preference android:title="@string/unica_di_app_whitelist_title" android:key="unica_di_app_whitelist" android:summary="@string/unica_di_app_whitelist_summary" android:dependency="unica_di_notifications">
+        <intent android:targetPackage="com.android.settings" android:targetClass="io.mesalabs.unica.settings.dynamicisland.AppWhitelistActivity" />
+    </Preference>
+</PreferenceScreen>
