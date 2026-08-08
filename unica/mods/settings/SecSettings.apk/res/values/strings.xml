@@ -160,4 +160,20 @@
     <string name="unica_vc_preset_old_woman">Old woman</string>
     <string name="unica_vc_preset_title">Voice</string>
     <string name="unica_vc_settings_title">Call voice changer</string>
+    <!-- Dynamic Island strings -->
+    <string name="unica_dynamicisland_settings_title">Dynamic Island</string>
+    <string name="unica_di_enabled_title">Enable Dynamic Island</string>
+    <string name="unica_di_enabled_summary">Show notifications, calls, and activities around the camera cutout</string>
+    <string name="unica_di_calls_title">Phone calls</string>
+    <string name="unica_di_calls_summary">Show incoming calls in the island (replaces Samsung call screen)</string>
+    <string name="unica_di_music_title">Music playback</string>
+    <string name="unica_di_music_summary">Show now playing with album art and controls</string>
+    <string name="unica_di_notifications_title">Notifications</string>
+    <string name="unica_di_notifications_summary">Show priority notifications in the island</string>
+    <string name="unica_di_progress_title">Progress tasks</string>
+    <string name="unica_di_progress_summary">Show downloads, transfers, and other progress</string>
+    <string name="unica_di_app_whitelist_title">Notification apps</string>
+    <string name="unica_di_app_whitelist_summary">Choose which apps show notifications in the island</string>
+    <string name="unica_di_charging_title">Charging status</string>
+    <string name="unica_di_timer_title">Timer countdown</string>
 </resources>
