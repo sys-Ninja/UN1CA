@@ -158,4 +158,20 @@
     <string name="unica_vc_preset_old_woman">امرأة مسنة</string>
     <string name="unica_vc_preset_title">الصوت</string>
     <string name="unica_vc_settings_title">مُغيّر الصوت في المكالمات</string>
+    <!-- Dynamic Island strings -->
+    <string name="unica_dynamicisland_settings_title">Dynamic Island</string>
+    <string name="unica_di_enabled_title">تفعيل Dynamic Island</string>
+    <string name="unica_di_enabled_summary">عرض الإشعارات والمكالمات والأنشطة حول ثقب الكاميرا</string>
+    <string name="unica_di_calls_title">المكالمات الهاتفية</string>
+    <string name="unica_di_calls_summary">عرض المكالمات الواردة في الـ island (يستبدل شاشة مكالمات سامسونج)</string>
+    <string name="unica_di_music_title">تشغيل الموسيقى</string>
+    <string name="unica_di_music_summary">عرض ما يتم تشغيله الآن مع غلاف الألبوم وأدوات التحكم</string>
+    <string name="unica_di_notifications_title">الإشعارات</string>
+    <string name="unica_di_notifications_summary">عرض الإشعارات ذات الأولوية في الـ island</string>
+    <string name="unica_di_progress_title">مهام التقدم</string>
+    <string name="unica_di_progress_summary">عرض التنزيلات والتحويلات والتقدم الآخر</string>
+    <string name="unica_di_app_whitelist_title">تطبيقات الإشعارات</string>
+    <string name="unica_di_app_whitelist_summary">اختر التطبيقات التي تعرض إشعارات في الـ island</string>
+    <string name="unica_di_charging_title">حالة الشحن</string>
+    <string name="unica_di_timer_title">العد التنازلي للمؤقت</string>
 </resources>
