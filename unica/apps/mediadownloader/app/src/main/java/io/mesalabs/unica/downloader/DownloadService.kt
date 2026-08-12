@@ -6,15 +6,22 @@ import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import androidx.core.graphics.drawable.toBitmap
+import coil.ImageLoader
+import coil.request.ErrorResult
+import coil.request.ImageRequest
+import coil.request.SuccessResult
 import com.yausername.youtubedl_android.YoutubeDL
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -68,9 +75,37 @@ class DownloadService : Service() {
         }
     }
 
+    /** Load thumbnail bitmap from URL using Coil (best-effort, null on failure). */
+    private suspend fun loadThumbnail(url: String?): Bitmap? {
+        if (url.isNullOrBlank()) return null
+        return try {
+            val loader = ImageLoader(this@DownloadService)
+            val req = ImageRequest.Builder(this@DownloadService)
+                .data(url)
+                .allowHardware(false)
+                .size(256, 256)
+                .build()
+            when (val result = loader.execute(req)) {
+                is SuccessResult -> result.drawable.toBitmap()
+                is ErrorResult -> null
+            }
+        } catch (e: Exception) {
+            Log.w(App.TAG, "thumbnail load failed", e)
+            null
+        }
+    }
+
     private fun runDownload(item: DownloadItem) {
         DownloadRepo.update(item.id) { it.status = DlStatus.RUNNING }
-        notifyProgress(item.id, item.title, 0f, "")
+        notifyProgress(item.id, item.title, 0f, "", null)
+
+        // Load thumbnail once before download starts (IO dispatcher already active)
+        var thumb: Bitmap? = null
+        scope.launch {
+            thumb = loadThumbnail(item.thumbnail)
+            notifyProgress(item.id, item.title, 0f, "", thumb)
+        }
+
         var attempt = 0
         while (true) {
             try {
@@ -82,7 +117,7 @@ class DownloadService : Service() {
                             it.etaSeconds = etaSec
                             it.line = line
                         }
-                        notifyProgress(item.id, item.title, progress, line)
+                        notifyProgress(item.id, item.title, progress, line, thumb)
                     }
                 Log.i(App.TAG, "done ${item.id}: ${resp.elapsedTime}ms")
                 DownloadRepo.update(item.id) {
@@ -90,7 +125,7 @@ class DownloadService : Service() {
                     it.progress = 100f
                     it.filePath = guessFile(item)
                 }
-                notifyDone(item)
+                notifyDone(item, thumb)
                 return
             } catch (e: YoutubeDL.CanceledException) {
                 DownloadRepo.update(item.id) { it.status = DlStatus.CANCELLED }
@@ -135,7 +170,7 @@ class DownloadService : Service() {
             .setOngoing(true)
             .build()
 
-    private fun notifyProgress(id: String, title: String, progress: Float, line: String) {
+    private fun notifyProgress(id: String, title: String, progress: Float, line: String, thumb: Bitmap?) {
         val cancelIntent = PendingIntent.getService(
             this, id.hashCode(),
             Intent(this, DownloadService::class.java)
@@ -143,7 +178,7 @@ class DownloadService : Service() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
         val indeterminate = progress < 0f
-        val n = NotificationCompat.Builder(this, App.CHANNEL_PROGRESS)
+        val builder = NotificationCompat.Builder(this, App.CHANNEL_PROGRESS)
             .setSmallIcon(android.R.drawable.stat_sys_download)
             .setContentTitle(title)
             .setContentText(line.take(60))
@@ -151,24 +186,28 @@ class DownloadService : Service() {
             .setOngoing(true)
             .setOnlyAlertOnce(true)
             .addAction(0, getString(R.string.cancel), cancelIntent)
-            .build()
-        nm.notify(id.hashCode(), n)
+        if (thumb != null) {
+            builder.setLargeIcon(thumb)
+        }
+        nm.notify(id.hashCode(), builder.build())
     }
 
-    private fun notifyDone(item: DownloadItem) {
+    private fun notifyDone(item: DownloadItem, thumb: Bitmap?) {
         val open = PendingIntent.getActivity(
             this, item.id.hashCode(),
             Intent(this, DownloadsActivity::class.java),
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
-        val n = NotificationCompat.Builder(this, App.CHANNEL_DONE)
+        val builder = NotificationCompat.Builder(this, App.CHANNEL_DONE)
             .setSmallIcon(android.R.drawable.stat_sys_download_done)
             .setContentTitle(getString(R.string.notif_done))
             .setContentText(item.title)
             .setContentIntent(open)
             .setAutoCancel(true)
-            .build()
-        nm.notify(item.id.hashCode(), n)
+        if (thumb != null) {
+            builder.setLargeIcon(thumb)
+        }
+        nm.notify(item.id.hashCode(), builder.build())
     }
 
     private fun notifyFailed(item: DownloadItem) {
