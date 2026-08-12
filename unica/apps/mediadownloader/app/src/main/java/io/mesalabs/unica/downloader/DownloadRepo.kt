@@ -18,6 +18,7 @@ data class DownloadItem(
     val title: String,
     val audioOnly: Boolean,
     val quality: String,
+    val thumbnail: String? = null,
     val playlistTitle: String? = null,
     val playlistItems: String? = null,
     var status: DlStatus = DlStatus.QUEUED,
