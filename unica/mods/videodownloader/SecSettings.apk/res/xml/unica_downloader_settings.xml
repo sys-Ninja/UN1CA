@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen android:title="@string/unica_dl_settings_title"
+    settings:hierarchicalParentFragment="io.mesalabs.unica.settings.UnicaSettingsFragment"
+    settings:topLevelPreferenceKey="unica_dl_settings"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:settings="http://schemas.android.com/apk/res-auto">
+
+    <!-- Enable / Disable the whole feature -->
+    <SecSwitchPreference
+        android:key="unica_dl_enabled"
+        android:title="@string/unica_dl_enabled_title"
+        android:summary="@string/unica_dl_enabled_summary"
+        settings:controller="io.mesalabs.unica.settings.downloader.DownloaderEnabledPreferenceController" />
+
+    <com.samsung.android.settings.widget.SecInsetCategoryPreference />
+
+    <!-- Clipboard monitor -->
+    <SecSwitchPreference
+        android:key="unica_dl_clipboard"
+        android:title="@string/unica_dl_clipboard_title"
+        android:summary="@string/unica_dl_clipboard_summary"
+        settings:controller="io.mesalabs.unica.settings.downloader.DownloaderClipboardPreferenceController" />
+
+    <com.samsung.android.settings.widget.SecInsetCategoryPreference />
+
+    <!-- Open downloads list -->
+    <Preference
+        android:key="unica_dl_open"
+        android:title="@string/unica_dl_open_title"
+        android:persistent="false">
+        <intent
+            android:targetPackage="io.mesalabs.unica.downloader"
+            android:targetClass="io.mesalabs.unica.downloader.DownloadsActivity" />
+    </Preference>
+
+</PreferenceScreen>
