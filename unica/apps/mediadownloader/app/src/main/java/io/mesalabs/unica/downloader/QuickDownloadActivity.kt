@@ -170,6 +170,7 @@ class QuickDownloadActivity : AppCompatActivity() {
             title = m?.title ?: u,
             audioOnly = audioOnly,
             quality = prefs.defaultQuality,
+            thumbnail = m?.thumbnail,
             playlistTitle = playlistTitle,
             playlistItems = playlistItems,
         )
