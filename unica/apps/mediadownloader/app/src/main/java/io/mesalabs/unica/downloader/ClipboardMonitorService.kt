@@ -35,6 +35,15 @@ class ClipboardMonitorService : Service() {
 
     override fun onCreate() {
         super.onCreate()
+        // Run as foreground so Android doesn't kill us due to app-idle
+        val n = NotificationCompat.Builder(this, App.CHANNEL_CLIPBOARD)
+            .setSmallIcon(android.R.drawable.stat_sys_download)
+            .setContentTitle(getString(R.string.app_name))
+            .setContentText(getString(R.string.clip_monitor_running))
+            .setOngoing(true)
+            .setPriority(NotificationCompat.PRIORITY_MIN)
+            .build()
+        startForeground(FOREGROUND_ID, n)
         cm = getSystemService(ClipboardManager::class.java)
         try {
             cm?.addPrimaryClipChangedListener(listener)
@@ -89,17 +98,46 @@ class ClipboardMonitorService : Service() {
     }
 
     companion object {
-        private val MEDIA_HOSTS = listOf(
+        private const val FOREGROUND_ID = 1002
+
+        val MEDIA_HOSTS = listOf(
+            // Google / YouTube
             "youtube.com", "youtu.be", "m.youtube.com",
+            // Meta
+            "facebook.com", "fb.watch", "m.facebook.com", "instagram.com",
+            // TikTok
             "tiktok.com", "vm.tiktok.com",
-            "facebook.com", "fb.watch", "m.facebook.com",
-            "instagram.com",
+            // Twitter / X
             "twitter.com", "x.com",
+            // Dailymotion
+            "dailymotion.com", "dai.ly",
+            // Vimeo
+            "vimeo.com",
+            // Reddit
+            "reddit.com", "v.redd.it",
+            // Twitch
+            "twitch.tv",
+            // Pornhub
+            "pornhub.com",
+            // XVideos
+            "xvideos.com",
+            // XNXX
+            "xnxx.com",
+            // RedTube
+            "redtube.com",
+            // xHamster
+            "xhamster.com",
+            // YouPorn
+            "youporn.com",
+            // SoundCloud (audio)
+            "soundcloud.com",
+            // Bilibili
+            "bilibili.com",
         )
 
         fun start(ctx: Context) {
             try {
-                ctx.startService(Intent(ctx, ClipboardMonitorService::class.java))
+                ctx.startForegroundService(Intent(ctx, ClipboardMonitorService::class.java))
             } catch (e: Exception) {
                 Log.w(App.TAG, "clipboard service start failed", e)
             }
