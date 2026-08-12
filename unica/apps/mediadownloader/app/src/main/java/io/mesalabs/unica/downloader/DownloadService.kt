@@ -7,6 +7,7 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
+import android.media.MediaScannerConnection
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
@@ -19,9 +20,7 @@ import com.yausername.youtubedl_android.YoutubeDL
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.io.File
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -42,11 +41,8 @@ class DownloadService : Service() {
         when (intent?.action) {
             ACTION_CANCEL -> {
                 intent.getStringExtra(EXTRA_ID)?.let { id ->
-                    try {
-                        YoutubeDL.getInstance().destroyProcessById(id)
-                    } catch (e: Exception) {
-                        Log.w(App.TAG, "cancel failed", e)
-                    }
+                    try { YoutubeDL.getInstance().destroyProcessById(id) }
+                    catch (e: Exception) { Log.w(App.TAG, "cancel failed", e) }
                     DownloadRepo.update(id) { it.status = DlStatus.CANCELLED }
                     nm.cancel(id.hashCode())
                 }
@@ -75,7 +71,7 @@ class DownloadService : Service() {
         }
     }
 
-    /** Load thumbnail bitmap from URL using Coil (best-effort, null on failure). */
+    /** Load thumbnail bitmap via Coil — best-effort, null on any failure. */
     private suspend fun loadThumbnail(url: String?): Bitmap? {
         if (url.isNullOrBlank()) return null
         return try {
@@ -87,7 +83,7 @@ class DownloadService : Service() {
                 .build()
             when (val result = loader.execute(req)) {
                 is SuccessResult -> result.drawable.toBitmap()
-                is ErrorResult -> null
+                is ErrorResult  -> null
             }
         } catch (e: Exception) {
             Log.w(App.TAG, "thumbnail load failed", e)
@@ -95,15 +91,23 @@ class DownloadService : Service() {
         }
     }
 
+    /** Notify MediaScanner so the file appears in Gallery / Studio immediately. */
+    private fun scanFile(path: String?) {
+        if (path == null) return
+        MediaScannerConnection.scanFile(this, arrayOf(path), null) { p, _ ->
+            Log.d(App.TAG, "MediaScanner scanned: $p")
+        }
+    }
+
     private fun runDownload(item: DownloadItem) {
         DownloadRepo.update(item.id) { it.status = DlStatus.RUNNING }
         notifyProgress(item.id, item.title, 0f, "", null)
 
-        // Load thumbnail once before download starts (IO dispatcher already active)
+        // Load thumbnail asynchronously — doesn't block the download
         var thumb: Bitmap? = null
         scope.launch {
             thumb = loadThumbnail(item.thumbnail)
-            notifyProgress(item.id, item.title, 0f, "", thumb)
+            if (thumb != null) notifyProgress(item.id, item.title, 0f, "", thumb)
         }
 
         var attempt = 0
@@ -120,11 +124,14 @@ class DownloadService : Service() {
                         notifyProgress(item.id, item.title, progress, line, thumb)
                     }
                 Log.i(App.TAG, "done ${item.id}: ${resp.elapsedTime}ms")
+                val filePath = guessFile(item)
                 DownloadRepo.update(item.id) {
                     it.status = DlStatus.DONE
                     it.progress = 100f
-                    it.filePath = guessFile(item)
+                    it.filePath = filePath
                 }
+                // Tell MediaStore about the new file so Gallery/Studio see it
+                scanFile(filePath)
                 notifyDone(item, thumb)
                 return
             } catch (e: YoutubeDL.CanceledException) {
@@ -177,18 +184,15 @@ class DownloadService : Service() {
                 .setAction(ACTION_CANCEL).putExtra(EXTRA_ID, id),
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
-        val indeterminate = progress < 0f
         val builder = NotificationCompat.Builder(this, App.CHANNEL_PROGRESS)
             .setSmallIcon(android.R.drawable.stat_sys_download)
             .setContentTitle(title)
             .setContentText(line.take(60))
-            .setProgress(100, progress.toInt().coerceIn(0, 100), indeterminate)
+            .setProgress(100, progress.toInt().coerceIn(0, 100), progress < 0f)
             .setOngoing(true)
             .setOnlyAlertOnce(true)
             .addAction(0, getString(R.string.cancel), cancelIntent)
-        if (thumb != null) {
-            builder.setLargeIcon(thumb)
-        }
+        if (thumb != null) builder.setLargeIcon(thumb)
         nm.notify(id.hashCode(), builder.build())
     }
 
@@ -204,9 +208,7 @@ class DownloadService : Service() {
             .setContentText(item.title)
             .setContentIntent(open)
             .setAutoCancel(true)
-        if (thumb != null) {
-            builder.setLargeIcon(thumb)
-        }
+        if (thumb != null) builder.setLargeIcon(thumb)
         nm.notify(item.id.hashCode(), builder.build())
     }
 
@@ -216,14 +218,14 @@ class DownloadService : Service() {
             Intent(this, DownloadsActivity::class.java),
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
-        val n = NotificationCompat.Builder(this, App.CHANNEL_DONE)
-            .setSmallIcon(android.R.drawable.stat_notify_error)
-            .setContentTitle(getString(R.string.notif_failed))
-            .setContentText(getString(R.string.extract_failed))
-            .setContentIntent(open)
-            .setAutoCancel(true)
-            .build()
-        nm.notify(item.id.hashCode(), n)
+        nm.notify(item.id.hashCode(),
+            NotificationCompat.Builder(this, App.CHANNEL_DONE)
+                .setSmallIcon(android.R.drawable.stat_notify_error)
+                .setContentTitle(getString(R.string.notif_failed))
+                .setContentText(getString(R.string.extract_failed))
+                .setContentIntent(open)
+                .setAutoCancel(true)
+                .build())
     }
 
     companion object {
