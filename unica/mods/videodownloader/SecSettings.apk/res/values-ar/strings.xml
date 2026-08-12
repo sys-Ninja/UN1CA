@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="unica_dl_settings_title">تحميل الوسائط</string>
+    <string name="unica_dl_enabled_title">تحميل الوسائط</string>
+    <string name="unica_dl_enabled_summary">تفعيل تحميل الوسائط من المواقع المدعومة</string>
+    <string name="unica_dl_clipboard_title">مراقبة الحافظة</string>
+    <string name="unica_dl_clipboard_summary">اكتشاف روابط الوسائط تلقائياً عند نسخها</string>
+    <string name="unica_dl_open_title">عرض التنزيلات</string>
 </resources>
