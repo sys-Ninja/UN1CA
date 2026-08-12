@@ -1,6 +1,7 @@
 package io.mesalabs.unica.downloader
 
 import android.content.Context
+import android.net.Uri
 import android.util.Log
 import com.yausername.youtubedl_android.YoutubeDL
 import com.yausername.youtubedl_android.YoutubeDLRequest
@@ -44,35 +45,23 @@ object DownloadRepo {
     private val _flow = MutableStateFlow<List<DownloadItem>>(emptyList())
     val flow: StateFlow<List<DownloadItem>> = _flow
 
-    @Synchronized
-    fun add(item: DownloadItem) {
-        items[item.id] = item
-        publish()
-    }
+    @Synchronized fun add(item: DownloadItem) { items[item.id] = item; publish() }
 
     @Synchronized
     fun update(id: String, block: (DownloadItem) -> Unit) {
-        items[id]?.let { block(it) }
-        publish()
+        items[id]?.let { block(it) }; publish()
     }
 
-    @Synchronized
-    fun get(id: String): DownloadItem? = items[id]
+    @Synchronized fun get(id: String): DownloadItem? = items[id]
+    @Synchronized fun all(): List<DownloadItem> = items.values.toList()
+    @Synchronized fun nextQueued(): DownloadItem? = items.values.firstOrNull { it.status == DlStatus.QUEUED }
+    @Synchronized fun remove(id: String) { items.remove(id); publish() }
 
-    @Synchronized
-    fun all(): List<DownloadItem> = items.values.toList()
+    private fun publish() { _flow.value = items.values.toList() }
 
-    @Synchronized
-    fun nextQueued(): DownloadItem? = items.values.firstOrNull { it.status == DlStatus.QUEUED }
-
-    @Synchronized
-    fun remove(id: String) {
-        items.remove(id)
-        publish()
-    }
-
-    private fun publish() {
-        _flow.value = items.values.toList()
+    private fun isTikTok(url: String): Boolean {
+        val host = try { Uri.parse(url).host?.lowercase() ?: "" } catch (e: Exception) { "" }
+        return host == "tiktok.com" || host.endsWith(".tiktok.com") || host == "vm.tiktok.com"
     }
 
     /** Runs yt-dlp -J to fetch metadata. Blocking — call from IO dispatcher. */
@@ -83,6 +72,13 @@ object DownloadRepo {
             addOption("--no-warnings")
             addOption("-R", "1")
             addOption("--socket-timeout", "15")
+            // TikTok requires a realistic browser User-Agent to avoid 403/empty results
+            if (isTikTok(url)) {
+                addOption("--user-agent",
+                    "Mozilla/5.0 (Linux; Android 14; SM-A528B) AppleWebKit/537.36 " +
+                    "(KHTML, like Gecko) Chrome/125.0.0.0 Mobile Safari/537.36")
+                addOption("--extractor-args", "tiktok:api_hostname=api22-normal-c-useast1a.tiktokv.com")
+            }
         }
         val out = YoutubeDL.getInstance().execute(req).out
         val json = JSONObject(out.substring(out.indexOf('{')))
@@ -125,6 +121,13 @@ object DownloadRepo {
             addOption("--restrict-filenames")
             if (item.playlistItems != null) addOption("--playlist-items", item.playlistItems)
             if (item.playlistTitle == null) addOption("--no-playlist")
+            // TikTok-specific: needs mobile UA + API hostname workaround
+            if (isTikTok(item.url)) {
+                addOption("--user-agent",
+                    "Mozilla/5.0 (Linux; Android 14; SM-A528B) AppleWebKit/537.36 " +
+                    "(KHTML, like Gecko) Chrome/125.0.0.0 Mobile Safari/537.36")
+                addOption("--extractor-args", "tiktok:api_hostname=api22-normal-c-useast1a.tiktokv.com")
+            }
             if (item.audioOnly) {
                 addOption("-x")
                 addOption("--audio-format", "mp3")
@@ -140,7 +143,6 @@ object DownloadRepo {
         }
     }
 
-    /** Best-effort free space check: warn if < 500MB free on target. */
     fun hasSpace(ctx: Context): Boolean {
         return try {
             File(Prefs.get(ctx).downloadDir).apply { mkdirs() }.usableSpace > 500L * 1024 * 1024
