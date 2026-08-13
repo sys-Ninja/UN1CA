@@ -1,2 +1,2 @@
-/</PreferenceScreen>/i
-    <io.mesalabs.unica.settings.preference.IconPreference android:icon="@drawable/ic_unica_settings_dl" android:title="@string/unica_dl_settings_title" android:key="unica_dl_settings" android:fragment="com.android.settings.Settings$UnicaDownloaderSettingsActivity" settings:controller="io.mesalabs.unica.settings.DownloaderPreferenceController" />
+/<\/PreferenceScreen>/i
+    <io.mesalabs.unica.settings.preference.IconPreference android:icon="@drawable/ic_unica_settings_dl" android:title="@string/unica_dl_settings_title" android:key="unica_dl_settings" android:fragment="io.mesalabs.unica.settings.downloader.DownloaderSettingsFragment" settings:controller="io.mesalabs.unica.settings.DownloaderPreferenceController" />
