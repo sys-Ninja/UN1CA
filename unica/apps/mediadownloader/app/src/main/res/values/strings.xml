@@ -13,6 +13,9 @@
     <string name="notif_failed">Download failed</string>
     <string name="extract_failed">Downloading from this platform is not available right now. It may work again after the next extractor update.</string>
 
+    <string name="clip_notif_title">Download the link you copied?</string>
+    <string name="clip_monitor_running">Watching clipboard for media links</string>
+
     <string name="no_link_found">No link found</string>
     <string name="download_started">Download started</string>
     <string name="low_space">Not enough storage space</string>
@@ -63,6 +66,4 @@
     <string name="updating">Updating…</string>
     <string name="update_ok">Extractors updated</string>
     <string name="update_failed">Update failed</string>
-
-    <string name="clip_notif_title">Download the link you copied?</string>
 </resources>
