@@ -6,14 +6,12 @@ if [ ! -f "$MODPATH/system/priv-app/UnicaDownloader/UnicaDownloader.apk" ]; then
     return 0
 fi
 
-ADD_TO_WORK_DIR "$MODPATH" "system" "." 0 0 755 "u:object_r:system_file:s0"
-
-# ── Extract native libs so Android can execute them from priv-app ──────────────
-# priv-app APKs are NOT unpacked automatically; we pre-extract and set correct
-# permissions (libpython.so needs +x as it is the Python interpreter binary).
+# ── Extract native libs into MODPATH BEFORE ADD_TO_WORK_DIR ───────────────────
+# This ensures ADD_TO_WORK_DIR picks them up and registers them in fs_config
+# (mkfs.erofs requires every file/dir to have an fs_config entry).
 LOG "- Extracting native libraries from UnicaDownloader.apk"
-APK_PATH="$WORK_DIR/system/system/priv-app/UnicaDownloader/UnicaDownloader.apk"
-LIB_DIR="$WORK_DIR/system/system/priv-app/UnicaDownloader/lib/arm64"
+APK_PATH="$MODPATH/system/priv-app/UnicaDownloader/UnicaDownloader.apk"
+LIB_DIR="$MODPATH/system/priv-app/UnicaDownloader/lib/arm64"
 mkdir -p "$LIB_DIR"
 unzip -o "$APK_PATH" 'lib/arm64-v8a/*' -d /tmp/unica_dl_extract/ > /dev/null 2>&1
 if [ -d "/tmp/unica_dl_extract/lib/arm64-v8a" ]; then
@@ -21,17 +19,16 @@ if [ -d "/tmp/unica_dl_extract/lib/arm64-v8a" ]; then
     # libpython.so is the Python interpreter — must be executable
     chmod 755 "$LIB_DIR/libpython.so"
     # all other .so files are shared libraries, not executables
-    chmod 644 "$LIB_DIR/libffmpeg.so" \
-               "$LIB_DIR/libffmpeg.zip.so" \
-               "$LIB_DIR/libffprobe.so" \
-               "$LIB_DIR/libpython.zip.so" \
-               "$LIB_DIR/libqjs.so" 2>/dev/null || true
+    chmod 644 "$LIB_DIR/"*.so 2>/dev/null || true
     LIB_COUNT=$(find "$LIB_DIR" -maxdepth 1 -name "*.so" | wc -l)
     LOG "- Extracted ${LIB_COUNT} native lib(s) to lib/arm64 (libpython.so +x)"
 else
     LOG "\033[0;33m! No arm64-v8a libs found in APK\033[0m"
 fi
 rm -rf /tmp/unica_dl_extract/
+
+# ── Now add entire system tree (includes the extracted lib/arm64 dir) ──────────
+ADD_TO_WORK_DIR "$MODPATH" "system" "." 0 0 755 "u:object_r:system_file:s0"
 
 DECODE_APK "system" "system/priv-app/SecSettings/SecSettings.apk"
 
