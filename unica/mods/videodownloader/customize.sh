@@ -53,7 +53,7 @@ while IFS= read -r f; do
             PATCH_INST="$(head -n 1 "$MODPATH/SecSettings.apk/$f")"
             CONTENT="$(tail -n +2 "$MODPATH/SecSettings.apk/$f")"
         fi
-        CONTENT="$(sed -e "s/\"/\\\\\"/g" -e "s/\$/\\\\\$/g" -e "s/ /\\ /g" -e "s/\\\\n/\\\\\\\\\\\\n/g" <<< "$CONTENT")"
+        CONTENT="$(sed -e "s/\"/\\\\\"/g" -e "s/\\$/\\\\$/g" -e "s/ /\\\ /g" -e "s/\\\\n/\\\\\\\\\n/g" <<< "$CONTENT")"
         CONTENT="$(sed -E ':a;N;$!ba;s/\r{0,1}\n/\\n/g' <<< "$CONTENT")"
         EVAL "sed -i \"$PATCH_INST $CONTENT\" \"$APKTOOL_DIR/system/priv-app/SecSettings/SecSettings.apk/$f\""
     fi
