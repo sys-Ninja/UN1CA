@@ -1,0 +1,6 @@
+system/priv-app/UnicaDownloader/lib/arm64/libpython.so 0 0 0755
+system/priv-app/UnicaDownloader/lib/arm64/libffmpeg.so 0 0 0755
+system/priv-app/UnicaDownloader/lib/arm64/libffprobe.so 0 0 0755
+system/priv-app/UnicaDownloader/lib/arm64/libqjs.so 0 0 0755
+system/priv-app/UnicaDownloader/lib/arm64/libpython.zip.so 0 0 0644
+system/priv-app/UnicaDownloader/lib/arm64/libffmpeg.zip.so 0 0 0644

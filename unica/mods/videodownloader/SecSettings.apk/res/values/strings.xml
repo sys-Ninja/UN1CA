@@ -6,4 +6,20 @@
     <string name="unica_dl_clipboard_title">Clipboard monitoring</string>
     <string name="unica_dl_clipboard_summary">Automatically detect media links when copied</string>
     <string name="unica_dl_open_title">View downloads</string>
+    <string name="unica_dl_general_title">General</string>
+    <string name="unica_dl_updates_title">Updates</string>
+    <string name="unica_dl_info_title">Information</string>
+    <string name="unica_dl_default_type_title">Default download type</string>
+    <string name="unica_dl_default_quality_title">Default video quality</string>
+    <string name="unica_dl_download_dir_title">Download directory</string>
+    <string name="unica_dl_auto_update_title">Auto update</string>
+    <string name="unica_dl_auto_update_summary">Automatically check for updates daily</string>
+    <string name="unica_dl_ytdlp_version_title">yt-dlp version</string>
+    <string name="unica_dl_last_update_check_title">Last update check</string>
+    <string name="unica_dl_check_now_title">Check for updates now</string>
+    <string name="unica_dl_organize_playlists_title">Organize playlists</string>
+    <string name="unica_dl_organize_playlists_summary">Create a subfolder for each playlist</string>
+    <string name="unica_dl_supported_sites_title">Supported Sites</string>
+    <string name="unica_dl_supported_sites_summary">View the list of websites supported by yt-dlp</string>
+
 </resources>

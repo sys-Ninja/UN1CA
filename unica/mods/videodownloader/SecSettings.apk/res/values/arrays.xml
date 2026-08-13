@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="unica_dl_type_entries">
+        <item>Video</item>
+        <item>Audio</item>
+    </string-array>
+    <string-array name="unica_dl_type_values">
+        <item>video</item>
+        <item>audio</item>
+    </string-array>
+    <string-array name="unica_dl_quality_entries">
+        <item>Best</item>
+        <item>1080p</item>
+        <item>720p</item>
+        <item>480p</item>
+    </string-array>
+    <string-array name="unica_dl_quality_values">
+        <item>best</item>
+        <item>1080</item>
+        <item>720</item>
+        <item>480</item>
+    </string-array>
+</resources>

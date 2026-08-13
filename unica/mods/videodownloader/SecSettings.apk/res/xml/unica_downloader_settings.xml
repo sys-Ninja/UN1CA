@@ -10,27 +10,94 @@
         android:key="unica_dl_enabled"
         android:title="@string/unica_dl_enabled_title"
         android:summary="@string/unica_dl_enabled_summary"
-        settings:controller="io.mesalabs.unica.settings.downloader.DownloaderEnabledPreferenceController" />
+        settings:controller="io.mesalabs.unica.settings.downloader.DownloaderSystemTogglePreferenceController" />
 
     <com.samsung.android.settings.widget.SecInsetCategoryPreference />
 
-    <!-- Clipboard monitor -->
-    <SecSwitchPreference
-        android:key="unica_dl_clipboard"
-        android:title="@string/unica_dl_clipboard_title"
-        android:summary="@string/unica_dl_clipboard_summary"
-        settings:controller="io.mesalabs.unica.settings.downloader.DownloaderClipboardPreferenceController" />
+    <!-- General Settings -->
+    <PreferenceCategory android:title="@string/unica_dl_general_title">
+        <SecSwitchPreference
+            android:key="unica_dl_clipboard"
+            android:title="@string/unica_dl_clipboard_title"
+            android:summary="@string/unica_dl_clipboard_summary"
+            settings:controller="io.mesalabs.unica.settings.downloader.DownloaderSystemTogglePreferenceController" />
+
+        <SecDropDownPreference
+            android:key="unica_dl_default_type"
+            android:title="@string/unica_dl_default_type_title"
+            android:entries="@array/unica_dl_type_entries"
+            android:entryValues="@array/unica_dl_type_values"
+            settings:controller="io.mesalabs.unica.settings.downloader.DownloaderSystemListPreferenceController" />
+
+        <SecDropDownPreference
+            android:key="unica_dl_default_quality"
+            android:title="@string/unica_dl_default_quality_title"
+            android:entries="@array/unica_dl_quality_entries"
+            android:entryValues="@array/unica_dl_quality_values"
+            settings:controller="io.mesalabs.unica.settings.downloader.DownloaderSystemListPreferenceController" />
+
+        <SecSwitchPreference
+            android:key="unica_dl_organize_playlists"
+            android:title="@string/unica_dl_organize_playlists_title"
+            android:summary="@string/unica_dl_organize_playlists_summary"
+            settings:controller="io.mesalabs.unica.settings.downloader.DownloaderSystemTogglePreferenceController" />
+
+        <Preference
+            android:key="unica_dl_download_dir"
+            android:title="@string/unica_dl_download_dir_title"
+            android:selectable="false"
+            settings:controller="io.mesalabs.unica.settings.downloader.DownloaderDirPreferenceController" />
+    </PreferenceCategory>
 
     <com.samsung.android.settings.widget.SecInsetCategoryPreference />
 
-    <!-- Open downloads list -->
-    <Preference
-        android:key="unica_dl_open"
-        android:title="@string/unica_dl_open_title"
-        android:persistent="false">
-        <intent
-            android:targetPackage="io.mesalabs.unica.downloader"
-            android:targetClass="io.mesalabs.unica.downloader.DownloadsActivity" />
-    </Preference>
+    <!-- Updates & Library -->
+    <PreferenceCategory android:title="@string/unica_dl_updates_title">
+        <SecSwitchPreference
+            android:key="unica_dl_auto_update"
+            android:title="@string/unica_dl_auto_update_title"
+            android:summary="@string/unica_dl_auto_update_summary"
+            settings:controller="io.mesalabs.unica.settings.downloader.DownloaderSystemTogglePreferenceController" />
+
+        <Preference
+            android:key="unica_dl_ytdlp_version"
+            android:title="@string/unica_dl_ytdlp_version_title"
+            android:selectable="false"
+            settings:controller="io.mesalabs.unica.settings.downloader.DownloaderVersionPreferenceController" />
+
+        <Preference
+            android:key="unica_dl_last_update_check"
+            android:title="@string/unica_dl_last_update_check_title"
+            android:selectable="false"
+            settings:controller="io.mesalabs.unica.settings.downloader.DownloaderLastUpdatePreferenceController" />
+
+        <Preference
+            android:key="unica_dl_check_now"
+            android:title="@string/unica_dl_check_now_title"
+            settings:controller="io.mesalabs.unica.settings.downloader.DownloaderCheckUpdatePreferenceController" />
+    </PreferenceCategory>
+
+    <com.samsung.android.settings.widget.SecInsetCategoryPreference />
+
+    <!-- Links & Information -->
+    <PreferenceCategory android:title="@string/unica_dl_info_title">
+        <Preference
+            android:key="unica_dl_supported_sites"
+            android:title="@string/unica_dl_supported_sites_title"
+            android:summary="@string/unica_dl_supported_sites_summary">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="https://github.com/yt-dlp/yt-dlp/blob/master/supportedsites.md" />
+        </Preference>
+
+        <Preference
+            android:key="unica_dl_open"
+            android:title="@string/unica_dl_open_title"
+            android:persistent="false">
+            <intent
+                android:targetPackage="io.mesalabs.unica.downloader"
+                android:targetClass="io.mesalabs.unica.downloader.DownloadsActivity" />
+        </Preference>
+    </PreferenceCategory>
 
 </PreferenceScreen>
