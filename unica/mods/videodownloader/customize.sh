@@ -16,10 +16,11 @@ mkdir -p "$LIB_DIR"
 unzip -o "$APK_PATH" 'lib/arm64-v8a/*' -d /tmp/unica_dl_extract/ > /dev/null 2>&1
 if [ -d "/tmp/unica_dl_extract/lib/arm64-v8a" ]; then
     cp /tmp/unica_dl_extract/lib/arm64-v8a/* "$LIB_DIR/"
-    # libpython.so is the Python interpreter — must be executable
-    chmod 755 "$LIB_DIR/libpython.so"
-    # all other .so files are shared libraries, not executables
+    # FIX: apply 644 to ALL .so files FIRST (shared libraries, not executables)
+    # THEN apply 755 to libpython.so LAST — it is the Python interpreter and
+    # must be executable. Order matters.
     chmod 644 "$LIB_DIR/"*.so 2>/dev/null || true
+    chmod 755 "$LIB_DIR/libpython.so"
     LIB_COUNT=$(find "$LIB_DIR" -maxdepth 1 -name "*.so" | wc -l)
     LOG "- Extracted ${LIB_COUNT} native lib(s) to lib/arm64 (libpython.so +x)"
 else
@@ -50,7 +51,7 @@ while IFS= read -r f; do
             PATCH_INST="$(head -n 1 "$MODPATH/SecSettings.apk/$f")"
             CONTENT="$(tail -n +2 "$MODPATH/SecSettings.apk/$f")"
         fi
-        CONTENT="$(sed -e "s/\"/\\\\\"/g" -e "s/\\$/\\\\$/g" -e "s/ /\\\ /g" -e "s/\\\\n/\\\\\\\\\n/g" <<< "$CONTENT")"
+        CONTENT="$(sed -e "s/\"/\\\"/g" -e "s/\$/\\\$/g" -e "s/ /\\ /g" -e "s/\\n/\\\\\\n/g" <<< "$CONTENT")"
         CONTENT="$(sed -E ':a;N;$!ba;s/\r{0,1}\n/\\n/g' <<< "$CONTENT")"
         EVAL "sed -i \"$PATCH_INST $CONTENT\" \"$APKTOOL_DIR/system/priv-app/SecSettings/SecSettings.apk/$f\""
     fi
