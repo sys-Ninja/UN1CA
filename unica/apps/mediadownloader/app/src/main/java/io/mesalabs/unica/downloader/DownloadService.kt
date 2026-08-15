@@ -166,7 +166,9 @@ class DownloadService : Service() {
         val dir = if (item.playlistTitle != null && prefs.organizePlaylists)
             File(prefs.downloadDir, DownloadRepo.sanitize(item.playlistTitle))
         else File(prefs.downloadDir)
-        return dir.listFiles()?.maxByOrNull { it.lastModified() }?.absolutePath
+        return dir.listFiles { f -> 
+            f.isFile && !f.name.endsWith(".part") && !f.name.endsWith(".ytdl") && !f.name.endsWith(".temp")
+        }?.maxByOrNull { it.lastModified() }?.absolutePath
     }
 
     private fun baseNotification(text: String): Notification =
