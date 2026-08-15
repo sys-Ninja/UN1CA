@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Moon/crescent icon representing prayer times -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Background circle -->
+    <path
+        android:fillColor="#1259C3"
+        android:pathData="M0,0 L108,0 L108,108 L0,108 Z"/>
+
+    <!-- Crescent moon shape -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M54,20 A27,27 0 1,1 54,74 A18,18 0 1,0 54,20 Z"/>
+
+    <!-- Star -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M68,28 L70,34 L76,34 L71,38 L73,44 L68,40 L63,44 L65,38 L60,34 L66,34 Z"/>
+</vector>
