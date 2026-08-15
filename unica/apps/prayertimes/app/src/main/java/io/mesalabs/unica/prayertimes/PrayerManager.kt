@@ -103,7 +103,12 @@ object PrayerManager {
                 setAlarm(ctx, nextPrayer)
             } else {
                 // End of month, need to fetch next month
-                fetchAndCacheTimings(ctx)
+                kotlinx.coroutines.GlobalScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+                    val success = fetchAndCacheTimings(ctx)
+                    if (success) {
+                        scheduleNextPrayer(ctx)
+                    }
+                }
             }
         } catch (e: Exception) {
             Log.e(TAG, "Scheduling failed", e)
