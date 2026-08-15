@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">مواقيت الصلاة</string>
+    <string name="prayer_settings_title">إعدادات مواقيت الصلاة</string>
+    
+    <string name="pref_enabled">تفعيل منبه الصلاة</string>
+    <string name="pref_enabled_sum">تشغيل أو إيقاف الأذان ومواقيت الصلاة</string>
+    
+    <string name="pref_location_title">الموقع الحالي</string>
+    <string name="pref_location_sum">اختر مدينتك لتحديث المواقيت</string>
+    <string name="location_dialog_title">ابحث عن مدينتك</string>
+    <string name="location_hint">مثال: القاهرة، مكة، الرياض</string>
+    <string name="location_searching">جارٍ البحث…</string>
+    <string name="location_not_found">لم يتم العثور على المدينة</string>
+    
+    <string name="pref_sounds_category">أصوات الأذان</string>
+    <string name="pref_sound_fajr">أذان الفجر</string>
+    <string name="pref_sound_dhuhr">أذان الظهر</string>
+    <string name="pref_sound_asr">أذان العصر</string>
+    <string name="pref_sound_maghrib">أذان المغرب</string>
+    <string name="pref_sound_isha">أذان العشاء</string>
+    <string name="default_sound">الافتراضي</string>
+    
+    <string name="notification_adhan_title">حان الآن موعد أذان %1$s</string>
+    <string name="notification_adhan_text">اضغط لإيقاف الأذان</string>
+    <string name="stop_adhan">إيقاف</string>
+    
+    <string name="prayer_fajr">الفجر</string>
+    <string name="prayer_dhuhr">الظهر</string>
+    <string name="prayer_asr">العصر</string>
+    <string name="prayer_maghrib">المغرب</string>
+    <string name="prayer_isha">العشاء</string>
+    
+    <string name="channel_adhan">تنبيهات الأذان</string>
+    
+    <string name="api_error">حدث خطأ أثناء جلب المواقيت. تأكد من اتصالك بالإنترنت.</string>
+</resources>

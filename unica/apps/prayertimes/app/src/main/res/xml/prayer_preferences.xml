@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <SwitchPreferenceCompat
+        app:key="pref_enabled"
+        app:title="@string/pref_enabled"
+        app:summary="@string/pref_enabled_sum"
+        app:iconSpaceReserved="false" />
+
+    <Preference
+        app:key="pref_location"
+        app:title="@string/pref_location_title"
+        app:summary="@string/pref_location_sum"
+        app:iconSpaceReserved="false" />
+
+    <PreferenceCategory
+        app:title="@string/pref_sounds_category"
+        app:iconSpaceReserved="false">
+
+        <Preference
+            app:key="pref_sound_fajr"
+            app:title="@string/pref_sound_fajr"
+            app:summary="@string/default_sound"
+            app:iconSpaceReserved="false" />
+
+        <Preference
+            app:key="pref_sound_dhuhr"
+            app:title="@string/pref_sound_dhuhr"
+            app:summary="@string/default_sound"
+            app:iconSpaceReserved="false" />
+
+        <Preference
+            app:key="pref_sound_asr"
+            app:title="@string/pref_sound_asr"
+            app:summary="@string/default_sound"
+            app:iconSpaceReserved="false" />
+
+        <Preference
+            app:key="pref_sound_maghrib"
+            app:title="@string/pref_sound_maghrib"
+            app:summary="@string/default_sound"
+            app:iconSpaceReserved="false" />
+
+        <Preference
+            app:key="pref_sound_isha"
+            app:title="@string/pref_sound_isha"
+            app:summary="@string/default_sound"
+            app:iconSpaceReserved="false" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<permissions>
+    <privapp-permissions package="io.mesalabs.unica.prayertimes">
+        <permission name="android.permission.SCHEDULE_EXACT_ALARM" />
+        <permission name="android.permission.USE_EXACT_ALARM" />
+        <permission name="android.permission.RECEIVE_BOOT_COMPLETED" />
+        <permission name="android.permission.WAKE_LOCK" />
+        <permission name="android.permission.FOREGROUND_SERVICE" />
+        <permission name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
+        <permission name="android.permission.POST_NOTIFICATIONS" />
+        <permission name="android.permission.INTERNET" />
+    </privapp-permissions>
+</permissions>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<exceptions>
+    <exception package="io.mesalabs.unica.prayertimes">
+        <permission name="android.permission.SCHEDULE_EXACT_ALARM" fixed="true" />
+        <permission name="android.permission.POST_NOTIFICATIONS" fixed="true" />
+    </exception>
+</exceptions>

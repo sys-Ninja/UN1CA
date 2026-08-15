@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.PrayerTimes" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@color/samsung_blue</item>
+        <item name="colorPrimaryDark">@color/samsung_blue_dark</item>
+        <item name="colorAccent">@color/samsung_blue</item>
+    </style>
+    <style name="Theme.PrayerTimes.Settings" parent="Theme.PrayerTimes" />
+</resources>

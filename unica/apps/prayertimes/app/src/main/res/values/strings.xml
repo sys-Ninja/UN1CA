@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Prayer Times</string>
+    <string name="prayer_settings_title">Prayer Times Settings</string>
+    
+    <string name="pref_enabled">Enable Prayer Alarms</string>
+    <string name="pref_enabled_sum">Turn on or off Adhan and prayer notifications</string>
+    
+    <string name="pref_location_title">Current Location</string>
+    <string name="pref_location_sum">Select your city to update timings</string>
+    <string name="location_dialog_title">Search for your city</string>
+    <string name="location_hint">e.g., Cairo, Makkah, Riyadh</string>
+    <string name="location_searching">Searching…</string>
+    <string name="location_not_found">City not found</string>
+    
+    <string name="pref_sounds_category">Adhan Sounds</string>
+    <string name="pref_sound_fajr">Fajr Adhan</string>
+    <string name="pref_sound_dhuhr">Dhuhr Adhan</string>
+    <string name="pref_sound_asr">Asr Adhan</string>
+    <string name="pref_sound_maghrib">Maghrib Adhan</string>
+    <string name="pref_sound_isha">Isha Adhan</string>
+    <string name="default_sound">Default</string>
+    
+    <string name="notification_adhan_title">It is time for %1$s prayer</string>
+    <string name="notification_adhan_text">Tap to stop Adhan</string>
+    <string name="stop_adhan">Stop</string>
+    
+    <string name="prayer_fajr">Fajr</string>
+    <string name="prayer_dhuhr">Dhuhr</string>
+    <string name="prayer_asr">Asr</string>
+    <string name="prayer_maghrib">Maghrib</string>
+    <string name="prayer_isha">Isha</string>
+    
+    <string name="channel_adhan">Adhan Alarms</string>
+    
+    <string name="api_error">An error occurred while fetching prayer times. Check your internet connection.</string>
+</resources>
