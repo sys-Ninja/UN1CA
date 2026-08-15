@@ -110,7 +110,9 @@ jobs:
           echo -n "${{ secrets.PLATFORM_KEY_PEM }}" | base64 --decode > security/unica_platform.x509.pem
 
       - name: Build UnicaPrayerTimes
-        run: ./scripts/build_prayertimes_apk.sh
+        run: |
+          chmod +x ./scripts/build_prayertimes_apk.sh
+          ./scripts/build_prayertimes_apk.sh
 
       - name: Upload UnicaPrayerTimes
         uses: actions/upload-artifact@v4
