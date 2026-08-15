@@ -12,7 +12,7 @@ set -e
 
 SRC_DIR="$(dirname "$(readlink -f "$0")")/.."
 APP_DIR="$SRC_DIR/unica/apps/prayertimes"
-OUT_APK="$SRC_DIR/unica/mods/prayertimes/system/priv-app/UnicaPrayerTimes/UnicaPrayerTimes.apk"
+OUT_APK="$SRC_DIR/unica/mods/z_prayertimes/system/priv-app/UnicaPrayerTimes/UnicaPrayerTimes.apk"
 GRADLE_VERSION="8.9"
 
 SDK="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-}}"
