@@ -18,6 +18,7 @@ class UpdateReceiver : BroadcastReceiver() {
                 val ok = try {
                     YoutubeDL.getInstance().updateYoutubeDL(context, YoutubeDL.UpdateChannel.NIGHTLY)
                     Prefs.get(context).lastUpdateCheck = System.currentTimeMillis()
+                    App.saveYtdlpVersion(context)
                     true
                 } catch (e: Exception) {
                     false

@@ -16,9 +16,14 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreferenceCompat
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.json.JSONObject
+import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Locale
 
 class PrayerTimesSettingsActivity : AppCompatActivity() {
@@ -39,11 +44,106 @@ class PrayerTimesFragment : PreferenceFragmentCompat() {
     )
     private var currentSoundPicker: String? = null
 
+    /** Coroutine job for the live countdown ticker. */
+    private var countdownJob: Job? = null
+
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         preferenceManager.preferenceDataStore = null
         setPreferencesFromResource(R.xml.prayer_preferences, rootKey)
         bindPreferences()
     }
+
+    override fun onResume() {
+        super.onResume()
+        startCountdown()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        countdownJob?.cancel()
+        countdownJob = null
+    }
+
+    // ── Countdown helpers ────────────────────────────────────────────────────
+
+    private fun startCountdown() {
+        countdownJob?.cancel()
+        countdownJob = lifecycleScope.launch(Dispatchers.IO) {
+            while (isActive) {
+                val (name, millis) = findNextPrayerNow()
+                withContext(Dispatchers.Main) {
+                    updateCountdownPref(name, millis)
+                }
+                delay(1_000L)
+            }
+        }
+    }
+
+    /**
+     * Returns Pair(prayerName, millisUntilPrayer) for the next upcoming prayer,
+     * or Pair(null, -1) when nothing is found (no location / timings cached).
+     */
+    private fun findNextPrayerNow(): Pair<String?, Long> {
+        val prefs = Prefs.get(requireContext())
+        if (prefs.cachedTimings.isEmpty()) return null to -1L
+
+        return try {
+            val json = JSONObject(prefs.cachedTimings)
+            val dataArray = json.optJSONArray("data") ?: return null to -1L
+            val prayers = listOf("Fajr", "Dhuhr", "Asr", "Maghrib", "Isha")
+            val sdf = SimpleDateFormat("dd-MM-yyyy HH:mm", Locale.US)
+            val now = System.currentTimeMillis()
+
+            for (offset in 0..1) {
+                val cal = Calendar.getInstance()
+                cal.add(Calendar.DAY_OF_MONTH, offset)
+                val day = cal.get(Calendar.DAY_OF_MONTH)
+                val dayData = dataArray.optJSONObject(day - 1) ?: continue
+                val timings = dayData.optJSONObject("timings") ?: continue
+                val dateStr = dayData.optJSONObject("date")
+                    ?.optJSONObject("gregorian")?.optString("date") ?: continue
+
+                for (p in prayers) {
+                    val timeStr = timings.optString(p).substringBefore(" ")
+                    val dateObj = sdf.parse("$dateStr $timeStr") ?: continue
+                    if (dateObj.time > now) return p to (dateObj.time - now)
+                }
+            }
+            null to -1L
+        } catch (e: Exception) {
+            null to -1L
+        }
+    }
+
+    private fun updateCountdownPref(prayerName: String?, millisUntil: Long) {
+        val pref = findPreference<Preference>("pref_next_prayer") ?: return
+        if (prayerName == null || millisUntil < 0) {
+            pref.summary = getString(R.string.pref_next_prayer_unknown)
+            return
+        }
+
+        // Localised prayer name
+        val nameRes = when (prayerName) {
+            "Fajr"    -> R.string.prayer_fajr
+            "Dhuhr"   -> R.string.prayer_dhuhr
+            "Asr"     -> R.string.prayer_asr
+            "Maghrib" -> R.string.prayer_maghrib
+            "Isha"    -> R.string.prayer_isha
+            else      -> null
+        }
+        val localName = if (nameRes != null) getString(nameRes) else prayerName
+
+        // Format HH:MM:SS
+        val totalSec = millisUntil / 1000
+        val h = totalSec / 3600
+        val m = (totalSec % 3600) / 60
+        val s = totalSec % 60
+        val timeStr = String.format(Locale.US, "%02d:%02d:%02d", h, m, s)
+
+        pref.summary = getString(R.string.pref_next_prayer_sum_format, localName, timeStr)
+    }
+
+    // ── Existing preference binding ──────────────────────────────────────────
 
     private fun bindPreferences() {
         val prefs = Prefs.get(requireContext())

@@ -37,7 +37,7 @@
     return p0
 .end method
 
-.method public handlePreferenceTreeClick(Landroid/support/v7/preference/Preference;)Z
+.method public handlePreferenceTreeClick(Landroidx/preference/Preference;)Z
     .locals 3
 
     iget-object v0, p0, Lcom/android/settingslib/core/AbstractPreferenceController;->mContext:Landroid/content/Context;

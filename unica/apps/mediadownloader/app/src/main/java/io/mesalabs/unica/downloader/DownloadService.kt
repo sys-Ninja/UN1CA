@@ -99,6 +99,14 @@ class DownloadService : Service() {
         }
     }
 
+    /** Scan multiple files at once — used after playlist downloads. */
+    private fun scanFiles(paths: List<String>) {
+        if (paths.isEmpty()) return
+        MediaScannerConnection.scanFile(this, paths.toTypedArray(), null) { p, _ ->
+            Log.d(App.TAG, "MediaScanner scanned: $p")
+        }
+    }
+
     private fun runDownload(item: DownloadItem) {
         DownloadRepo.update(item.id) { it.status = DlStatus.RUNNING }
         notifyProgress(item.id, item.title, 0f, "", null)
@@ -109,6 +117,14 @@ class DownloadService : Service() {
             thumb = loadThumbnail(item.thumbnail)
             if (thumb != null) notifyProgress(item.id, item.title, 0f, "", thumb)
         }
+
+        // Snapshot existing files before download so we can diff afterwards
+        val prefs = Prefs.get(this)
+        val dlDir = File(prefs.downloadDir).also { it.mkdirs() }
+        val before: Set<String> = dlDir.walkTopDown()
+            .filter { it.isFile }
+            .map { it.absolutePath }
+            .toHashSet()
 
         var attempt = 0
         while (true) {
@@ -124,14 +140,26 @@ class DownloadService : Service() {
                         notifyProgress(item.id, item.title, progress, line, thumb)
                     }
                 Log.i(App.TAG, "done ${item.id}: ${resp.elapsedTime}ms")
-                val filePath = guessFile(item)
+
+                // Find newly added files (diff against pre-download snapshot)
+                val newFiles: List<String> = dlDir.walkTopDown()
+                    .filter { it.isFile && it.absolutePath !in before }
+                    .filter { f ->
+                        !f.name.endsWith(".part") &&
+                        !f.name.endsWith(".ytdl") &&
+                        !f.name.endsWith(".temp")
+                    }
+                    .map { it.absolutePath }
+                    .toList()
+
+                val filePath = newFiles.firstOrNull()
                 DownloadRepo.update(item.id) {
                     it.status = DlStatus.DONE
                     it.progress = 100f
                     it.filePath = filePath
                 }
-                // Tell MediaStore about the new file so Gallery/Studio see it
-                scanFile(filePath)
+                // Scan all new files so Gallery/Studio see them immediately
+                scanFiles(newFiles)
                 notifyDone(item, thumb)
                 return
             } catch (e: YoutubeDL.CanceledException) {
@@ -161,15 +189,7 @@ class DownloadService : Service() {
         }
     }
 
-    private fun guessFile(item: DownloadItem): String? {
-        val prefs = Prefs.get(this)
-        val dir = if (item.playlistTitle != null && prefs.organizePlaylists)
-            File(prefs.downloadDir, DownloadRepo.sanitize(item.playlistTitle))
-        else File(prefs.downloadDir)
-        return dir.listFiles { f -> 
-            f.isFile && !f.name.endsWith(".part") && !f.name.endsWith(".ytdl") && !f.name.endsWith(".temp")
-        }?.maxByOrNull { it.lastModified() }?.absolutePath
-    }
+
 
     private fun baseNotification(text: String): Notification =
         NotificationCompat.Builder(this, App.CHANNEL_PROGRESS)

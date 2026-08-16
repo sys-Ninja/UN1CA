@@ -3,6 +3,8 @@ package io.mesalabs.unica.downloader
 import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.content.Context
+import android.provider.Settings
 import android.util.Log
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
@@ -32,6 +34,8 @@ class App : Application() {
                 YoutubeDL.getInstance().init(this@App)
                 FFmpeg.getInstance().init(this@App)
                 libReady = true
+                // Persist current yt-dlp version so SecSettings can display it
+                saveYtdlpVersion(this@App)
             } catch (e: Exception) {
                 Log.e(TAG, "yt-dlp init failed", e)
             }
@@ -81,5 +85,21 @@ class App : Application() {
         const val CHANNEL_CLIPBOARD = "clipboard"
         lateinit var instance: App
             private set
+
+        /** Write the current yt-dlp version to Settings.System for SecSettings to read. */
+        fun saveYtdlpVersion(context: Context) {
+            try {
+                val version = YoutubeDL.getInstance().version(context)
+                if (!version.isNullOrBlank()) {
+                    Settings.System.putString(
+                        context.contentResolver,
+                        "unica_dl_ytdlp_version",
+                        version
+                    )
+                }
+            } catch (e: Exception) {
+                Log.w(TAG, "Could not read yt-dlp version", e)
+            }
+        }
     }
 }

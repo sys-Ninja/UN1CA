@@ -32,6 +32,9 @@
     <string name="prayer_isha">العشاء</string>
     
     <string name="channel_adhan">تنبيهات الأذان</string>
+    <string name="pref_next_prayer_title">الصلاة القادمة</string>
+    <string name="pref_next_prayer_sum_format">%1$s · متبقي %2$s</string>
+    <string name="pref_next_prayer_unknown">لا توجد صلاة مجدولة</string>
     
     <string name="api_error">حدث خطأ أثناء جلب المواقيت. تأكد من اتصالك بالإنترنت.</string>
 </resources>

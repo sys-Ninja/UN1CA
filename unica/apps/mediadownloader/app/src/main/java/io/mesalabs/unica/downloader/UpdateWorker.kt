@@ -13,6 +13,7 @@ class UpdateWorker(ctx: Context, params: WorkerParameters) : CoroutineWorker(ctx
             YoutubeDL.getInstance()
                 .updateYoutubeDL(applicationContext, YoutubeDL.UpdateChannel.NIGHTLY)
             Prefs.get(applicationContext).lastUpdateCheck = System.currentTimeMillis()
+            App.saveYtdlpVersion(applicationContext)
             Result.success()
         } catch (e: Exception) {
             Log.w(App.TAG, "yt-dlp update failed", e)

@@ -2,6 +2,14 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <!-- Next prayer countdown — updated every second in PrayerTimesFragment -->
+    <Preference
+        app:key="pref_next_prayer"
+        app:title="@string/pref_next_prayer_title"
+        app:summary="@string/pref_next_prayer_unknown"
+        app:selectable="false"
+        app:iconSpaceReserved="false" />
+
     <SwitchPreferenceCompat
         app:key="pref_enabled"
         app:title="@string/pref_enabled"
