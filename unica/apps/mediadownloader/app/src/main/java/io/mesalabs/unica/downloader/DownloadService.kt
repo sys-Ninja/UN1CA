@@ -94,7 +94,7 @@ class DownloadService : Service() {
     /** Notify MediaScanner so the file appears in Gallery / Studio immediately. */
     private fun scanFile(path: String?) {
         if (path == null) return
-        MediaScannerConnection.scanFile(this, arrayOf(path), null) { p, _ ->
+        MediaScannerConnection.scanFile(applicationContext, arrayOf(path), null) { p, _ ->
             Log.d(App.TAG, "MediaScanner scanned: $p")
         }
     }
@@ -102,7 +102,7 @@ class DownloadService : Service() {
     /** Scan multiple files at once — used after playlist downloads. */
     private fun scanFiles(paths: List<String>) {
         if (paths.isEmpty()) return
-        MediaScannerConnection.scanFile(this, paths.toTypedArray(), null) { p, _ ->
+        MediaScannerConnection.scanFile(applicationContext, paths.toTypedArray(), null) { p, _ ->
             Log.d(App.TAG, "MediaScanner scanned: $p")
         }
     }
