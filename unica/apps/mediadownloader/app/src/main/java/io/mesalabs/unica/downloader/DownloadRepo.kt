@@ -75,9 +75,10 @@ object DownloadRepo {
             // TikTok requires a realistic browser User-Agent to avoid 403/empty results
             if (isTikTok(url)) {
                 addOption("--user-agent",
-                    "Mozilla/5.0 (Linux; Android 14; SM-A528B) AppleWebKit/537.36 " +
-                    "(KHTML, like Gecko) Chrome/125.0.0.0 Mobile Safari/537.36")
-                addOption("--extractor-args", "tiktok:api_hostname=api22-normal-c-useast1a.tiktokv.com")
+                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 " +
+                    "(KHTML, like Gecko) Chrome/125.0.6422.141 Safari/537.36")
+                addOption("--extractor-args",
+                    "tiktok:app_name=tiktok_web;app_version=1.0.0;manifest_app_version=1.0.0")
             }
         }
         val out = YoutubeDL.getInstance().execute(req).out
@@ -121,12 +122,13 @@ object DownloadRepo {
             addOption("--restrict-filenames")
             if (item.playlistItems != null) addOption("--playlist-items", item.playlistItems)
             if (item.playlistTitle == null) addOption("--no-playlist")
-            // TikTok-specific: needs mobile UA + API hostname workaround
+            // TikTok-specific: needs desktop UA + app_name workaround
             if (isTikTok(item.url)) {
                 addOption("--user-agent",
-                    "Mozilla/5.0 (Linux; Android 14; SM-A528B) AppleWebKit/537.36 " +
-                    "(KHTML, like Gecko) Chrome/125.0.0.0 Mobile Safari/537.36")
-                addOption("--extractor-args", "tiktok:api_hostname=api22-normal-c-useast1a.tiktokv.com")
+                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 " +
+                    "(KHTML, like Gecko) Chrome/125.0.6422.141 Safari/537.36")
+                addOption("--extractor-args",
+                    "tiktok:app_name=tiktok_web;app_version=1.0.0;manifest_app_version=1.0.0")
             }
             if (item.audioOnly) {
                 addOption("-x")

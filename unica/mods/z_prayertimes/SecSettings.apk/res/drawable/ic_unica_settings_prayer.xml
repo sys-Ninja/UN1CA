@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector android:height="28.0dp" android:width="28.0dp" android:viewportWidth="28.0" android:viewportHeight="28.0"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <path android:fillColor="@color/unica_settings_ic_dl_color" android:pathData="M14,14m-14,0a14,14 0,1 1,28 0a14,14 0,1 1,-28 0" android:strokeColor="#00000000" android:strokeWidth="1.0" android:fillType="evenOdd" />
+    <group android:scaleX="0.58" android:scaleY="0.58" android:translateX="7.04" android:translateY="7.04">
+        <path android:fillColor="#ffffff" android:pathData="M12,3a9,9 0,1 0,9,9c0,-0.47 -0.04,-0.93 -0.11,-1.38 -0.72,1.1 -1.96,1.84 -3.39,1.84a4.5,4.5 0,1 1,0,-9c0.5,0 0.98,0.08 1.44,0.22A8.98,8.98 0,0 0,12,3z" android:strokeColor="#00000000" android:strokeWidth="1.0" android:fillType="nonZero" />
+    </group>
+    <path android:fillColor="@color/sec_dashboard_layer_color" android:pathData="M14,14m-14,0a14,14 0,1 1,28 0a14,14 0,1 1,-28 0" android:strokeColor="#00000000" android:strokeWidth="1.0" android:fillType="evenOdd" />
+</vector>

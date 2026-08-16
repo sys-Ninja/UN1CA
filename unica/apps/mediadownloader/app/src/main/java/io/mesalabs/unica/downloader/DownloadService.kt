@@ -65,7 +65,10 @@ class DownloadService : Service() {
                 }
             } finally {
                 working.set(false)
-                stopForeground(STOP_FOREGROUND_REMOVE)
+                // Detach (don't remove) the foreground notification so any
+                // "done" / "failed" notification posted just before this can
+                // still be seen by the user.
+                stopForeground(STOP_FOREGROUND_DETACH)
                 stopSelf()
             }
         }
@@ -158,6 +161,8 @@ class DownloadService : Service() {
                     it.progress = 100f
                     it.filePath = filePath
                 }
+                // Cancel the "in-progress" notification first
+                nm.cancel(item.id.hashCode())
                 // Scan all new files so Gallery/Studio see them immediately
                 scanFiles(newFiles)
                 notifyDone(item, thumb)
