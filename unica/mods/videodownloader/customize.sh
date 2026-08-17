@@ -16,13 +16,12 @@ mkdir -p "$LIB_DIR"
 unzip -o "$APK_PATH" 'lib/arm64-v8a/*' -d /tmp/unica_dl_extract/ > /dev/null 2>&1
 if [ -d "/tmp/unica_dl_extract/lib/arm64-v8a" ]; then
     cp /tmp/unica_dl_extract/lib/arm64-v8a/* "$LIB_DIR/"
-    # FIX: apply 644 to ALL .so files FIRST (shared libraries, not executables)
-    # THEN apply 755 to libpython.so LAST — it is the Python interpreter and
-    # must be executable. Order matters.
+    # Apply 644 to all libraries first, then grant 755 (+x) to executable binaries:
+    # libpython.so (Python runtime), libffmpeg.so & libffprobe.so (FFmpeg binaries for stream merging), libqjs.so (QuickJS engine)
     chmod 644 "$LIB_DIR/"*.so 2>/dev/null || true
-    chmod 755 "$LIB_DIR/libpython.so"
+    chmod 755 "$LIB_DIR/libpython.so" "$LIB_DIR/libffmpeg.so" "$LIB_DIR/libffprobe.so" "$LIB_DIR/libqjs.so" 2>/dev/null || true
     LIB_COUNT=$(find "$LIB_DIR" -maxdepth 1 -name "*.so" | wc -l)
-    LOG "- Extracted ${LIB_COUNT} native lib(s) to lib/arm64 (libpython.so +x)"
+    LOG "- Extracted ${LIB_COUNT} native lib(s) to lib/arm64 (binaries +x)"
 else
     LOG "\033[0;33m! No arm64-v8a libs found in APK\033[0m"
 fi

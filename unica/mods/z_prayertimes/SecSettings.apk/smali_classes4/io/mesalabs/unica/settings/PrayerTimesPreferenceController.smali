@@ -29,13 +29,15 @@
 
     new-instance v1, Landroid/content/Intent;
 
+    invoke-direct {v1}, Landroid/content/Intent;-><init>()V
+
     const-string v2, "io.mesalabs.unica.prayertimes"
 
     const-string v3, "io.mesalabs.unica.prayertimes.PrayerTimesSettingsActivity"
 
-    invoke-direct {v1, v2, v3}, Landroid/content/Intent;-><init>(Ljava/lang/String;Ljava/lang/String;)V
+    invoke-virtual {v1, v2, v3}, Landroid/content/Intent;->setClassName(Ljava/lang/String;Ljava/lang/String;)Landroid/content/Intent;
 
-    const/16 v2, 0x10000000
+    const/high16 v2, 0x10000000
 
     invoke-virtual {v1, v2}, Landroid/content/Intent;->addFlags(I)Landroid/content/Intent;
 
@@ -85,7 +87,7 @@
 
     const/4 p0, 0x0
 
-    return p0
+    return-object p0
 .end method
 
 .method public bridge synthetic getStatusText()Ljava/lang/String;
@@ -109,7 +111,7 @@
 
     const/4 p0, 0x0
 
-    return p0
+    return-object p0
 .end method
 
 .method public bridge synthetic ignoreUserInteraction()V
@@ -123,7 +125,7 @@
 
     const/4 p0, 0x0
 
-    return p0
+    return-object p0
 .end method
 
 .method public bridge synthetic isPublicSlice()Z
@@ -131,7 +133,7 @@
 
     const/4 p0, 0x0
 
-    return p0
+    return-object p0
 .end method
 
 .method public bridge synthetic isSliceable()Z
@@ -139,7 +141,7 @@
 
     const/4 p0, 0x0
 
-    return p0
+    return-object p0
 .end method
 
 .method public bridge synthetic needUserInteraction(Ljava/lang/Object;)Lcom/samsung/android/settings/cube/Controllable$ControllableType;
@@ -155,7 +157,7 @@
 
     const/4 p0, 0x0
 
-    return p0
+    return-object p0
 .end method
 
 .method public bridge synthetic setValue(Lcom/samsung/android/settings/cube/ControlValue;)Lcom/samsung/android/settings/cube/ControlResult;
@@ -171,5 +173,5 @@
 
     const/4 p0, 0x0
 
-    return p0
+    return-object p0
 .end method
