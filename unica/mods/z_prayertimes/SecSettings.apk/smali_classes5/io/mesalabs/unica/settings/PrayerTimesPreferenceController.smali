@@ -15,23 +15,8 @@
 
 # virtual methods
 .method public getAvailabilityStatus()I
-    .locals 1
+    .locals 0
 
-    iget-object v0, p0, Lcom/android/settingslib/core/AbstractPreferenceController;->mContext:Landroid/content/Context;
-
-    const-string p0, "io.mesalabs.unica.prayertimes"
-
-    invoke-static {v0, p0}, Lcom/android/settings/Utils;->isPackageEnabled(Landroid/content/Context;Ljava/lang/String;)Z
-
-    move-result p0
-
-    if-nez p0, :cond_0
-
-    const/4 p0, 0x3
-
-    return p0
-
-    :cond_0
     const/4 p0, 0x0
 
     return p0

@@ -65,10 +65,13 @@ class DownloadService : Service() {
                 }
             } finally {
                 working.set(false)
-                // Detach (don't remove) the foreground notification so any
-                // "done" / "failed" notification posted just before this can
-                // still be seen by the user.
+                // Detach so any "done"/"failed" notification posted just before
+                // this call is still visible to the user.
                 stopForeground(STOP_FOREGROUND_DETACH)
+                // The detached foreground notification has ongoing=true so the
+                // user CANNOT swipe it away. Cancel it explicitly so it vanishes
+                // the moment all downloads are finished.
+                nm.cancel(FG_ID)
                 stopSelf()
             }
         }
