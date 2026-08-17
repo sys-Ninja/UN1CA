@@ -25,20 +25,30 @@ class App : Application() {
     var libReady = false
         private set
 
+    fun ensureInit(context: Context = this) {
+        if (!libReady) {
+            synchronized(this) {
+                if (!libReady) {
+                    try {
+                        YoutubeDL.getInstance().init(context.applicationContext)
+                        FFmpeg.getInstance().init(context.applicationContext)
+                        libReady = true
+                        saveYtdlpVersion(context.applicationContext)
+                        Log.i(TAG, "YoutubeDL and FFmpeg initialized successfully")
+                    } catch (e: Exception) {
+                        Log.e(TAG, "yt-dlp/ffmpeg init failed", e)
+                    }
+                }
+            }
+        }
+    }
+
     override fun onCreate() {
         super.onCreate()
         instance = this
         createChannels()
         appScope.launch {
-            try {
-                YoutubeDL.getInstance().init(this@App)
-                FFmpeg.getInstance().init(this@App)
-                libReady = true
-                // Persist current yt-dlp version so SecSettings can display it
-                saveYtdlpVersion(this@App)
-            } catch (e: Exception) {
-                Log.e(TAG, "yt-dlp init failed", e)
-            }
+            ensureInit(this@App)
         }
         if (Prefs.get(this).autoUpdate) scheduleUpdate()
         if (Prefs.get(this).clipboardMonitor && Prefs.get(this).enabled) {

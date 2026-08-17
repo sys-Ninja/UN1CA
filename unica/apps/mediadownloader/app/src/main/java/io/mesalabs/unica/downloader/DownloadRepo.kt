@@ -3,7 +3,6 @@ package io.mesalabs.unica.downloader
 import android.content.Context
 import android.net.Uri
 import android.util.Log
-import com.yausername.ffmpeg.FFmpeg
 import com.yausername.youtubedl_android.YoutubeDL
 import com.yausername.youtubedl_android.YoutubeDLRequest
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -67,6 +66,7 @@ object DownloadRepo {
 
     /** Runs yt-dlp -J to fetch metadata. Blocking — call from IO dispatcher. */
     fun fetchMeta(url: String): VideoMeta {
+        App.instance.ensureInit()
         val req = YoutubeDLRequest(url).apply {
             addOption("--dump-single-json")
             addOption("--flat-playlist")
@@ -107,6 +107,7 @@ object DownloadRepo {
         name.replace(Regex("[\\\\/:*?\"<>|]"), "_").trim().take(120).ifBlank { "playlist" }
 
     fun buildRequest(ctx: Context, item: DownloadItem): YoutubeDLRequest {
+        App.instance.ensureInit(ctx)
         val prefs = Prefs.get(ctx)
         val baseDir = File(prefs.downloadDir)
         val outTemplate: String
@@ -121,16 +122,6 @@ object DownloadRepo {
             addOption("--no-mtime")
             addOption("--no-warnings")
             addOption("--restrict-filenames")
-            // Tell yt-dlp exactly where to find the bundled FFmpeg binary so it
-            // can merge separate video+audio streams into a single MP4 file.
-            // Without this, yt-dlp cannot find ffmpeg on Android and saves
-            // video and audio as two separate files.
-            try {
-                val ffmpegPath = FFmpeg.getInstance().ffmpegPath
-                if (!ffmpegPath.isNullOrBlank()) addOption("--ffmpeg-location", ffmpegPath)
-            } catch (e: Exception) {
-                Log.w(App.TAG, "ffmpeg path unavailable: ${e.message}")
-            }
             if (item.playlistItems != null) addOption("--playlist-items", item.playlistItems)
             if (item.playlistTitle == null) addOption("--no-playlist")
             // TikTok-specific: needs desktop UA + app_name workaround
@@ -148,7 +139,7 @@ object DownloadRepo {
             } else {
                 val fmt = when (item.quality) {
                     "best" -> "bestvideo+bestaudio/best"
-                    else -> "bestvideo[height<=${item.quality}]+bestaudio/best[height<=${item.quality}]"
+                    else -> "bestvideo[height<=${item.quality}]+bestaudio/best[height<=${item.quality}]/best"
                 }
                 addOption("-f", fmt)
                 addOption("--merge-output-format", "mp4")
