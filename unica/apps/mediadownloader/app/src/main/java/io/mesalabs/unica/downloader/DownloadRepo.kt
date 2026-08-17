@@ -61,7 +61,7 @@ object DownloadRepo {
 
     private fun isTikTok(url: String): Boolean {
         val host = try { Uri.parse(url).host?.lowercase() ?: "" } catch (e: Exception) { "" }
-        return host == "tiktok.com" || host.endsWith(".tiktok.com") || host == "vm.tiktok.com"
+        return host == "tiktok.com" || host.endsWith(".tiktok.com") || host == "vm.tiktok.com" || host == "vt.tiktok.com"
     }
 
     /** Runs yt-dlp -J to fetch metadata. Blocking — call from IO dispatcher. */
@@ -73,13 +73,11 @@ object DownloadRepo {
             addOption("--no-warnings")
             addOption("-R", "1")
             addOption("--socket-timeout", "15")
-            // TikTok requires a realistic browser User-Agent to avoid 403/empty results
             if (isTikTok(url)) {
                 addOption("--user-agent",
                     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 " +
-                    "(KHTML, like Gecko) Chrome/125.0.6422.141 Safari/537.36")
-                addOption("--extractor-args",
-                    "tiktok:app_name=tiktok_web;app_version=1.0.0;manifest_app_version=1.0.0")
+                    "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+                addOption("--referer", "https://www.tiktok.com/")
             }
         }
         val out = YoutubeDL.getInstance().execute(req).out
@@ -124,13 +122,11 @@ object DownloadRepo {
             addOption("--restrict-filenames")
             if (item.playlistItems != null) addOption("--playlist-items", item.playlistItems)
             if (item.playlistTitle == null) addOption("--no-playlist")
-            // TikTok-specific: needs desktop UA + app_name workaround
             if (isTikTok(item.url)) {
                 addOption("--user-agent",
                     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 " +
-                    "(KHTML, like Gecko) Chrome/125.0.6422.141 Safari/537.36")
-                addOption("--extractor-args",
-                    "tiktok:app_name=tiktok_web;app_version=1.0.0;manifest_app_version=1.0.0")
+                    "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+                addOption("--referer", "https://www.tiktok.com/")
             }
             if (item.audioOnly) {
                 addOption("-x")
