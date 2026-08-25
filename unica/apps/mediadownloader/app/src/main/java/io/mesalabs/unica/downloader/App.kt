@@ -80,9 +80,18 @@ class App : Application() {
                 NotificationManager.IMPORTANCE_DEFAULT
             )
         )
+        // Silent background channel — used for the ongoing "monitoring" notification.
+        // Deliberately IMPORTANCE_MIN so it never makes noise or shows as a heads-up.
         nm.createNotificationChannel(
             NotificationChannel(
-                CHANNEL_CLIPBOARD, getString(R.string.channel_clipboard),
+                CHANNEL_CLIPBOARD_SERVICE, getString(R.string.channel_clipboard_service),
+                NotificationManager.IMPORTANCE_MIN
+            ).apply { setShowBadge(false) }
+        )
+        // High-importance channel — used only for the one-shot "tap to download" prompt.
+        nm.createNotificationChannel(
+            NotificationChannel(
+                CHANNEL_CLIPBOARD_PROMPT, getString(R.string.channel_clipboard),
                 NotificationManager.IMPORTANCE_HIGH
             )
         )
@@ -92,7 +101,12 @@ class App : Application() {
         const val TAG = "UnicaDownloader"
         const val CHANNEL_PROGRESS = "progress"
         const val CHANNEL_DONE = "done"
-        const val CHANNEL_CLIPBOARD = "clipboard"
+        /** Silent persistent channel for the clipboard monitor foreground notification. */
+        const val CHANNEL_CLIPBOARD_SERVICE = "clipboard_service"
+        /** High-importance channel for the "tap to download" offer notification. */
+        const val CHANNEL_CLIPBOARD_PROMPT = "clipboard_prompt"
+        // Keep old constant as alias so SettingsActivity string reference still compiles
+        const val CHANNEL_CLIPBOARD = CHANNEL_CLIPBOARD_PROMPT
         lateinit var instance: App
             private set
 
