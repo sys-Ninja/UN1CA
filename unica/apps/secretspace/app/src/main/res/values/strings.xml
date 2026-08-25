@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">المساحة السرية</string>
+    <string name="secret_space_title">المساحة السرية (Ghost Space)</string>
+    <string name="secret_space_summary">بيئة هاتف ثانية معزولة 100% تفتح ببصمة إصبع مخصصة</string>
+    <string name="status_not_created">غير مفعلة (لم يتم إنشاء المساحة)</string>
+    <string name="status_active">نشطة ومعزولة (User ID: %1$d)</string>
+    <string name="btn_create_space">إنشاء وتفعيل المساحة السرية</string>
+    <string name="btn_enter_space">الدخول إلى المساحة السرية</string>
+    <string name="btn_delete_space">حذف المساحة السرية وجميع بياناتها</string>
+    <string name="creating_space">جاري تهيئة المساحة السرية وعزل البيانات...</string>
+    <string name="deleting_space">جاري حذف المساحة السرية نهائياً...</string>
+    <string name="fingerprint_section_title">فتح القفل السريع بالبصمة</string>
+    <string name="fingerprint_summary">اختر بصمة إصبع لفتح المساحة السرية مباشرة من شاشة القفل</string>
+    <string name="fingerprint_not_set">لم يتم تعيين بصمة مخصصة</string>
+    <string name="fingerprint_assigned">تم تعيين: %1$s</string>
+    <string name="network_isolation_title">عزل الشبكة والـ IP</string>
+    <string name="network_isolation_summary">استخدام نفق VPN معزول دائماً للحفاظ على سرية عنوان الـ IP</string>
+    <string name="lock_screen_off_title">القفل عند إطفاء الشاشة</string>
+    <string name="lock_screen_off_summary">إغلاق وتأمين المساحة السرية تلقائياً فور إغلاق الشاشة</string>
+    <string name="delete_confirm_title">هل أنت متأكد من حذف المساحة؟</string>
+    <string name="delete_confirm_msg">سيتم مسح جميع التطبيقات والصور والملفات وحسابات جوجل الموجودة داخل المساحة السرية نهائياً ولا يمكن استرجاعها.</string>
+    <string name="confirm_delete">حذف نهائي</string>
+    <string name="cancel">إلغاء</string>
+    <string name="space_created_success">تم إنشاء المساحة السرية بنجاح!</string>
+    <string name="space_deleted_success">تم حذف المساحة السرية بنجاح.</string>
+</resources>
