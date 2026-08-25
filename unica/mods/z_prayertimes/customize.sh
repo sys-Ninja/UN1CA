@@ -1,9 +1,6 @@
 # shellcheck disable=SC2034
 SKIPUNZIP=1
 
-# Guard: fail loudly if the APK was not placed here by the build system.
-# In CI this file is downloaded from the 'prayertimes' job artifact before
-# make_rom.sh runs.  Locally, run ./scripts/build_prayertimes_apk.sh first.
 if [ ! -f "$MODPATH/system/priv-app/UnicaPrayerTimes/UnicaPrayerTimes.apk" ]; then
     LOGE "UnicaPrayerTimes.apk not found at $MODPATH/system/priv-app/UnicaPrayerTimes/"
     LOGE "Run ./scripts/build_prayertimes_apk.sh and retry."
@@ -33,7 +30,7 @@ while IFS= read -r f; do
             PATCH_INST="$(head -n 1 "$MODPATH/SecSettings.apk/$f")"
             CONTENT="$(tail -n +2 "$MODPATH/SecSettings.apk/$f")"
         fi
-        CONTENT="$(sed -e "s/\"/\\\\\"/g" -e "s/\\\$/$\\\$/g" -e "s/ /\\ /g" -e "s/\\\\n/\\\\\\\n/g" <<< "$CONTENT")"
+        CONTENT="$(sed -e "s/\"/\\\\\"/g" -e "s/\\$/\\\\$/g" -e "s/ /\\\ /g" -e "s/\\\\n/\\\\\\\\\n/g" <<< "$CONTENT")"
         CONTENT="$(sed -E ':a;N;$!ba;s/\r{0,1}\n/\\n/g' <<< "$CONTENT")"
         EVAL "sed -i \"$PATCH_INST $CONTENT\" \"$APKTOOL_DIR/system/priv-app/SecSettings/SecSettings.apk/$f\""
     fi
