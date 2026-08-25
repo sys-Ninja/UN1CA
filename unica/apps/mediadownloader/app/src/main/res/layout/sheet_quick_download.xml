@@ -1,139 +1,216 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- One UI-style Bottom Sheet for media download -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="20dp">
+    android:background="@drawable/bg_bottom_sheet"
+    android:paddingBottom="16dp">
 
-    <ImageView
-        android:id="@+id/thumbnail"
+    <!-- One UI drag handle -->
+    <View
+        android:layout_width="32dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="4dp"
+        android:background="@drawable/bg_drag_handle" />
+
+    <!-- Thumbnail card — rounded corners One UI style -->
+    <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="180dp"
-        android:scaleType="centerCrop"
-        android:background="#20000000"
-        android:contentDescription="@string/app_name" />
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="8dp"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="0dp"
+        app:cardBackgroundColor="?attr/colorSurfaceVariant">
 
+        <ImageView
+            android:id="@+id/thumbnail"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:contentDescription="@string/app_name" />
+    </androidx.cardview.widget.CardView>
+
+    <!-- Title -->
     <TextView
         android:id="@+id/title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:textSize="16sp"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="14dp"
+        android:textSize="17sp"
         android:textStyle="bold"
+        android:textColor="?attr/colorOnSurface"
         android:maxLines="2"
-        android:ellipsize="end" />
+        android:ellipsize="end"
+        android:lineSpacingMultiplier="1.1" />
 
+    <!-- Loading spinner (shown until meta is ready) -->
     <ProgressBar
         android:id="@+id/progress"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="16dp" />
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="8dp" />
 
+    <!-- Playlist options (shown only for playlists) -->
     <LinearLayout
         android:id="@+id/playlistGroup"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginHorizontal="16dp"
         android:visibility="gone">
 
-        <TextView
-            android:id="@+id/playlistLabel"
+        <!-- Card wraps playlist controls for One UI look -->
+        <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textStyle="bold" />
-
-        <RadioGroup
-            android:id="@+id/playlistOptions"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <RadioButton
-                android:id="@+id/optAll"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checked="true"
-                android:text="@string/playlist_all" />
-
-            <RadioButton
-                android:id="@+id/optRange"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/playlist_range" />
-
-            <RadioButton
-                android:id="@+id/optSelect"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/playlist_select" />
-        </RadioGroup>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <EditText
-                android:id="@+id/rangeFrom"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:inputType="number"
-                android:hint="@string/range_from"
-                android:importantForAutofill="no" />
-
-            <EditText
-                android:id="@+id/rangeTo"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:inputType="number"
-                android:hint="@string/range_to"
-                android:importantForAutofill="no" />
-        </LinearLayout>
-
-        <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:maxHeight="200dp">
+            app:cardCornerRadius="16dp"
+            app:cardElevation="0dp"
+            app:cardBackgroundColor="?attr/colorSurfaceVariant">
 
             <LinearLayout
-                android:id="@+id/itemsContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:visibility="gone" />
-        </ScrollView>
+                android:padding="16dp">
+
+                <TextView
+                    android:id="@+id/playlistLabel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:textSize="14sp"
+                    android:textColor="?attr/colorOnSurface" />
+
+                <RadioGroup
+                    android:id="@+id/playlistOptions"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginTop="8dp">
+
+                    <RadioButton
+                        android:id="@+id/optAll"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checked="true"
+                        android:text="@string/playlist_all" />
+
+                    <RadioButton
+                        android:id="@+id/optRange"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/playlist_range" />
+
+                    <RadioButton
+                        android:id="@+id/optSelect"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/playlist_select" />
+                </RadioGroup>
+
+                <!-- Range inputs — shown when optRange is selected -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="4dp">
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="8dp"
+                        android:hint="@string/range_from">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/rangeFrom"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="number"
+                            android:importantForAutofill="no" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:hint="@string/range_to">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/rangeTo"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="number"
+                            android:importantForAutofill="no" />
+                    </com.google.android.material.textfield.TextInputLayout>
+                </LinearLayout>
+
+                <!-- Scrollable checklist for individual item selection -->
+                <ScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:maxHeight="180dp">
+
+                    <LinearLayout
+                        android:id="@+id/itemsContainer"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:visibility="gone" />
+                </ScrollView>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
     </LinearLayout>
 
+    <!-- Action buttons — One UI pill/filled style -->
     <LinearLayout
         android:id="@+id/actions"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:layout_marginTop="16dp"
+        android:layout_marginHorizontal="16dp"
         android:visibility="gone">
 
-        <Button
+        <!-- Primary: Download Video (filled pill, Samsung blue) -->
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btnVideo"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/btn_best_video" />
+            android:layout_height="56dp"
+            android:text="@string/btn_best_video"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            app:cornerRadius="28dp"
+            style="@style/Widget.Material3.Button" />
 
-        <Button
+        <!-- Secondary: Audio only (tonal/outlined pill) -->
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btnAudio"
-            style="?attr/materialButtonOutlinedStyle"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/btn_audio_only" />
+            android:layout_height="56dp"
+            android:layout_marginTop="8dp"
+            android:text="@string/btn_audio_only"
+            android:textSize="15sp"
+            app:cornerRadius="28dp"
+            style="@style/Widget.Material3.Button.TonalButton" />
 
-        <Button
+        <!-- Tertiary: View downloads (text/borderless) -->
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btnDownloads"
-            style="?attr/borderlessButtonStyle"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/downloads_title" />
+            android:layout_height="48dp"
+            android:layout_marginTop="2dp"
+            android:text="@string/downloads_title"
+            android:textSize="14sp"
+            style="@style/Widget.Material3.Button.TextButton" />
     </LinearLayout>
 </LinearLayout>
