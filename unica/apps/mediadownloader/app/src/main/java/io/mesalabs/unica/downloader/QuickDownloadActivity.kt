@@ -1,7 +1,6 @@
 package io.mesalabs.unica.downloader
 
 import android.content.Intent
-import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.util.Patterns
 import android.view.View
@@ -10,12 +9,12 @@ import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import coil.load
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import io.mesalabs.unica.downloader.databinding.SheetQuickDownloadBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.net.URL
 import java.util.UUID
 
 class QuickDownloadActivity : AppCompatActivity() {
@@ -61,6 +60,26 @@ class QuickDownloadActivity : AppCompatActivity() {
         loadMeta(url!!)
     }
 
+    // Handle subsequent taps on clipboard notifications when the activity is
+    // already alive (launchMode=singleInstance means onCreate won't be called again).
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        val newUrl = extractUrl(intent) ?: return
+        if (newUrl == url) return   // same link, ignore
+        url = newUrl
+
+        // Reset state and reload
+        meta = null
+        checkboxes.clear()
+        binding.playlistGroup.visibility = View.GONE
+        binding.actions.visibility = View.GONE
+        binding.progress.visibility = View.VISIBLE
+        binding.title.text = newUrl
+        binding.thumbnail.setImageDrawable(null)
+
+        loadMeta(newUrl)
+    }
+
     private fun extractUrl(intent: Intent): String? {
         val text = when (intent.action) {
             Intent.ACTION_SEND -> intent.getStringExtra(Intent.EXTRA_TEXT)
@@ -69,7 +88,7 @@ class QuickDownloadActivity : AppCompatActivity() {
         } ?: return null
         val m = Patterns.WEB_URL.matcher(text)
         while (m.find()) {
-            val u = m.group()
+            val u = m.group() ?: continue
             if (u.startsWith("http")) return u
         }
         return null
@@ -83,19 +102,26 @@ class QuickDownloadActivity : AppCompatActivity() {
                     Thread.sleep(100); tries++
                 }
                 val m = DownloadRepo.fetchMeta(url)
-                val thumb = m.thumbnail?.let { t ->
-                    try {
-                        URL(t).openStream().use { BitmapFactory.decodeStream(it) }
-                    } catch (e: Exception) { null }
-                }
+
                 withContext(Dispatchers.Main) {
                     if (isFinishing) return@withContext
                     meta = m
+                    // Show title + buttons immediately — thumbnail loads separately below
                     binding.progress.visibility = View.GONE
                     binding.actions.visibility = View.VISIBLE
                     binding.title.text = m.title
-                    if (thumb != null) binding.thumbnail.setImageBitmap(thumb)
                     if (m.isPlaylist) setupPlaylistUi(m)
+                }
+
+                // Load thumbnail asynchronously via Coil — non-blocking for the UI
+                if (!m.thumbnail.isNullOrBlank()) {
+                    withContext(Dispatchers.Main) {
+                        if (!isFinishing) {
+                            binding.thumbnail.load(m.thumbnail) {
+                                crossfade(true)
+                            }
+                        }
+                    }
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
