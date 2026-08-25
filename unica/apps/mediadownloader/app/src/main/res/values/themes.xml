@@ -4,12 +4,34 @@
         <item name="android:windowActivityTransitions">true</item>
     </style>
 
+    <!--
+        Transparent host activity for the Bottom Sheet.
+        Must be windowIsTranslucent so the launcher/home shows behind
+        the dimmed sheet — matches One UI behaviour for share sheets.
+    -->
     <style name="Theme.Downloader.Dialog" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>
-        <item name="android:backgroundDimEnabled">false</item>
+        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:backgroundDimAmount">0.4</item>
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowIsFloating">false</item>
         <item name="android:windowAnimationStyle">@null</item>
+    </style>
+
+    <!-- Pill-shaped filled button (primary action) — One UI uses 28dp corners -->
+    <style name="Widget.Downloader.Button" parent="Widget.Material3.Button">
+        <item name="cornerRadius">28dp</item>
+        <item name="android:minHeight">56dp</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:letterSpacing">0.01</item>
+    </style>
+
+    <!-- Tonal pill button for secondary actions -->
+    <style name="Widget.Downloader.Button.Tonal" parent="Widget.Material3.Button.TonalButton">
+        <item name="cornerRadius">28dp</item>
+        <item name="android:minHeight">56dp</item>
+        <item name="android:textSize">15sp</item>
     </style>
 </resources>
