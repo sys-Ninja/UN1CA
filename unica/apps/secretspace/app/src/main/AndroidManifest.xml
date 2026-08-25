@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="io.mesalabs.unica.secretspace"
+    android:sharedUserId="android.uid.system">
+
+    <uses-permission android:name="android.permission.MANAGE_USERS" tools:ignore="ProtectedPermissions" />
+    <uses-permission android:name="android.permission.CREATE_USERS" tools:ignore="ProtectedPermissions" />
+    <uses-permission android:name="android.permission.INTERACT_ACROSS_USERS" tools:ignore="ProtectedPermissions" />
+    <uses-permission android:name="android.permission.INTERACT_ACROSS_USERS_FULL" tools:ignore="ProtectedPermissions" />
+    <uses-permission android:name="android.permission.USE_BIOMETRIC" />
+    <uses-permission android:name="android.permission.USE_FINGERPRINT" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
+    <application
+        android:name=".App"
+        android:allowBackup="false"
+        android:icon="@drawable/ic_ghost_space"
+        android:label="@string/app_name"
+        android:roundIcon="@drawable/ic_ghost_space"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.UnicaSecretSpace">
+
+        <!-- Main Settings & Control Center Activity -->
+        <activity
+            android:name=".SecretSpaceSettingsActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.UnicaSecretSpace">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <!-- Samsung Settings Integration Filter -->
+            <intent-filter>
+                <action android:name="io.mesalabs.unica.action.SECRET_SPACE_SETTINGS" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <!-- Quick Switch Broadcast Receiver -->
+        <receiver
+            android:name=".QuickSwitchReceiver"
+            android:exported="true"
+            android:permission="android.permission.MANAGE_USERS">
+            <intent-filter>
+                <action android:name="io.mesalabs.unica.action.SWITCH_TO_SECRET_SPACE" />
+                <action android:name="io.mesalabs.unica.action.SWITCH_TO_MAIN_SPACE" />
+            </intent-filter>
+        </receiver>
+
+    </application>
+
+</manifest>
