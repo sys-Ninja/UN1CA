@@ -16,6 +16,9 @@ import androidx.core.app.NotificationCompat
 class ClipboardMonitorService : Service() {
 
     private var cm: ClipboardManager? = null
+    // In-memory cache of the last seen URL hash — avoids any Settings.System writes
+    // and ensures the listener never crashes with a SecurityException.
+    private var lastHashInMemory: Int = 0
 
     private val listener = ClipboardManager.OnPrimaryClipChangedListener {
         try {
@@ -23,10 +26,12 @@ class ClipboardMonitorService : Service() {
             if (clip.itemCount == 0) return@OnPrimaryClipChangedListener
             val text = clip.getItemAt(0).coerceToText(this).toString()
             val url = firstMediaUrl(text) ?: return@OnPrimaryClipChangedListener
-            val prefs = Prefs.get(this)
             val hash = url.hashCode()
-            if (hash == prefs.lastClipboardHash) return@OnPrimaryClipChangedListener
-            prefs.lastClipboardHash = hash
+            // Use in-memory hash first; also check persisted hash to survive service restarts
+            val prefs = Prefs.get(this)
+            if (hash == lastHashInMemory || hash == prefs.lastClipboardHash) return@OnPrimaryClipChangedListener
+            lastHashInMemory = hash
+            prefs.lastClipboardHash = hash   // SharedPreferences write — safe, no SecurityException
             offerDownload(url)
         } catch (e: Exception) {
             Log.w(App.TAG, "clipboard read failed", e)
@@ -35,13 +40,20 @@ class ClipboardMonitorService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        // Run as foreground so Android doesn't kill us due to app-idle
-        val n = NotificationCompat.Builder(this, App.CHANNEL_CLIPBOARD)
+        // Run as foreground on the SILENT service channel so Android doesn't kill us,
+        // but without making any noise or showing a heads-up.
+        val stopIntent = PendingIntent.getService(
+            this, 0,
+            Intent(this, ClipboardMonitorService::class.java).setAction(ACTION_STOP),
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        val n = NotificationCompat.Builder(this, App.CHANNEL_CLIPBOARD_SERVICE)
             .setSmallIcon(android.R.drawable.stat_sys_download)
             .setContentTitle(getString(R.string.app_name))
             .setContentText(getString(R.string.clip_monitor_running))
             .setOngoing(true)
             .setPriority(NotificationCompat.PRIORITY_MIN)
+            .addAction(0, getString(R.string.clip_monitor_stop), stopIntent)
             .build()
         startForeground(FOREGROUND_ID, n)
         cm = getSystemService(ClipboardManager::class.java)
@@ -53,6 +65,16 @@ class ClipboardMonitorService : Service() {
         }
     }
 
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        if (intent?.action == ACTION_STOP) {
+            // User tapped "Stop" in the notification — honour it and update the pref
+            Prefs.get(this).clipboardMonitor = false
+            stopSelf()
+            return START_NOT_STICKY
+        }
+        return START_STICKY
+    }
+
     override fun onDestroy() {
         try {
             cm?.removePrimaryClipChangedListener(listener)
@@ -62,15 +84,15 @@ class ClipboardMonitorService : Service() {
         super.onDestroy()
     }
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int = START_STICKY
-
     override fun onBind(intent: Intent?): IBinder? = null
 
     private fun firstMediaUrl(text: String): String? {
         val m = Patterns.WEB_URL.matcher(text)
         while (m.find()) {
-            val u = m.group()
+            var u = m.group() ?: continue
             if (!u.startsWith("http")) continue
+            // Strip trailing punctuation that might have been included in the match
+            u = u.trimEnd('.', ',', '!', '?', ';', ')', ']')
             val host = try { Uri.parse(u).host?.lowercase() ?: "" } catch (e: Exception) { "" }
             if (MEDIA_HOSTS.any { host == it || host.endsWith(".$it") }) return u
         }
@@ -83,10 +105,10 @@ class ClipboardMonitorService : Service() {
             Intent(this, QuickDownloadActivity::class.java)
                 .setAction(Intent.ACTION_VIEW)
                 .setData(Uri.parse(url))
-                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP),
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
-        val n: Notification = NotificationCompat.Builder(this, App.CHANNEL_CLIPBOARD)
+        val n: Notification = NotificationCompat.Builder(this, App.CHANNEL_CLIPBOARD_PROMPT)
             .setSmallIcon(android.R.drawable.stat_sys_download)
             .setContentTitle(getString(R.string.clip_notif_title))
             .setContentText(url)
@@ -99,14 +121,15 @@ class ClipboardMonitorService : Service() {
 
     companion object {
         private const val FOREGROUND_ID = 1002
+        const val ACTION_STOP = "io.mesalabs.unica.downloader.STOP_CLIPBOARD_MONITOR"
 
         val MEDIA_HOSTS = listOf(
             // Google / YouTube
             "youtube.com", "youtu.be", "m.youtube.com",
             // Meta
             "facebook.com", "fb.watch", "m.facebook.com", "instagram.com",
-            // TikTok
-            "tiktok.com", "vm.tiktok.com",
+            // TikTok — all known short-link and regional domains
+            "tiktok.com", "vm.tiktok.com", "vt.tiktok.com",
             // Twitter / X
             "twitter.com", "x.com",
             // Dailymotion
