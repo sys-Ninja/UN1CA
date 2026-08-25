@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="oneui_primary">#0381FE</color>
+    <color name="oneui_primary_dark">#0260BE</color>
+    <color name="oneui_background">#F7F8FA</color>
+    <color name="oneui_surface">#FFFFFF</color>
+    <color name="oneui_text_primary">#252525</color>
+    <color name="oneui_text_secondary">#7A7A7A</color>
+    <color name="oneui_destructive">#E53935</color>
+    <color name="oneui_card_bg">#FFFFFF</color>
+    <color name="oneui_stroke">#E0E0E0</color>
+</resources>
