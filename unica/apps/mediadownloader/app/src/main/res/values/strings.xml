@@ -6,7 +6,10 @@
 
     <string name="channel_progress">Download progress</string>
     <string name="channel_done">Completed downloads</string>
+    <!-- channel_clipboard kept as alias — used by legacy references -->
     <string name="channel_clipboard">Clipboard link detection</string>
+    <!-- Silent background channel label (shown in system notification settings) -->
+    <string name="channel_clipboard_service">Clipboard monitor (background)</string>
 
     <string name="notif_preparing">Preparing download…</string>
     <string name="notif_done">Download complete</string>
@@ -15,6 +18,8 @@
 
     <string name="clip_notif_title">Download the link you copied?</string>
     <string name="clip_monitor_running">Watching clipboard for media links</string>
+    <!-- Action label on the ongoing clipboard-monitor notification -->
+    <string name="clip_monitor_stop">Stop</string>
 
     <string name="no_link_found">No link found</string>
     <string name="download_started">Download started</string>
