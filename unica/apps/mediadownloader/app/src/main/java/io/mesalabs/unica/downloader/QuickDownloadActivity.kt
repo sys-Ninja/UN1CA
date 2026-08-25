@@ -1,6 +1,7 @@
 package io.mesalabs.unica.downloader
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Patterns
 import android.view.View
@@ -44,9 +45,14 @@ class QuickDownloadActivity : AppCompatActivity() {
         dialog = BottomSheetDialog(this)
         dialog.setContentView(binding.root)
         dialog.setOnDismissListener { finish() }
+
+        // Open Bottom Sheet IMMEDIATELY (0 ms delay)
         dialog.show()
 
-        binding.title.text = url
+        // Display initial loading state with platform domain
+        val host = try { Uri.parse(url).host?.removePrefix("www.")?.removePrefix("m.") ?: "" } catch (e: Exception) { "" }
+        binding.title.text = getString(R.string.notif_preparing)
+        binding.subtitle.text = if (host.isNotBlank()) host.uppercase() else url
         binding.progress.visibility = View.VISIBLE
         binding.actions.visibility = View.GONE
 
@@ -60,21 +66,21 @@ class QuickDownloadActivity : AppCompatActivity() {
         loadMeta(url!!)
     }
 
-    // Handle subsequent taps on clipboard notifications when the activity is
-    // already alive (launchMode=singleInstance means onCreate won't be called again).
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         val newUrl = extractUrl(intent) ?: return
-        if (newUrl == url) return   // same link, ignore
+        if (newUrl == url) return
         url = newUrl
 
-        // Reset state and reload
         meta = null
         checkboxes.clear()
         binding.playlistGroup.visibility = View.GONE
         binding.actions.visibility = View.GONE
         binding.progress.visibility = View.VISIBLE
-        binding.title.text = newUrl
+
+        val host = try { Uri.parse(newUrl).host?.removePrefix("www.")?.removePrefix("m.") ?: "" } catch (e: Exception) { "" }
+        binding.title.text = getString(R.string.notif_preparing)
+        binding.subtitle.text = if (host.isNotBlank()) host.uppercase() else newUrl
         binding.thumbnail.setImageDrawable(null)
 
         loadMeta(newUrl)
@@ -99,26 +105,28 @@ class QuickDownloadActivity : AppCompatActivity() {
             try {
                 var tries = 0
                 while (!App.instance.libReady && tries < 100) {
-                    Thread.sleep(100); tries++
+                    Thread.sleep(50); tries++
                 }
                 val m = DownloadRepo.fetchMeta(url)
 
                 withContext(Dispatchers.Main) {
                     if (isFinishing) return@withContext
                     meta = m
-                    // Show title + buttons immediately — thumbnail loads separately below
                     binding.progress.visibility = View.GONE
                     binding.actions.visibility = View.VISIBLE
                     binding.title.text = m.title
+                    val host = try { Uri.parse(url).host?.removePrefix("www.")?.removePrefix("m.") ?: "" } catch (e: Exception) { "" }
+                    binding.subtitle.text = host.uppercase()
+
                     if (m.isPlaylist) setupPlaylistUi(m)
                 }
 
-                // Load thumbnail asynchronously via Coil — non-blocking for the UI
+                // Load thumbnail smoothly via Coil
                 if (!m.thumbnail.isNullOrBlank()) {
                     withContext(Dispatchers.Main) {
                         if (!isFinishing) {
                             binding.thumbnail.load(m.thumbnail) {
-                                crossfade(true)
+                                crossfade(300)
                             }
                         }
                     }
