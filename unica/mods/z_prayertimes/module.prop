@@ -1,6 +1,4 @@
-id=io.mesalabs.unica.prayertimes
-name=UnicaPrayerTimes
-version=1.0
-versionCode=1
+id=prayertimes
+name=UN1CA Prayer Times
 author=sys-Ninja
-description=Prayer times with accurate Adhan alarms for UN1CA ROM
+description=Prayer times and Athan notifications for One UI.
