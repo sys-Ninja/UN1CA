@@ -13,7 +13,7 @@ set -e
 
 SRC_DIR="$(dirname "$(readlink -f "$0")")/.."
 APP_DIR="$SRC_DIR/unica/apps/prayertimes"
-OUT_APK="$SRC_DIR/unica/mods/z_prayertimes/system/priv-app/UnicaPrayerTimes/UnicaPrayerTimes.apk"
+OUT_APK="$SRC_DIR/unica/mods/v_prayertimes/system/priv-app/UnicaPrayerTimes/UnicaPrayerTimes.apk"
 
 # ── Find Android SDK ──────────────────────────────────────────────────────────
 SDK="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-}}"

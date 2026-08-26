@@ -9,7 +9,7 @@ set -e
 
 SRC_DIR="$(dirname "$(readlink -f "$0")")/.."
 APP_DIR="$SRC_DIR/unica/apps/secretspace"
-OUT_APK="$SRC_DIR/unica/mods/z_secretspace/system/priv-app/UnicaSecretSpace/UnicaSecretSpace.apk"
+OUT_APK="$SRC_DIR/unica/mods/v_secretspace/system/priv-app/UnicaSecretSpace/UnicaSecretSpace.apk"
 
 # ── Find Android SDK ──────────────────────────────────────────────────────────
 SDK="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-}}"
