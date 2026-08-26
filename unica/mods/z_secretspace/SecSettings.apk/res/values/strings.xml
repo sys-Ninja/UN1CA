@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="unica_secret_space_settings_title">المساحة السرية (Ghost Space)</string>
-    <string name="unica_secret_space_settings_summary">بيئة هاتف ثانية معزولة 100% تفتح ببصمة مخصصة</string>
+    <string name="unica_secret_space_settings_title">المساحة السرية</string>
 </resources>
