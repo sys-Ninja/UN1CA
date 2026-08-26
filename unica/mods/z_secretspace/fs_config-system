@@ -1,7 +1,5 @@
 system 0 0 755 capabilities=0x0
 system/etc 0 0 755 capabilities=0x0
-system/etc/default-permissions 0 0 755 capabilities=0x0
-system/etc/default-permissions/default-permissions-io.mesalabs.unica.secretspace.xml 0 0 644 capabilities=0x0
 system/etc/permissions 0 0 755 capabilities=0x0
 system/etc/permissions/privapp-permissions-io.mesalabs.unica.secretspace.xml 0 0 644 capabilities=0x0
 system/priv-app 0 0 755 capabilities=0x0
