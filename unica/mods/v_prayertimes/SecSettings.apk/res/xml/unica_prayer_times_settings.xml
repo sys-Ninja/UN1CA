@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:settings="http://schemas.android.com/apk/res-auto">
+
+    <com.samsung.android.settings.widget.SecInsetCategoryPreference />
+
+    <SecSwitchPreference
+        android:key="unica_prayer_times_enabled"
+        android:title="@string/unica_pt_enabled_title"
+        android:summary="@string/unica_pt_enabled_summary"
+        settings:controller="io.mesalabs.unica.settings.prayertimes.PrayerTimesSystemTogglePreferenceController" />
+
+    <com.samsung.android.settings.widget.SecInsetCategoryPreference />
+
+    <PreferenceCategory android:title="@string/unica_pt_general_title">
+        <SecDropDownPreference
+            android:key="unica_prayer_times_method"
+            android:title="@string/unica_pt_method_title"
+            android:entries="@array/unica_pt_method_entries"
+            android:entryValues="@array/unica_pt_method_values"
+            settings:controller="io.mesalabs.unica.settings.prayertimes.PrayerTimesSystemListPreferenceController" />
+    </PreferenceCategory>
+
+    <com.samsung.android.settings.widget.SecInsetCategoryPreference />
+
+    <PreferenceCategory android:title="@string/unica_pt_app_title">
+        <Preference
+            android:key="unica_pt_open"
+            android:title="@string/unica_pt_open_title"
+            android:persistent="false">
+            <intent
+                android:targetPackage="io.mesalabs.unica.prayertimes"
+                android:targetClass="io.mesalabs.unica.prayertimes.PrayerTimesSettingsActivity" />
+        </Preference>
+    </PreferenceCategory>
+
+</PreferenceScreen>

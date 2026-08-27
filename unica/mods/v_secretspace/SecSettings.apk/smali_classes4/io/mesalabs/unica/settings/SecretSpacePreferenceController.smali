@@ -2,7 +2,6 @@
 .super Lcom/android/settings/core/BasePreferenceController;
 .source "SecretSpacePreferenceController.java"
 
-
 # direct methods
 .method public constructor <init>(Landroid/content/Context;Ljava/lang/String;)V
     .locals 0
@@ -11,7 +10,6 @@
 
     return-void
 .end method
-
 
 # virtual methods
 .method public getAvailabilityStatus()I
@@ -37,156 +35,98 @@
     return p0
 .end method
 
-.method public handlePreferenceTreeClick(Landroidx/preference/Preference;)Z
-    .locals 3
-
-    iget-object v0, p0, Lcom/android/settingslib/core/AbstractPreferenceController;->mContext:Landroid/content/Context;
-
-    new-instance v1, Landroid/content/Intent;
-
-    invoke-direct {v1}, Landroid/content/Intent;-><init>()V
-
-    const-string v2, "io.mesalabs.unica.secretspace"
-
-    const-string v3, "io.mesalabs.unica.secretspace.SecretSpaceSettingsActivity"
-
-    invoke-virtual {v1, v2, v3}, Landroid/content/Intent;->setClassName(Ljava/lang/String;Ljava/lang/String;)Landroid/content/Intent;
-
-    const/high16 v2, 0x10000000
-
-    invoke-virtual {v1, v2}, Landroid/content/Intent;->addFlags(I)Landroid/content/Intent;
-
-    invoke-virtual {v0, v1}, Landroid/content/Context;->startActivity(Landroid/content/Intent;)V
-
-    const/4 v0, 0x1
-
-    return v0
-.end method
-
 .method public bridge synthetic getBackgroundWorkerClass()Ljava/lang/Class;
     .locals 0
-
     const/4 p0, 0x0
-
     return-object p0
 .end method
 
 .method public getBackupKeys()Ljava/util/List;
     .locals 0
-
     new-instance p0, Ljava/util/ArrayList;
-
     invoke-direct {p0}, Ljava/util/ArrayList;-><init>()V
-
     return-object p0
 .end method
 
 .method public bridge synthetic getIntentFilter()Landroid/content/IntentFilter;
     .locals 0
-
     const/4 p0, 0x0
-
     return-object p0
 .end method
 
 .method public bridge synthetic getLaunchIntent()Landroid/content/Intent;
     .locals 0
-
     const/4 p0, 0x0
-
     return-object p0
 .end method
 
 .method public bridge synthetic getSliceHighlightMenuRes()I
     .locals 0
-
     const/4 p0, 0x0
-
     return p0
 .end method
 
 .method public bridge synthetic getStatusText()Ljava/lang/String;
     .locals 0
-
     const/4 p0, 0x0
-
     return-object p0
 .end method
 
 .method public bridge synthetic getValue()Lcom/samsung/android/settings/cube/ControlValue;
     .locals 0
-
     const/4 p0, 0x0
-
     return-object p0
 .end method
 
 .method public bridge synthetic hasAsyncUpdate()Z
     .locals 0
-
     const/4 p0, 0x0
-
     return p0
 .end method
 
 .method public bridge synthetic ignoreUserInteraction()V
     .locals 0
-
     return-void
 .end method
 
 .method public bridge synthetic isControllable()Z
     .locals 0
-
     const/4 p0, 0x0
-
     return p0
 .end method
 
 .method public bridge synthetic isPublicSlice()Z
     .locals 0
-
     const/4 p0, 0x0
-
     return p0
 .end method
 
 .method public bridge synthetic isSliceable()Z
     .locals 0
-
     const/4 p0, 0x0
-
     return p0
 .end method
 
 .method public bridge synthetic needUserInteraction(Ljava/lang/Object;)Lcom/samsung/android/settings/cube/Controllable$ControllableType;
     .locals 0
-
     sget-object p0, Lcom/samsung/android/settings/cube/Controllable$ControllableType;->NO_INTERACTION:Lcom/samsung/android/settings/cube/Controllable$ControllableType;
-
     return-object p0
 .end method
 
 .method public bridge synthetic runDefaultAction()Z
     .locals 0
-
     const/4 p0, 0x0
-
     return p0
 .end method
 
 .method public bridge synthetic setValue(Lcom/samsung/android/settings/cube/ControlValue;)Lcom/samsung/android/settings/cube/ControlResult;
     .locals 0
-
     const/4 p0, 0x0
-
     return-object p0
 .end method
 
 .method public bridge synthetic useDynamicSliceSummary()Z
     .locals 0
-
     const/4 p0, 0x0
-
     return p0
 .end method
