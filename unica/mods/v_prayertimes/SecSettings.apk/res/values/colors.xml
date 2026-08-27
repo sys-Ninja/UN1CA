@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="unica_settings_ic_prayertimes_color">#00897b</color>
+    <color name="unica_settings_ic_prayer_color">#00897b</color>
 </resources>
