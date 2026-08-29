@@ -13,16 +13,32 @@
     <string name="notif_failed">فشل التحميل</string>
     <string name="extract_failed">تعذر التحميل من هذه المنصة حاليًا. قد يعود للعمل بعد التحديث القادم للمستخرجات.</string>
 
+    <string name="clip_notif_title">تحميل الرابط اللي نسخته؟</string>
+    <string name="clip_monitor_running">مراقبة الروابط تعمل في الخلفية…</string>
+    <string name="clip_monitor_stop">إيقاف</string>
+
     <string name="no_link_found">لم يتم العثور على رابط</string>
     <string name="download_started">بدأ التحميل</string>
     <string name="low_space">مساحة التخزين غير كافية</string>
     <string name="cancel">إلغاء</string>
     <string name="open">فتح</string>
     <string name="retry">إعادة المحاولة</string>
+    <string name="share">مشاركة</string>
+    <string name="delete">حذف</string>
+    <string name="delete_confirm">هل أنت متأكد من حذف هذا الملف نهائياً؟</string>
     <string name="no_downloads">لا توجد تنزيلات بعد</string>
+    <string name="no_downloads_sum">الفيديوهات والملفات الصوتية التي تقوم بتحميلها ستظهر هنا</string>
     <string name="file_missing">الملف غير موجود</string>
     <string name="no_player">لا يوجد تطبيق يفتح هذا الملف</string>
     <string name="select_at_least_one">اختر عنصرًا واحدًا على الأقل</string>
+
+    <string name="filter_all">الكل</string>
+    <string name="filter_video">فيديو</string>
+    <string name="filter_audio">صوت</string>
+    <string name="sort_date">التاريخ</string>
+    <string name="sort_size">الحجم</string>
+    <string name="sort_name">الاسم</string>
+    <string name="items_stat">%1$d ملفات • %2$s</string>
 
     <string name="btn_best_video">تحميل الفيديو (أفضل جودة)</string>
     <string name="btn_audio_only">صوت فقط (MP3)</string>
@@ -36,7 +52,7 @@
 
     <string name="status_queued">في الانتظار</string>
     <string name="status_running">جارٍ التحميل… %1$d%%</string>
-    <string name="status_done">اكتمل</string>
+    <string name="status_done">مكتمل</string>
     <string name="status_failed">فشل</string>
     <string name="status_cancelled">أُلغي</string>
 
@@ -63,7 +79,4 @@
     <string name="updating">جارٍ التحديث…</string>
     <string name="update_ok">تم تحديث المستخرجات</string>
     <string name="update_failed">فشل التحديث</string>
-
-    <string name="clip_notif_title">تحميل الرابط اللي نسخته؟</string>
-    <string name="clip_monitor_running">مراقبة الروابط تعمل في الخلفية…</string>
 </resources>

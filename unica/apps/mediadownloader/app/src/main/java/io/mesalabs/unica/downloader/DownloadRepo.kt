@@ -5,8 +5,10 @@ import android.net.Uri
 import android.util.Log
 import com.yausername.youtubedl_android.YoutubeDL
 import com.yausername.youtubedl_android.YoutubeDLRequest
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
@@ -28,6 +30,8 @@ data class DownloadItem(
     var line: String = "",
     var filePath: String? = null,
     var error: String? = null,
+    var fileSize: Long = 0L,
+    var dateAdded: Long = System.currentTimeMillis()
 )
 
 data class VideoMeta(
@@ -45,37 +49,95 @@ object DownloadRepo {
     private val _flow = MutableStateFlow<List<DownloadItem>>(emptyList())
     val flow: StateFlow<List<DownloadItem>> = _flow
 
-    @Synchronized fun add(item: DownloadItem) { items[item.id] = item; publish() }
+    @Synchronized fun add(item: DownloadItem) {
+        items[item.id] = item
+        publish()
+    }
 
     @Synchronized
     fun update(id: String, block: (DownloadItem) -> Unit) {
-        items[id]?.let { block(it) }; publish()
+        items[id]?.let { block(it) }
+        publish()
     }
 
     @Synchronized fun get(id: String): DownloadItem? = items[id]
     @Synchronized fun all(): List<DownloadItem> = items.values.toList()
     @Synchronized fun nextQueued(): DownloadItem? = items.values.firstOrNull { it.status == DlStatus.QUEUED }
-    @Synchronized fun remove(id: String) { items.remove(id); publish() }
+    @Synchronized fun remove(id: String) {
+        items.remove(id)
+        publish()
+    }
 
-    private fun publish() { _flow.value = items.values.toList() }
+    @Synchronized
+    fun delete(item: DownloadItem) {
+        item.filePath?.let { path ->
+            try {
+                val f = File(path)
+                if (f.exists()) f.delete()
+            } catch (_: Exception) {}
+        }
+        items.remove(item.id)
+        publish()
+    }
+
+    private fun publish() {
+        _flow.value = items.values.toList()
+    }
+
+    /**
+     * Scans storage folder to ensure any downloaded file on disk is properly indexed and displayed!
+     */
+    suspend fun syncFromStorage(context: Context) = withContext(Dispatchers.IO) {
+        val prefs = Prefs.get(context)
+        val baseDir = File(prefs.downloadDir)
+        if (!baseDir.exists()) return@withContext
+
+        val foundFiles = mutableListOf<File>()
+        fun scan(dir: File) {
+            val list = dir.listFiles() ?: return
+            for (f in list) {
+                if (f.isDirectory) {
+                    scan(f)
+                } else {
+                    val ext = f.extension.lowercase()
+                    if (ext in listOf("mp4", "mp3", "m4a", "webm", "mkv", "mov", "flv")) {
+                        foundFiles.add(f)
+                    }
+                }
+            }
+        }
+        scan(baseDir)
+
+        synchronized(DownloadRepo) {
+            for (f in foundFiles) {
+                val path = f.absolutePath
+                val alreadyTracked = items.values.any { it.filePath == path }
+                if (!alreadyTracked) {
+                    val isAudio = f.extension.lowercase() in listOf("mp3", "m4a", "aac", "wav")
+                    val item = DownloadItem(
+                        id = "disk_${f.name}_${f.lastModified()}",
+                        url = "",
+                        title = f.nameWithoutExtension.replace('_', ' '),
+                        audioOnly = isAudio,
+                        quality = if (isAudio) "MP3" else "Video",
+                        status = DlStatus.DONE,
+                        progress = 100f,
+                        filePath = path,
+                        fileSize = f.length(),
+                        dateAdded = f.lastModified()
+                    )
+                    items[item.id] = item
+                }
+            }
+            publish()
+        }
+    }
 
     private fun isTikTok(url: String): Boolean {
         val host = try { Uri.parse(url).host?.lowercase() ?: "" } catch (e: Exception) { "" }
         return host == "tiktok.com" || host.endsWith(".tiktok.com")
     }
 
-    /**
-     * Runs yt-dlp -J to fetch metadata. Blocking — call from IO dispatcher.
-     *
-     * Performance optimisations vs the original:
-     *  - --flat-playlist  : don't recurse into playlist entries (already present)
-     *  - --no-check-certificates : skip TLS handshake validation overhead
-     *  - -R 1             : one retry max (already present)
-     *  - --socket-timeout 10 : tighter than the original 15 s
-     *  Thumbnail is returned as a URL string from the JSON; actual bitmap loading
-     *  is done lazily in QuickDownloadActivity via Coil so the dialog opens
-     *  in ~1 s instead of ~10 s.
-     */
     fun fetchMeta(url: String): VideoMeta {
         App.instance.ensureInit()
         val req = YoutubeDLRequest(url).apply {
@@ -123,7 +185,6 @@ object DownloadRepo {
         val outTemplate: String
         if (item.playlistTitle != null && prefs.organizePlaylists) {
             val dir = File(baseDir, sanitize(item.playlistTitle))
-            // Use a safe fallback for playlist_index in case yt-dlp doesn't provide it
             outTemplate = "${dir.absolutePath}/%(playlist_index|0)02d - %(title).100B.%(ext)s"
         } else {
             outTemplate = "${baseDir.absolutePath}/%(title).100B.%(ext)s"
@@ -136,7 +197,6 @@ object DownloadRepo {
             addOption("--restrict-filenames")
             if (item.playlistItems != null) addOption("--playlist-items", item.playlistItems)
             if (item.playlistTitle != null) {
-                // Playlist download: continue even if individual videos fail
                 addOption("--yes-playlist")
                 addOption("--ignore-errors")
                 addOption("--no-abort-on-error")

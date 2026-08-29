@@ -1,11 +1,11 @@
 package io.mesalabs.unica.ghostengine.location
 
 import android.content.Context
+import android.location.Address
 import android.location.Geocoder
-import android.os.Build
 import android.util.Log
-import com.google.android.gms.tasks.CancellationTokenSource
 import com.google.android.libraries.places.api.Places
+import com.google.android.libraries.places.api.model.AutocompletePrediction
 import com.google.android.libraries.places.api.model.AutocompleteSessionToken
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.api.model.TypeFilter
@@ -13,6 +13,7 @@ import com.google.android.libraries.places.api.net.FetchPlaceRequest
 import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest
 import com.google.android.libraries.places.api.net.PlacesClient
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import java.util.Locale
 
@@ -33,7 +34,6 @@ object GooglePlacesHelper {
     private const val TAG = "GooglePlacesHelper"
     private var placesClient: PlacesClient? = null
     private var sessionToken: AutocompleteSessionToken? = null
-    private var cancellationTokenSource: CancellationTokenSource? = null
 
     fun isInitialized(): Boolean = Places.isInitialized()
 
@@ -43,8 +43,10 @@ object GooglePlacesHelper {
             if (!Places.isInitialized()) {
                 Places.initializeWithNewPlacesApiEnabled(context.applicationContext, apiKey)
             }
-            placesClient = Places.createClient(context.applicationContext)
-            sessionToken = AutocompleteSessionToken.newInstance()
+            if (Places.isInitialized()) {
+                placesClient = Places.createClient(context.applicationContext)
+                sessionToken = AutocompleteSessionToken.newInstance()
+            }
         } catch (e: Exception) {
             Log.e(TAG, "Failed to initialize Places SDK", e)
         }
@@ -58,19 +60,18 @@ object GooglePlacesHelper {
 
         if (placesClient != null && isInitialized()) {
             try {
-                cancellationTokenSource?.cancel()
-                val token = CancellationTokenSource()
-                cancellationTokenSource = token
+                if (sessionToken == null) {
+                    sessionToken = AutocompleteSessionToken.newInstance()
+                }
 
                 val request = FindAutocompletePredictionsRequest.builder()
                     .setTypeFilter(TypeFilter.CITIES)
                     .setSessionToken(sessionToken)
-                    .setCancellationToken(token.token)
                     .setQuery(query)
                     .build()
 
-                val response = kotlinx.coroutines.tasks.await(placesClient!!.findAutocompletePredictions(request))
-                return@withContext response.autocompletePredictions.map { p ->
+                val response = placesClient!!.findAutocompletePredictions(request).await()
+                return@withContext response.autocompletePredictions.map { p: AutocompletePrediction ->
                     PlacePrediction(
                         placeId = p.placeId,
                         primaryText = p.getPrimaryText(null).toString(),
@@ -85,17 +86,10 @@ object GooglePlacesHelper {
 
         // Fallback: Android Geocoder
         try {
+            @Suppress("DEPRECATION")
             val geocoder = Geocoder(context, Locale.getDefault())
-            val addresses = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                var result: List<android.location.Address> = emptyList()
-                geocoder.getFromLocationName(query, 5) { addrs -> result = addrs }
-                result
-            } else {
-                @Suppress("DEPRECATION")
-                geocoder.getFromLocationName(query, 5) ?: emptyList()
-            }
-
-            return@withContext addresses.map { addr ->
+            val addresses = geocoder.getFromLocationName(query, 5) ?: emptyList()
+            return@withContext addresses.map { addr: Address ->
                 val name = addr.locality ?: addr.featureName ?: addr.adminArea ?: query
                 val country = addr.countryName ?: ""
                 PlacePrediction(
@@ -130,7 +124,7 @@ object GooglePlacesHelper {
             .build()
 
         return@withContext try {
-            val response = kotlinx.coroutines.tasks.await(client.fetchPlace(request))
+            val response = client.fetchPlace(request).await()
             val place = response.place
             val latLng = place.latLng ?: return@withContext null
             PlaceDetails(

@@ -3,7 +3,6 @@ package io.mesalabs.unica.ghostengine.location
 import android.content.Context
 import android.location.Location
 import android.location.LocationManager
-import android.os.Build
 import android.os.SystemClock
 import android.util.Log
 import io.mesalabs.unica.ghostengine.data.GhostEnginePrefs
@@ -28,7 +27,6 @@ object StealthLocationManager {
         val lm = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
         val prefs = GhostEnginePrefs.get(context)
 
-        // Ensure GPS provider test mock is registered if needed
         try {
             lm.addTestProvider(
                 LocationManager.GPS_PROVIDER,
@@ -55,23 +53,24 @@ object StealthLocationManager {
                         latitude = jitterLat
                         longitude = jitterLng
                         altitude = jitterAlt
-                        accuracy = Random.nextFloat() * 1.5f + 2.0f // 2.0 - 3.5m high accuracy
+                        accuracy = Random.nextFloat() * 1.5f + 2.0f
                         time = System.currentTimeMillis()
                         elapsedRealtimeNanos = SystemClock.elapsedRealtimeNanos()
                         speed = prefs.movementSpeed
                         bearing = Random.nextFloat() * 360f
-
-                        // CRITICAL ANTI-DETECTION: Clear isMock flag completely
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                            mock = false
-                        }
                     }
 
-                    // Bypass mock indicator through reflection on older frameworks as well
+                    // Anti-detection: Clear isMock / isFromMockProvider safely via reflection across all Android versions
                     try {
-                        val setIsMockMethod = Location::class.java.getDeclaredMethod("setIsFromMockProvider", Boolean::class.javaPrimitiveType)
-                        setIsMockMethod.isAccessible = true
-                        setIsMockMethod.invoke(loc, false)
+                        val m1 = Location::class.java.getDeclaredMethod("setIsFromMockProvider", Boolean::class.javaPrimitiveType)
+                        m1.isAccessible = true
+                        m1.invoke(loc, false)
+                    } catch (_: Exception) {}
+
+                    try {
+                        val m2 = Location::class.java.getDeclaredMethod("setMock", Boolean::class.javaPrimitiveType)
+                        m2.isAccessible = true
+                        m2.invoke(loc, false)
                     } catch (_: Exception) {}
 
                     lm.setTestProviderLocation(LocationManager.GPS_PROVIDER, loc)
@@ -80,7 +79,7 @@ object StealthLocationManager {
                     Log.e(TAG, "Error injecting stealth location", e)
                 }
 
-                delay(1000) // 1Hz authentic GPS update rate
+                delay(1000)
             }
         }
     }
@@ -94,7 +93,6 @@ object StealthLocationManager {
         } catch (_: Exception) {}
     }
 
-    // Synthesizes authentic NMEA sentences with 12 active GPS satellites in view
     fun generateAuthenticNmea(lat: Double, lng: Double, alt: Double): String {
         val sdf = SimpleDateFormat("HHmmss.SS", Locale.US).apply {
             timeZone = TimeZone.getTimeZone("UTC")
