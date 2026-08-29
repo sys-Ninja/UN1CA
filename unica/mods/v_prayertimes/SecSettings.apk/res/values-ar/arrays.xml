@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="unica_pt_method_entries">
-        <item>الهيئة العامة المصرية للمساحة</item>
+        <item>الهيئة المصرية العامة للمساحة</item>
         <item>أم القرى (مكة المكرمة)</item>
         <item>رابطة العالم الإسلامي</item>
         <item>جامعة العلوم الإسلامية بكراتشي</item>
-        <item>ISNA (أمريكا الشمالية)</item>
+        <item>الجمعية الإسلامية لأمريكا الشمالية (ISNA)</item>
         <item>دبي</item>
         <item>الكويت</item>
         <item>قطر</item>
-        <item>ديانت (تركيا)</item>
-        <item>طهران</item>
+        <item>رئاسة الشؤون الدينية (تركيا)</item>
+        <item>معهد الجيوفيزياء (طهران)</item>
         <item>لجنة رؤية الهلال</item>
     </string-array>
     <string-array name="unica_pt_method_values">
@@ -25,5 +25,29 @@
         <item>diyanet</item>
         <item>tehran</item>
         <item>moonsighting</item>
+    </string-array>
+
+    <string-array name="unica_pt_madhab_entries">
+        <item>الجمهور (الشافعي والمالكي والحنبلي)</item>
+        <item>المتأخر (الحنفي)</item>
+    </string-array>
+    <string-array name="unica_pt_madhab_values">
+        <item>shafi</item>
+        <item>hanafi</item>
+    </string-array>
+
+    <string-array name="unica_pt_early_minutes_entries">
+        <item>٥ دقائق</item>
+        <item>١٠ دقائق</item>
+        <item>١٥ دقيقة</item>
+        <item>٢٠ دقيقة</item>
+        <item>٣٠ دقيقة</item>
+    </string-array>
+    <string-array name="unica_pt_early_minutes_values">
+        <item>5</item>
+        <item>10</item>
+        <item>15</item>
+        <item>20</item>
+        <item>30</item>
     </string-array>
 </resources>

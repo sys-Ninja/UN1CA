@@ -19,6 +19,36 @@
             android:entries="@array/unica_pt_method_entries"
             android:entryValues="@array/unica_pt_method_values"
             settings:controller="io.mesalabs.unica.settings.prayertimes.PrayerTimesSystemListPreferenceController" />
+
+        <SecDropDownPreference
+            android:key="unica_prayer_times_madhab"
+            android:title="@string/unica_pt_madhab_title"
+            android:entries="@array/unica_pt_madhab_entries"
+            android:entryValues="@array/unica_pt_madhab_values"
+            settings:controller="io.mesalabs.unica.settings.prayertimes.PrayerTimesSystemListPreferenceController" />
+
+        <SecSwitchPreference
+            android:key="unica_prayer_times_online_sync"
+            android:title="@string/unica_pt_online_sync_title"
+            android:summary="@string/unica_pt_online_sync_summary"
+            settings:controller="io.mesalabs.unica.settings.prayertimes.PrayerTimesSystemTogglePreferenceController" />
+    </PreferenceCategory>
+
+    <com.samsung.android.settings.widget.SecInsetCategoryPreference />
+
+    <PreferenceCategory android:title="@string/unica_pt_notifications_title">
+        <SecSwitchPreference
+            android:key="unica_prayer_times_early_warning"
+            android:title="@string/unica_pt_early_warning_title"
+            android:summary="@string/unica_pt_early_warning_summary"
+            settings:controller="io.mesalabs.unica.settings.prayertimes.PrayerTimesSystemTogglePreferenceController" />
+
+        <SecDropDownPreference
+            android:key="unica_prayer_times_early_minutes"
+            android:title="@string/unica_pt_early_minutes_title"
+            android:entries="@array/unica_pt_early_minutes_entries"
+            android:entryValues="@array/unica_pt_early_minutes_values"
+            settings:controller="io.mesalabs.unica.settings.prayertimes.PrayerTimesSystemListPreferenceController" />
     </PreferenceCategory>
 
     <com.samsung.android.settings.widget.SecInsetCategoryPreference />

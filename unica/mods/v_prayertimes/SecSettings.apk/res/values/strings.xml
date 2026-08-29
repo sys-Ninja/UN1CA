@@ -3,9 +3,16 @@
     <string name="unica_prayer_times_settings_title">Prayer Times</string>
     <string name="unica_pt_enabled_title">Prayer Time Notifications</string>
     <string name="unica_pt_enabled_summary">Receive alarms and Adhan at prayer times</string>
-    <string name="unica_pt_general_title">General</string>
+    <string name="unica_pt_general_title">Calculation &amp; Method</string>
     <string name="unica_pt_method_title">Calculation Method</string>
+    <string name="unica_pt_madhab_title">Asr Method (Madhab)</string>
+    <string name="unica_pt_online_sync_title">Sync with Official Authority</string>
+    <string name="unica_pt_online_sync_summary">Fetch times from official online server instead of local calculation</string>
+    <string name="unica_pt_notifications_title">Notifications &amp; Reminders</string>
+    <string name="unica_pt_early_warning_title">Early Reminder</string>
+    <string name="unica_pt_early_warning_summary">Get notified before Adhan time</string>
+    <string name="unica_pt_early_minutes_title">Remind me before</string>
     <string name="unica_pt_app_title">Customization &amp; Location</string>
-    <string name="unica_pt_open_title">Prayer Times Settings</string>
-    <string name="unica_pt_open_summary">Configure Adhan audio, search location with Google Places, and live countdown</string>
+    <string name="unica_pt_open_title">Prayer Times Customizer</string>
+    <string name="unica_pt_open_summary">Configure Adhan audio with preview, search location with Google Places, and live countdown</string>
 </resources>

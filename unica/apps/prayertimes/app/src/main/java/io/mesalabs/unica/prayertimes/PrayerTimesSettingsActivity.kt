@@ -1,7 +1,10 @@
 package io.mesalabs.unica.prayertimes
 
 import android.app.AlertDialog
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
@@ -54,6 +57,13 @@ class PrayerTimesFragment : PreferenceFragmentCompat() {
     private var countdownJob: Job? = null
     private var currentSoundPrayer: Prayer? = null
 
+    private val timeChangeReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            PrayerManager.scheduleNextPrayer(requireContext())
+            startCountdown()
+        }
+    }
+
     private val customAudioLauncher = registerForActivityResult(
         ActivityResultContracts.OpenDocument()
     ) { uri: Uri? ->
@@ -90,6 +100,14 @@ class PrayerTimesFragment : PreferenceFragmentCompat() {
         super.onResume()
         startCountdown()
         updateAllSoundSummaries()
+
+        val filter = IntentFilter().apply {
+            addAction(Intent.ACTION_TIME_CHANGED)
+            addAction(Intent.ACTION_TIMEZONE_CHANGED)
+            addAction(Intent.ACTION_DATE_CHANGED)
+            addAction("android.intent.action.TIME_SET")
+        }
+        requireContext().registerReceiver(timeChangeReceiver, filter)
     }
 
     override fun onPause() {
@@ -97,6 +115,9 @@ class PrayerTimesFragment : PreferenceFragmentCompat() {
         countdownJob?.cancel()
         countdownJob = null
         AdhanSoundManager.stopPreview()
+        try {
+            requireContext().unregisterReceiver(timeChangeReceiver)
+        } catch (_: Exception) {}
     }
 
     // ── Live Countdown ───────────────────────────────────────────────────────
@@ -393,7 +414,7 @@ class PrayerTimesFragment : PreferenceFragmentCompat() {
 
                 searchJob?.cancel()
                 searchJob = lifecycleScope.launch(Dispatchers.IO) {
-                    delay(300) // Debounce
+                    delay(300)
                     withContext(Dispatchers.Main) { progress.visibility = View.VISIBLE }
                     val results = GooglePlacesHelper.searchCities(requireContext(), query)
                     withContext(Dispatchers.Main) {
