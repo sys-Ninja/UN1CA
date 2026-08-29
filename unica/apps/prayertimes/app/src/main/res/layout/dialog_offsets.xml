@@ -1,0 +1,99 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingStart="24dp"
+        android:paddingTop="16dp"
+        android:paddingEnd="24dp"
+        android:paddingBottom="16dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/offset_fajr"
+            android:textColor="?android:attr/textColorSecondary"
+            android:textSize="13sp" />
+        <EditText
+            android:id="@+id/edit_offset_fajr"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="numberSigned"
+            android:hint="0" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/prayer_sunrise"
+            android:textColor="?android:attr/textColorSecondary"
+            android:textSize="13sp" />
+        <EditText
+            android:id="@+id/edit_offset_sunrise"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="numberSigned"
+            android:hint="0" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/offset_dhuhr"
+            android:textColor="?android:attr/textColorSecondary"
+            android:textSize="13sp" />
+        <EditText
+            android:id="@+id/edit_offset_dhuhr"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="numberSigned"
+            android:hint="0" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/offset_asr"
+            android:textColor="?android:attr/textColorSecondary"
+            android:textSize="13sp" />
+        <EditText
+            android:id="@+id/edit_offset_asr"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="numberSigned"
+            android:hint="0" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/offset_maghrib"
+            android:textColor="?android:attr/textColorSecondary"
+            android:textSize="13sp" />
+        <EditText
+            android:id="@+id/edit_offset_maghrib"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="numberSigned"
+            android:hint="0" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/offset_isha"
+            android:textColor="?android:attr/textColorSecondary"
+            android:textSize="13sp" />
+        <EditText
+            android:id="@+id/edit_offset_isha"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="numberSigned"
+            android:hint="0" />
+
+    </LinearLayout>
+</ScrollView>

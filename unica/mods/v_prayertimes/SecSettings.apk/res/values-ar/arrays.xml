@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="unica_pt_method_entries">
+        <item>الهيئة العامة المصرية للمساحة</item>
+        <item>أم القرى (مكة المكرمة)</item>
+        <item>رابطة العالم الإسلامي</item>
+        <item>جامعة العلوم الإسلامية بكراتشي</item>
+        <item>ISNA (أمريكا الشمالية)</item>
+        <item>دبي</item>
+        <item>الكويت</item>
+        <item>قطر</item>
+        <item>ديانت (تركيا)</item>
+        <item>طهران</item>
+        <item>لجنة رؤية الهلال</item>
+    </string-array>
+    <string-array name="unica_pt_method_values">
+        <item>egyptian</item>
+        <item>umm_al_qura</item>
+        <item>mwl</item>
+        <item>karachi</item>
+        <item>isna</item>
+        <item>dubai</item>
+        <item>kuwait</item>
+        <item>qatar</item>
+        <item>diyanet</item>
+        <item>tehran</item>
+        <item>moonsighting</item>
+    </string-array>
+</resources>

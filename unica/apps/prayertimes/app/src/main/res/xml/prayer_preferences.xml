@@ -1,8 +1,8 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <!-- Next prayer countdown — updated every second in PrayerTimesFragment -->
+    <!-- Live Next Prayer Countdown Header -->
     <Preference
         app:key="pref_next_prayer"
         app:title="@string/pref_next_prayer_title"
@@ -21,6 +21,40 @@
         app:title="@string/pref_location_title"
         app:summary="@string/pref_location_sum"
         app:iconSpaceReserved="false" />
+
+    <PreferenceCategory
+        app:title="@string/pref_calculation_category"
+        app:iconSpaceReserved="false">
+
+        <ListPreference
+            app:key="pref_method"
+            app:title="@string/pref_method_title"
+            app:entries="@array/method_entries"
+            app:entryValues="@array/method_values"
+            app:defaultValue="egyptian"
+            app:iconSpaceReserved="false" />
+
+        <ListPreference
+            app:key="pref_madhab"
+            app:title="@string/pref_madhab_title"
+            app:entries="@array/madhab_entries"
+            app:entryValues="@array/madhab_values"
+            app:defaultValue="shafi"
+            app:iconSpaceReserved="false" />
+
+        <SwitchPreferenceCompat
+            app:key="pref_online_api"
+            app:title="@string/pref_online_api_title"
+            app:summary="@string/pref_online_api_sum_off"
+            app:iconSpaceReserved="false" />
+
+        <Preference
+            app:key="pref_offsets"
+            app:title="@string/pref_offsets_title"
+            app:summary="@string/pref_offsets_sum"
+            app:iconSpaceReserved="false" />
+
+    </PreferenceCategory>
 
     <PreferenceCategory
         app:title="@string/pref_sounds_category"
@@ -54,6 +88,26 @@
             app:key="pref_sound_isha"
             app:title="@string/pref_sound_isha"
             app:summary="@string/default_sound"
+            app:iconSpaceReserved="false" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:title="@string/pref_notifications_category"
+        app:iconSpaceReserved="false">
+
+        <SwitchPreferenceCompat
+            app:key="pref_early_warning"
+            app:title="@string/pref_early_warning_title"
+            app:summary="@string/pref_early_warning_sum"
+            app:iconSpaceReserved="false" />
+
+        <ListPreference
+            app:key="pref_early_minutes"
+            app:title="@string/pref_early_minutes_title"
+            app:entries="@array/early_minutes_entries"
+            app:entryValues="@array/early_minutes_values"
+            app:defaultValue="10"
             app:iconSpaceReserved="false" />
 
     </PreferenceCategory>

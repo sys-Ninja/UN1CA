@@ -1,40 +1,76 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">مواقيت الصلاة</string>
-    <string name="prayer_settings_title">إعدادات مواقيت الصلاة</string>
-    
-    <string name="pref_enabled">تفعيل منبه الصلاة</string>
-    <string name="pref_enabled_sum">تشغيل أو إيقاف الأذان ومواقيت الصلاة</string>
-    
-    <string name="pref_location_title">الموقع الحالي</string>
-    <string name="pref_location_sum">اختر مدينتك لتحديث المواقيت</string>
-    <string name="location_dialog_title">ابحث عن مدينتك</string>
-    <string name="location_hint">مثال: القاهرة، مكة، الرياض</string>
-    <string name="location_searching">جارٍ البحث…</string>
-    <string name="location_not_found">لم يتم العثور على المدينة</string>
-    
+    <string name="prayer_settings_title">مواقيت الصلاة</string>
+
+    <string name="pref_enabled">تفعيل منبّهات الصلاة</string>
+    <string name="pref_enabled_sum">تلقّي الأذان وإشعارات مواقيت الصلاة</string>
+
+    <string name="pref_location_title">الموقع</string>
+    <string name="pref_location_sum">حدّد مدينتك لمواقيت دقيقة</string>
+    <string name="location_dialog_title">البحث عن موقع</string>
+    <string name="location_hint">اكتب اسم المدينة...</string>
+    <string name="location_searching">جارٍ البحث...</string>
+    <string name="location_not_found">لم يُعثر على المدينة. جرّب اسماً آخر.</string>
+    <string name="location_gps">استخدام الموقع الحالي</string>
+
+    <string name="pref_calculation_category">طريقة الحساب</string>
+    <string name="pref_method_title">هيئة الحساب</string>
+    <string name="pref_madhab_title">طريقة العصر (المذهب)</string>
+    <string name="pref_online_api_title">مزامنة مع الهيئة الرسمية</string>
+    <string name="pref_online_api_sum_on">مواقيت الصلاة تُجلب من خادم رسمي موثوق</string>
+    <string name="pref_online_api_sum_off">مواقيت الصلاة تُحسب محلياً (بدون إنترنت، فوري 0ms)</string>
+    <string name="pref_offsets_title">ضبط دقيق (تعديل بالدقائق)</string>
+    <string name="pref_offsets_sum">اضبط كل صلاة بدقائق ± لتطابق مسجدك المحلي</string>
+
     <string name="pref_sounds_category">أصوات الأذان</string>
     <string name="pref_sound_fajr">أذان الفجر</string>
     <string name="pref_sound_dhuhr">أذان الظهر</string>
     <string name="pref_sound_asr">أذان العصر</string>
     <string name="pref_sound_maghrib">أذان المغرب</string>
     <string name="pref_sound_isha">أذان العشاء</string>
+
+    <string name="adhan_makkah">المسجد الحرام - مكة المكرمة</string>
+    <string name="adhan_madinah">المسجد النبوي - المدينة المنورة</string>
+    <string name="adhan_aqsa">المسجد الأقصى</string>
+    <string name="adhan_cairo">القاهرة (مصر)</string>
+    <string name="adhan_fajr_full">أذان الفجر الكامل (مع التثويب)</string>
+    <string name="adhan_takbeer">تكبيرات فقط</string>
+    <string name="adhan_soft_chime">رنة هادئة</string>
+    <string name="adhan_silent">صامت (إشعار فقط)</string>
+    <string name="adhan_custom">ملف صوتي مخصص...</string>
+    <string name="adhan_preview_play">استمع</string>
+    <string name="adhan_preview_stop">إيقاف</string>
     <string name="default_sound">الافتراضي</string>
-    
+
+    <string name="pref_notifications_category">الإشعارات</string>
+    <string name="pref_early_warning_title">تنبيه مبكر</string>
+    <string name="pref_early_warning_sum">احصل على تنبيه قبل موعد الأذان</string>
+    <string name="pref_early_minutes_title">التنبيه قبل الصلاة بـ</string>
+
+    <string name="pref_next_prayer_title">الصلاة القادمة</string>
+    <string name="pref_next_prayer_unknown">حدّد موقعك لعرض مواقيت الصلاة</string>
+
     <string name="notification_adhan_title">حان الآن موعد أذان %1$s</string>
     <string name="notification_adhan_text">اضغط لإيقاف الأذان</string>
     <string name="stop_adhan">إيقاف</string>
-    
+
     <string name="prayer_fajr">الفجر</string>
+    <string name="prayer_sunrise">الشروق</string>
     <string name="prayer_dhuhr">الظهر</string>
     <string name="prayer_asr">العصر</string>
     <string name="prayer_maghrib">المغرب</string>
     <string name="prayer_isha">العشاء</string>
-    
+
     <string name="channel_adhan">تنبيهات الأذان</string>
-    <string name="pref_next_prayer_title">الصلاة القادمة</string>
-    <string name="pref_next_prayer_sum_format">%1$s · متبقي %2$s</string>
-    <string name="pref_next_prayer_unknown">لا توجد صلاة مجدولة</string>
-    
-    <string name="api_error">حدث خطأ أثناء جلب المواقيت. تأكد من اتصالك بالإنترنت.</string>
+    <string name="api_error">فشل جلب المواقيت من الإنترنت. سيتم استخدام الحساب الفلكي المحلي.</string>
+    <string name="ok">موافق</string>
+    <string name="cancel">إلغاء</string>
+    <string name="save">حفظ</string>
+
+    <string name="offset_fajr">تعديل الفجر (دقائق)</string>
+    <string name="offset_dhuhr">تعديل الظهر</string>
+    <string name="offset_asr">تعديل العصر</string>
+    <string name="offset_maghrib">تعديل المغرب</string>
+    <string name="offset_isha">تعديل العشاء</string>
 </resources>

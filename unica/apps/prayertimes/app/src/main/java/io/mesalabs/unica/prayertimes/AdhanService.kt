@@ -1,4 +1,4 @@
-package io.mesalabs.unica.prayertimes
+﻿package io.mesalabs.unica.prayertimes
 
 import android.app.Notification
 import android.app.NotificationChannel
@@ -13,6 +13,7 @@ import android.net.Uri
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import io.mesalabs.unica.prayertimes.audio.AdhanSoundManager
 
 class AdhanService : Service() {
 
@@ -35,14 +36,16 @@ class AdhanService : Service() {
     }
 
     private fun playAdhan(prayerName: String) {
-        val prefs = Prefs.get(this)
-        val soundUriStr = prefs.getSoundForPrayer(prayerName)
+        val soundUri: Uri? = AdhanSoundManager.getSoundUri(this, prayerName)
+
+        if (soundUri == null) {
+            // Silent mode
+            return
+        }
 
         try {
             mediaPlayer = MediaPlayer().apply {
-                val uri = if (soundUriStr != null) Uri.parse(soundUriStr)
-                          else android.provider.Settings.System.DEFAULT_ALARM_ALERT_URI
-                setDataSource(this@AdhanService, uri)
+                setDataSource(this@AdhanService, soundUri)
                 setAudioAttributes(
                     AudioAttributes.Builder()
                         .setUsage(AudioAttributes.USAGE_ALARM)
@@ -64,14 +67,14 @@ class AdhanService : Service() {
     private fun createNotification(prayerName: String): Notification {
         val nm = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val channelId = "prayer_adhan_channel"
-        
+
         nm.createNotificationChannel(
             NotificationChannel(
                 channelId,
                 getString(R.string.channel_adhan),
                 NotificationManager.IMPORTANCE_HIGH
             ).apply {
-                setSound(null, null) // Handled by MediaPlayer
+                setSound(null, null)
             }
         )
 
@@ -81,12 +84,13 @@ class AdhanService : Service() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        val prayerLocalName = when(prayerName) {
-            "Fajr" -> getString(R.string.prayer_fajr)
-            "Dhuhr" -> getString(R.string.prayer_dhuhr)
-            "Asr" -> getString(R.string.prayer_asr)
-            "Maghrib" -> getString(R.string.prayer_maghrib)
-            "Isha" -> getString(R.string.prayer_isha)
+        val prayerLocalName = when (prayerName.lowercase()) {
+            "fajr" -> getString(R.string.prayer_fajr)
+            "sunrise" -> getString(R.string.prayer_sunrise)
+            "dhuhr" -> getString(R.string.prayer_dhuhr)
+            "asr" -> getString(R.string.prayer_asr)
+            "maghrib" -> getString(R.string.prayer_maghrib)
+            "isha" -> getString(R.string.prayer_isha)
             else -> prayerName
         }
 

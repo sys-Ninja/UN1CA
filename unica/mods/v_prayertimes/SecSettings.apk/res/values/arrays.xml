@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="unica_pt_method_entries">
+        <item>Egyptian Authority</item>
+        <item>Umm Al-Qura (Makkah)</item>
+        <item>Muslim World League</item>
+        <item>Karachi</item>
+        <item>ISNA (North America)</item>
+        <item>Dubai</item>
+        <item>Kuwait</item>
+        <item>Qatar</item>
+        <item>Diyanet (Turkey)</item>
+        <item>Tehran</item>
+        <item>Moonsighting Committee</item>
+    </string-array>
+    <string-array name="unica_pt_method_values">
+        <item>egyptian</item>
+        <item>umm_al_qura</item>
+        <item>mwl</item>
+        <item>karachi</item>
+        <item>isna</item>
+        <item>dubai</item>
+        <item>kuwait</item>
+        <item>qatar</item>
+        <item>diyanet</item>
+        <item>tehran</item>
+        <item>moonsighting</item>
+    </string-array>
+</resources>

@@ -1,28 +1,11 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="unica_prayer_times_settings_title">&#1605;&#1608;&#1575;&#1602;&#1610;&#1578; &#1575;&#1604;&#1589;&#1604;&#1575;&#1577;</string>
-    <string name="unica_pt_enabled_title">&#1573;&#1588;&#1593;&#1575;&#1585;&#1575;&#1578; &#1605;&#1608;&#1575;&#1602;&#1610;&#1578; &#1575;&#1604;&#1589;&#1604;&#1575;&#1577;</string>
-    <string name="unica_pt_enabled_summary">&#1578;&#1604;&#1602;&#1617;&#1614;&#1616; &#1573;&#1588;&#1593;&#1575;&#1585;&#1575;&#1578; &#1593;&#1606;&#1583; &#1605;&#1608;&#1575;&#1602;&#1610;&#1578; &#1575;&#1604;&#1589;&#1604;&#1575;&#1577;</string>
-    <string name="unica_pt_general_title">&#1593;&#1575;&#1605;</string>
-    <string name="unica_pt_method_title">&#1591;&#1585;&#1610;&#1602;&#1577; &#1575;&#1604;&#1581;&#1587;&#1575;&#1576;</string>
-    <string name="unica_pt_app_title">&#1575;&#1604;&#1578;&#1591;&#1576;&#1610;&#1602;</string>
-    <string name="unica_pt_open_title">&#1601;&#1578;&#1581; &#1578;&#1591;&#1576;&#1610;&#1602; &#1605;&#1608;&#1575;&#1602;&#1610;&#1578; &#1575;&#1604;&#1589;&#1604;&#1575;&#1577;</string>
-    <string-array name="unica_pt_method_entries">
-        <item>Muslim World League</item>
-        <item>ISNA</item>
-        <item>Egypt</item>
-        <item>Makkah</item>
-        <item>Karachi</item>
-        <item>Tehran</item>
-        <item>Jafari</item>
-    </string-array>
-    <string-array name="unica_pt_method_values">
-        <item>mwl</item>
-        <item>isna</item>
-        <item>egypt</item>
-        <item>makkah</item>
-        <item>karachi</item>
-        <item>tehran</item>
-        <item>jafari</item>
-    </string-array>
+    <string name="unica_prayer_times_settings_title">Prayer Times</string>
+    <string name="unica_pt_enabled_title">Prayer Time Notifications</string>
+    <string name="unica_pt_enabled_summary">Receive alarms and Adhan at prayer times</string>
+    <string name="unica_pt_general_title">General</string>
+    <string name="unica_pt_method_title">Calculation Method</string>
+    <string name="unica_pt_app_title">Customization &amp; Location</string>
+    <string name="unica_pt_open_title">Prayer Times Settings</string>
+    <string name="unica_pt_open_summary">Configure Adhan audio, search location with Google Places, and live countdown</string>
 </resources>

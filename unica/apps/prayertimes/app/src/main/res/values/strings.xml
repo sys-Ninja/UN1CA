@@ -1,40 +1,76 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Prayer Times</string>
-    <string name="prayer_settings_title">Prayer Times Settings</string>
-    
+    <string name="prayer_settings_title">Prayer Times</string>
+
     <string name="pref_enabled">Enable Prayer Alarms</string>
-    <string name="pref_enabled_sum">Turn on or off Adhan and prayer notifications</string>
-    
-    <string name="pref_location_title">Current Location</string>
-    <string name="pref_location_sum">Select your city to update timings</string>
-    <string name="location_dialog_title">Search for your city</string>
-    <string name="location_hint">e.g., Cairo, Makkah, Riyadh</string>
-    <string name="location_searching">Searching…</string>
-    <string name="location_not_found">City not found</string>
-    
+    <string name="pref_enabled_sum">Receive Adhan and prayer notifications</string>
+
+    <string name="pref_location_title">Location</string>
+    <string name="pref_location_sum">Set your city for accurate prayer times</string>
+    <string name="location_dialog_title">Search Location</string>
+    <string name="location_hint">Type city name...</string>
+    <string name="location_searching">Searching...</string>
+    <string name="location_not_found">City not found. Try a different name.</string>
+    <string name="location_gps">Use Current Location</string>
+
+    <string name="pref_calculation_category">Calculation</string>
+    <string name="pref_method_title">Calculation Method</string>
+    <string name="pref_madhab_title">Asr Method (Madhab)</string>
+    <string name="pref_online_api_title">Sync with Official Authority</string>
+    <string name="pref_online_api_sum_on">Prayer times fetched from official trusted server</string>
+    <string name="pref_online_api_sum_off">Prayer times calculated locally (offline, instant 0ms)</string>
+    <string name="pref_offsets_title">Fine-tune (Minute Offsets)</string>
+    <string name="pref_offsets_sum">Adjust each prayer time by ±minutes to match your local mosque</string>
+
     <string name="pref_sounds_category">Adhan Sounds</string>
     <string name="pref_sound_fajr">Fajr Adhan</string>
     <string name="pref_sound_dhuhr">Dhuhr Adhan</string>
     <string name="pref_sound_asr">Asr Adhan</string>
     <string name="pref_sound_maghrib">Maghrib Adhan</string>
     <string name="pref_sound_isha">Isha Adhan</string>
+
+    <string name="adhan_makkah">Makkah Grand Mosque</string>
+    <string name="adhan_madinah">Madinah Prophet\'s Mosque</string>
+    <string name="adhan_aqsa">Al-Aqsa Mosque</string>
+    <string name="adhan_cairo">Cairo (Egypt)</string>
+    <string name="adhan_fajr_full">Fajr Full (with Tathwib)</string>
+    <string name="adhan_takbeer">Takbeer only</string>
+    <string name="adhan_soft_chime">Soft Chime</string>
+    <string name="adhan_silent">Silent (notification only)</string>
+    <string name="adhan_custom">Custom audio file...</string>
+    <string name="adhan_preview_play">Preview</string>
+    <string name="adhan_preview_stop">Stop</string>
     <string name="default_sound">Default</string>
-    
-    <string name="notification_adhan_title">It is time for %1$s prayer</string>
+
+    <string name="pref_notifications_category">Notifications</string>
+    <string name="pref_early_warning_title">Early Reminder</string>
+    <string name="pref_early_warning_sum">Get notified before Adhan time</string>
+    <string name="pref_early_minutes_title">Remind me before</string>
+
+    <string name="pref_next_prayer_title">Next Prayer</string>
+    <string name="pref_next_prayer_unknown">Set your location to see prayer times</string>
+
+    <string name="notification_adhan_title">Time for %1$s prayer</string>
     <string name="notification_adhan_text">Tap to stop Adhan</string>
     <string name="stop_adhan">Stop</string>
-    
+
     <string name="prayer_fajr">Fajr</string>
+    <string name="prayer_sunrise">Sunrise</string>
     <string name="prayer_dhuhr">Dhuhr</string>
     <string name="prayer_asr">Asr</string>
     <string name="prayer_maghrib">Maghrib</string>
     <string name="prayer_isha">Isha</string>
-    
+
     <string name="channel_adhan">Adhan Alarms</string>
-    <string name="pref_next_prayer_title">Next Prayer</string>
-    <string name="pref_next_prayer_sum_format">%1$s · %2$s remaining</string>
-    <string name="pref_next_prayer_unknown">No prayer scheduled</string>
-    
-    <string name="api_error">An error occurred while fetching prayer times. Check your internet connection.</string>
+    <string name="api_error">Failed to fetch prayer times. Using local astronomical calculation.</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
+
+    <string name="offset_fajr">Fajr offset (minutes)</string>
+    <string name="offset_dhuhr">Dhuhr offset</string>
+    <string name="offset_asr">Asr offset</string>
+    <string name="offset_maghrib">Maghrib offset</string>
+    <string name="offset_isha">Isha offset</string>
 </resources>

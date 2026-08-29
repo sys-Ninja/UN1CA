@@ -1,26 +1,27 @@
-package io.mesalabs.unica.prayertimes
+﻿package io.mesalabs.unica.prayertimes
 
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.util.Log
+import android.os.Build
 
 class AlarmReceiver : BroadcastReceiver() {
+
     override fun onReceive(context: Context, intent: Intent) {
         val prayerName = intent.getStringExtra("PRAYER_NAME") ?: return
-        Log.i(PrayerManager.TAG, "Alarm triggered for $prayerName")
 
+        // Start Foreground Service to play Adhan
         val serviceIntent = Intent(context, AdhanService::class.java).apply {
             putExtra("PRAYER_NAME", prayerName)
         }
-        
-        try {
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             context.startForegroundService(serviceIntent)
-        } catch (e: Exception) {
-            Log.e(PrayerManager.TAG, "Failed to start AdhanService", e)
+        } else {
+            context.startService(serviceIntent)
         }
 
-        // Schedule the next prayer immediately
+        // Immediately schedule next prayer
         PrayerManager.scheduleNextPrayer(context)
     }
 }

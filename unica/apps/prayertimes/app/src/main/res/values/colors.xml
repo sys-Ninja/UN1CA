@@ -1,5 +1,8 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="samsung_blue">#1259C3</color>
-    <color name="samsung_blue_dark">#0D47A1</color>
+    <color name="samsung_blue">#0381FE</color>
+    <color name="samsung_blue_dark">#0057CB</color>
+    <color name="samsung_blue_alpha">#1F0381FE</color>
+    <color name="surface_card">#FFFFFFFF</color>
+    <color name="surface_card_dark">#FF1C1C1E</color>
 </resources>

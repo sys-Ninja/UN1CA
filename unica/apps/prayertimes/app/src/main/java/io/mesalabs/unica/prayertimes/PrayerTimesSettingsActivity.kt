@@ -1,32 +1,45 @@
-package io.mesalabs.unica.prayertimes
+﻿package io.mesalabs.unica.prayertimes
 
 import android.app.AlertDialog
 import android.content.Intent
-import android.location.Geocoder
-import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.EditText
+import android.widget.ProgressBar
+import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreferenceCompat
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import io.mesalabs.unica.prayertimes.audio.AdhanSoundManager
+import io.mesalabs.unica.prayertimes.calc.Prayer
+import io.mesalabs.unica.prayertimes.location.GooglePlacesHelper
+import io.mesalabs.unica.prayertimes.location.PlaceSuggestion
+import io.mesalabs.unica.prayertimes.ui.AdhanSoundPickerDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Date
 import java.util.Locale
 
 class PrayerTimesSettingsActivity : AppCompatActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         supportFragmentManager
@@ -38,241 +51,424 @@ class PrayerTimesSettingsActivity : AppCompatActivity() {
 
 class PrayerTimesFragment : PreferenceFragmentCompat() {
 
-    // Request codes for ringtone pickers
-    private val SOUND_REQUEST = mapOf(
-        "Fajr" to 100, "Dhuhr" to 101, "Asr" to 102, "Maghrib" to 103, "Isha" to 104
-    )
-    private var currentSoundPicker: String? = null
-
-    /** Coroutine job for the live countdown ticker. */
     private var countdownJob: Job? = null
+    private var currentSoundPrayer: Prayer? = null
+
+    private val customAudioLauncher = registerForActivityResult(
+        ActivityResultContracts.OpenDocument()
+    ) { uri: Uri? ->
+        if (uri != null) {
+            val prayer = currentSoundPrayer ?: return@registerForActivityResult
+            val ctx = requireContext()
+            try {
+                ctx.contentResolver.takePersistableUriPermission(
+                    uri,
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION
+                )
+            } catch (_: Exception) {}
+
+            val prefs = Prefs.get(ctx)
+            prefs.setCustomAdhanUri(prayer.name, uri.toString())
+            prefs.setAdhanSoundKey(prayer.name, "custom")
+            updateAllSoundSummaries()
+        }
+    }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         preferenceManager.preferenceDataStore = null
         setPreferencesFromResource(R.xml.prayer_preferences, rootKey)
+
+        val prefs = Prefs.get(requireContext())
+        if (prefs.googlePlacesApiKey.isNotEmpty()) {
+            GooglePlacesHelper.initialize(requireContext(), prefs.googlePlacesApiKey)
+        }
+
         bindPreferences()
     }
 
     override fun onResume() {
         super.onResume()
         startCountdown()
+        updateAllSoundSummaries()
     }
 
     override fun onPause() {
         super.onPause()
         countdownJob?.cancel()
         countdownJob = null
+        AdhanSoundManager.stopPreview()
     }
 
-    // ── Countdown helpers ────────────────────────────────────────────────────
+    // ── Live Countdown ───────────────────────────────────────────────────────
 
     private fun startCountdown() {
         countdownJob?.cancel()
         countdownJob = lifecycleScope.launch(Dispatchers.IO) {
             while (isActive) {
-                val (name, millis) = findNextPrayerNow()
+                val nextPrayer = findNextPrayer()
                 withContext(Dispatchers.Main) {
-                    updateCountdownPref(name, millis)
+                    updateHeaderCountdown(nextPrayer)
                 }
                 delay(1_000L)
             }
         }
     }
 
-    /**
-     * Returns Pair(prayerName, millisUntilPrayer) for the next upcoming prayer,
-     * or Pair(null, -1) when nothing is found (no location / timings cached).
-     */
-    private fun findNextPrayerNow(): Pair<String?, Long> {
-        val prefs = Prefs.get(requireContext())
-        if (prefs.cachedTimings.isEmpty()) return null to -1L
+    private fun findNextPrayer(): Pair<Prayer, Long>? {
+        val result = PrayerManager.getTodayPrayerTimes(requireContext()) ?: return null
+        val now = System.currentTimeMillis()
+        var next = result.getNextPrayer(now)
 
-        return try {
-            val json = JSONObject(prefs.cachedTimings)
-            val dataArray = json.optJSONArray("data") ?: return null to -1L
-            val prayers = listOf("Fajr", "Dhuhr", "Asr", "Maghrib", "Isha")
-            val sdf = SimpleDateFormat("dd-MM-yyyy HH:mm", Locale.US)
-            val now = System.currentTimeMillis()
-
-            for (offset in 0..1) {
-                val cal = Calendar.getInstance()
-                cal.add(Calendar.DAY_OF_MONTH, offset)
-                val day = cal.get(Calendar.DAY_OF_MONTH)
-                val dayData = dataArray.optJSONObject(day - 1) ?: continue
-                val timings = dayData.optJSONObject("timings") ?: continue
-                val dateStr = dayData.optJSONObject("date")
-                    ?.optJSONObject("gregorian")?.optString("date") ?: continue
-
-                for (p in prayers) {
-                    val timeStr = timings.optString(p).substringBefore(" ")
-                    val dateObj = sdf.parse("$dateStr $timeStr") ?: continue
-                    if (dateObj.time > now) return p to (dateObj.time - now)
-                }
-            }
-            null to -1L
-        } catch (e: Exception) {
-            null to -1L
+        if (next == null) {
+            val tomorrowCal = Calendar.getInstance().apply { add(Calendar.DAY_OF_MONTH, 1) }
+            val tomorrowResult = PrayerManager.calculateLocally(requireContext(), tomorrowCal)
+            next = tomorrowResult?.getNextPrayer(now)
         }
+        return next
     }
 
-    private fun updateCountdownPref(prayerName: String?, millisUntil: Long) {
+    private fun updateHeaderCountdown(next: Pair<Prayer, Long>?) {
         val pref = findPreference<Preference>("pref_next_prayer") ?: return
-        if (prayerName == null || millisUntil < 0) {
+        if (next == null) {
             pref.summary = getString(R.string.pref_next_prayer_unknown)
             return
         }
 
-        // Localised prayer name
-        val nameRes = when (prayerName) {
-            "Fajr"    -> R.string.prayer_fajr
-            "Dhuhr"   -> R.string.prayer_dhuhr
-            "Asr"     -> R.string.prayer_asr
-            "Maghrib" -> R.string.prayer_maghrib
-            "Isha"    -> R.string.prayer_isha
-            else      -> null
-        }
-        val localName = if (nameRes != null) getString(nameRes) else prayerName
+        val (prayer, timeMillis) = next
+        val millisRemaining = (timeMillis - System.currentTimeMillis()).coerceAtLeast(0L)
 
-        // Format HH:MM:SS
-        val totalSec = millisUntil / 1000
+        val nameRes = when (prayer) {
+            Prayer.FAJR -> R.string.prayer_fajr
+            Prayer.SUNRISE -> R.string.prayer_sunrise
+            Prayer.DHUHR -> R.string.prayer_dhuhr
+            Prayer.ASR -> R.string.prayer_asr
+            Prayer.MAGHRIB -> R.string.prayer_maghrib
+            Prayer.ISHA -> R.string.prayer_isha
+        }
+        val localName = getString(nameRes)
+
+        val totalSec = millisRemaining / 1000
         val h = totalSec / 3600
         val m = (totalSec % 3600) / 60
         val s = totalSec % 60
         val timeStr = String.format(Locale.US, "%02d:%02d:%02d", h, m, s)
 
-        pref.summary = getString(R.string.pref_next_prayer_sum_format, localName, timeStr)
+        val sdf = SimpleDateFormat("hh:mm a", Locale.getDefault())
+        val atTime = sdf.format(Date(timeMillis))
+
+        pref.summary = "$localName ($atTime) · $timeStr"
     }
 
-    // ── Existing preference binding ──────────────────────────────────────────
+    // ── Preference Binding ───────────────────────────────────────────────────
 
     private fun bindPreferences() {
         val prefs = Prefs.get(requireContext())
 
-        // Enable switch
+        // Enable master switch
         findPreference<SwitchPreferenceCompat>("pref_enabled")?.apply {
             isChecked = prefs.isEnabled
             setOnPreferenceChangeListener { _, newValue ->
-                prefs.isEnabled = newValue as Boolean
-                if (prefs.isEnabled) {
+                val enabled = newValue as Boolean
+                prefs.isEnabled = enabled
+                if (enabled) {
                     PrayerManager.scheduleNextPrayer(requireContext())
+                } else {
+                    PrayerManager.cancelAlarms(requireContext())
                 }
                 true
             }
         }
 
-        // Location picker
+        // Location Picker
         findPreference<Preference>("pref_location")?.apply {
-            summary = if (prefs.cityName.isNotEmpty()) prefs.cityName
-                      else getString(R.string.pref_location_sum)
+            summary = if (prefs.cityName.isNotEmpty()) prefs.cityName else getString(R.string.pref_location_sum)
             setOnPreferenceClickListener {
-                showLocationDialog()
+                showLocationSearchDialog()
                 true
             }
         }
 
-        // Sound pickers for each prayer
-        for ((prayer, reqCode) in SOUND_REQUEST) {
-            val key = "pref_sound_${prayer.lowercase()}"
-            findPreference<Preference>(key)?.apply {
-                val savedUri = prefs.getSoundForPrayer(prayer)
-                summary = if (savedUri != null) resolveRingtoneName(Uri.parse(savedUri))
-                          else getString(R.string.default_sound)
-                setOnPreferenceClickListener {
-                    currentSoundPicker = prayer
-                    val intent = Intent(RingtoneManager.ACTION_RINGTONE_PICKER).apply {
-                        putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_ALL)
-                        putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_SILENT, false)
-                        putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_DEFAULT, true)
-                        val cur = prefs.getSoundForPrayer(prayer)
-                        if (cur != null) putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, Uri.parse(cur))
+        // Calculation Method List
+        findPreference<ListPreference>("pref_method")?.apply {
+            value = prefs.calculationMethodKey
+            summary = entry ?: getString(R.string.pref_method_title)
+            setOnPreferenceChangeListener { _, newValue ->
+                val newKey = newValue as String
+                prefs.calculationMethodKey = newKey
+                val idx = findIndexOfValue(newKey)
+                if (idx >= 0) summary = entries[idx]
+
+                // Recalculate immediately
+                if (prefs.useOnlineApi) {
+                    syncOnlineTimings()
+                } else {
+                    PrayerManager.scheduleNextPrayer(requireContext())
+                    startCountdown()
+                }
+                true
+            }
+        }
+
+        // Madhab List (Shafi / Hanafi)
+        findPreference<ListPreference>("pref_madhab")?.apply {
+            value = prefs.madhabKey
+            summary = entry ?: getString(R.string.pref_madhab_title)
+            setOnPreferenceChangeListener { _, newValue ->
+                val newKey = newValue as String
+                prefs.madhabKey = newKey
+                val idx = findIndexOfValue(newKey)
+                if (idx >= 0) summary = entries[idx]
+
+                if (prefs.useOnlineApi) {
+                    syncOnlineTimings()
+                } else {
+                    PrayerManager.scheduleNextPrayer(requireContext())
+                    startCountdown()
+                }
+                true
+            }
+        }
+
+        // Online API Sync Toggle
+        findPreference<SwitchPreferenceCompat>("pref_online_api")?.apply {
+            isChecked = prefs.useOnlineApi
+            summary = if (prefs.useOnlineApi) getString(R.string.pref_online_api_sum_on) else getString(R.string.pref_online_api_sum_off)
+            setOnPreferenceChangeListener { _, newValue ->
+                val enabled = newValue as Boolean
+                prefs.useOnlineApi = enabled
+                summary = if (enabled) getString(R.string.pref_online_api_sum_on) else getString(R.string.pref_online_api_sum_off)
+                if (enabled) {
+                    syncOnlineTimings()
+                } else {
+                    PrayerManager.scheduleNextPrayer(requireContext())
+                    startCountdown()
+                }
+                true
+            }
+        }
+
+        // Minute Offsets Dialog
+        findPreference<Preference>("pref_offsets")?.apply {
+            setOnPreferenceClickListener {
+                showOffsetsDialog()
+                true
+            }
+        }
+
+        // Adhan Sound Pickers
+        bindSoundPref("pref_sound_fajr", Prayer.FAJR)
+        bindSoundPref("pref_sound_dhuhr", Prayer.DHUHR)
+        bindSoundPref("pref_sound_asr", Prayer.ASR)
+        bindSoundPref("pref_sound_maghrib", Prayer.MAGHRIB)
+        bindSoundPref("pref_sound_isha", Prayer.ISHA)
+
+        // Early warning
+        findPreference<SwitchPreferenceCompat>("pref_early_warning")?.apply {
+            isChecked = prefs.showEarlyWarning
+            setOnPreferenceChangeListener { _, newValue ->
+                prefs.showEarlyWarning = newValue as Boolean
+                true
+            }
+        }
+
+        findPreference<ListPreference>("pref_early_minutes")?.apply {
+            value = prefs.earlyWarningMinutes.toString()
+            summary = entry
+            setOnPreferenceChangeListener { _, newValue ->
+                prefs.earlyWarningMinutes = (newValue as String).toIntOrNull() ?: 10
+                val idx = findIndexOfValue(newValue)
+                if (idx >= 0) summary = entries[idx]
+                true
+            }
+        }
+    }
+
+    private fun bindSoundPref(prefKey: String, prayer: Prayer) {
+        findPreference<Preference>(prefKey)?.apply {
+            val soundKey = Prefs.get(requireContext()).getAdhanSoundKey(prayer.name)
+            summary = AdhanSoundManager.getSoundTitle(requireContext(), soundKey, prayer.name)
+            setOnPreferenceClickListener {
+                currentSoundPrayer = prayer
+                AdhanSoundPickerDialog(
+                    context = requireContext(),
+                    prayer = prayer,
+                    prefs = Prefs.get(requireContext()),
+                    onCustomFileRequested = {
+                        customAudioLauncher.launch(arrayOf("audio/*"))
+                    },
+                    onSoundSelected = {
+                        updateAllSoundSummaries()
                     }
-                    @Suppress("DEPRECATION")
-                    startActivityForResult(intent, reqCode)
-                    true
+                ).show()
+                true
+            }
+        }
+    }
+
+    private fun updateAllSoundSummaries() {
+        val prefs = Prefs.get(requireContext())
+        val map = mapOf(
+            "pref_sound_fajr" to Prayer.FAJR,
+            "pref_sound_dhuhr" to Prayer.DHUHR,
+            "pref_sound_asr" to Prayer.ASR,
+            "pref_sound_maghrib" to Prayer.MAGHRIB,
+            "pref_sound_isha" to Prayer.ISHA
+        )
+        for ((key, prayer) in map) {
+            val soundKey = prefs.getAdhanSoundKey(prayer.name)
+            findPreference<Preference>(key)?.summary =
+                AdhanSoundManager.getSoundTitle(requireContext(), soundKey, prayer.name)
+        }
+    }
+
+    private fun syncOnlineTimings() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            val ok = PrayerManager.fetchAndCacheTimings(requireContext())
+            withContext(Dispatchers.Main) {
+                if (ok) {
+                    PrayerManager.scheduleNextPrayer(requireContext())
+                    startCountdown()
+                    Toast.makeText(requireContext(), R.string.ok, Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(requireContext(), R.string.api_error, Toast.LENGTH_LONG).show()
                 }
             }
         }
     }
 
-    @Suppress("DEPRECATION")
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        val prayer = SOUND_REQUEST.entries.firstOrNull { it.value == requestCode }?.key ?: return
-        val uri = data?.getParcelableExtra<Uri>(RingtoneManager.EXTRA_RINGTONE_PICKED_URI)
-        val prefs = Prefs.get(requireContext())
-        prefs.setSoundForPrayer(prayer, uri?.toString())
-        findPreference<Preference>("pref_sound_${prayer.lowercase()}")?.summary =
-            if (uri != null) resolveRingtoneName(uri) else getString(R.string.default_sound)
-    }
+    // ── Location Search Dialog (Google Places Autocomplete) ─────────────────
 
-    private fun resolveRingtoneName(uri: Uri): String {
-        return try {
-            val rt = RingtoneManager.getRingtone(requireContext(), uri)
-            rt?.getTitle(requireContext()) ?: uri.lastPathSegment ?: ""
-        } catch (e: Exception) { getString(R.string.default_sound) }
-    }
+    private fun showLocationSearchDialog() {
+        val view = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_location_search, null)
+        val editQuery = view.findViewById<EditText>(R.id.edit_location_search)
+        val progress = view.findViewById<ProgressBar>(R.id.progress_search)
+        val recyclerView = view.findViewById<RecyclerView>(R.id.recycler_suggestions)
 
-    private fun showLocationDialog() {
-        val editText = EditText(requireContext()).apply {
-            hint = getString(R.string.location_hint)
-            setPadding(48, 24, 48, 12)
+        val suggestions = mutableListOf<PlaceSuggestion>()
+        var searchJob: Job? = null
+
+        var dialog: AlertDialog? = null
+
+        val adapter = SuggestionAdapter(suggestions) { selectedSuggestion ->
+            progress.visibility = View.VISIBLE
+            lifecycleScope.launch(Dispatchers.IO) {
+                val resolved = GooglePlacesHelper.fetchPlaceDetails(requireContext(), selectedSuggestion)
+                withContext(Dispatchers.Main) {
+                    progress.visibility = View.GONE
+                    if (resolved != null) {
+                        val prefs = Prefs.get(requireContext())
+                        prefs.latitude = resolved.latitude.toFloat()
+                        prefs.longitude = resolved.longitude.toFloat()
+                        prefs.cityName = resolved.name
+                        prefs.timeZoneId = resolved.timeZoneId
+
+                        findPreference<Preference>("pref_location")?.summary = resolved.name
+
+                        if (prefs.useOnlineApi) {
+                            syncOnlineTimings()
+                        } else {
+                            PrayerManager.scheduleNextPrayer(requireContext())
+                            startCountdown()
+                        }
+                        dialog?.dismiss()
+                    } else {
+                        Toast.makeText(requireContext(), R.string.location_not_found, Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
         }
 
-        val dialog = AlertDialog.Builder(requireContext())
-            .setTitle(getString(R.string.location_dialog_title))
-            .setView(editText)
-            .setPositiveButton(android.R.string.ok) { _, _ ->
-                val query = editText.text.toString().trim()
-                if (query.isNotEmpty()) searchCity(query)
+        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        recyclerView.adapter = adapter
+
+        editQuery.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                val query = s?.toString()?.trim() ?: ""
+                if (query.length < 2) {
+                    suggestions.clear()
+                    adapter.notifyDataSetChanged()
+                    return
+                }
+
+                searchJob?.cancel()
+                searchJob = lifecycleScope.launch(Dispatchers.IO) {
+                    delay(300) // Debounce
+                    withContext(Dispatchers.Main) { progress.visibility = View.VISIBLE }
+                    val results = GooglePlacesHelper.searchCities(requireContext(), query)
+                    withContext(Dispatchers.Main) {
+                        progress.visibility = View.GONE
+                        suggestions.clear()
+                        suggestions.addAll(results)
+                        adapter.notifyDataSetChanged()
+                    }
+                }
             }
-            .setNegativeButton(android.R.string.cancel, null)
+            override fun afterTextChanged(s: Editable?) {}
+        })
+
+        dialog = AlertDialog.Builder(requireContext())
+            .setTitle(R.string.location_dialog_title)
+            .setView(view)
+            .setNegativeButton(R.string.cancel, null)
             .create()
 
         dialog.show()
     }
 
-    private fun searchCity(query: String) {
-        val locationPref = findPreference<Preference>("pref_location")
-        locationPref?.summary = getString(R.string.location_searching)
+    // ── Offsets Dialog ───────────────────────────────────────────────────────
 
-        lifecycleScope.launch(Dispatchers.IO) {
-            try {
-                @Suppress("DEPRECATION")
-                val geocoder = Geocoder(requireContext(), Locale.getDefault())
-                val results = geocoder.getFromLocationName(query, 1)
-                
-                withContext(Dispatchers.Main) {
-                    if (results.isNullOrEmpty()) {
-                        locationPref?.summary = getString(R.string.location_not_found)
-                        Toast.makeText(requireContext(), getString(R.string.location_not_found), Toast.LENGTH_SHORT).show()
-                    } else {
-                        val addr = results[0]
-                        val cityName = addr.locality ?: addr.adminArea ?: query
-                        val prefs = Prefs.get(requireContext())
-                        prefs.latitude = addr.latitude.toFloat()
-                        prefs.longitude = addr.longitude.toFloat()
-                        prefs.cityName = cityName
-                        locationPref?.summary = cityName
+    private fun showOffsetsDialog() {
+        val view = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_offsets, null)
+        val prefs = Prefs.get(requireContext())
 
-                        // Fetch timings for new location in background
-                        launch(Dispatchers.IO) {
-                            val ok = PrayerManager.fetchAndCacheTimings(requireContext())
-                            if (ok) PrayerManager.scheduleNextPrayer(requireContext())
-                            withContext(Dispatchers.Main) {
-                                Toast.makeText(
-                                    requireContext(),
-                                    if (ok) cityName else getString(R.string.api_error),
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            }
-                        }
-                    }
-                }
-            } catch (e: Exception) {
-                withContext(Dispatchers.Main) {
-                    locationPref?.summary = getString(R.string.location_not_found)
-                }
+        val editFajr = view.findViewById<EditText>(R.id.edit_offset_fajr).apply { setText(prefs.fajrOffset.toString()) }
+        val editSunrise = view.findViewById<EditText>(R.id.edit_offset_sunrise).apply { setText(prefs.sunriseOffset.toString()) }
+        val editDhuhr = view.findViewById<EditText>(R.id.edit_offset_dhuhr).apply { setText(prefs.dhuhrOffset.toString()) }
+        val editAsr = view.findViewById<EditText>(R.id.edit_offset_asr).apply { setText(prefs.asrOffset.toString()) }
+        val editMaghrib = view.findViewById<EditText>(R.id.edit_offset_maghrib).apply { setText(prefs.maghribOffset.toString()) }
+        val editIsha = view.findViewById<EditText>(R.id.edit_offset_isha).apply { setText(prefs.ishaOffset.toString()) }
+
+        AlertDialog.Builder(requireContext())
+            .setTitle(R.string.pref_offsets_title)
+            .setView(view)
+            .setPositiveButton(R.string.save) { _, _ ->
+                prefs.fajrOffset = editFajr.text.toString().toIntOrNull() ?: 0
+                prefs.sunriseOffset = editSunrise.text.toString().toIntOrNull() ?: 0
+                prefs.dhuhrOffset = editDhuhr.text.toString().toIntOrNull() ?: 0
+                prefs.asrOffset = editAsr.text.toString().toIntOrNull() ?: 0
+                prefs.maghribOffset = editMaghrib.text.toString().toIntOrNull() ?: 0
+                prefs.ishaOffset = editIsha.text.toString().toIntOrNull() ?: 0
+
+                PrayerManager.scheduleNextPrayer(requireContext())
+                startCountdown()
             }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
+    }
+
+    inner class SuggestionAdapter(
+        private val list: List<PlaceSuggestion>,
+        private val onItemClick: (PlaceSuggestion) -> Unit
+    ) : RecyclerView.Adapter<SuggestionAdapter.SuggestionViewHolder>() {
+
+        inner class SuggestionViewHolder(v: View) : RecyclerView.ViewHolder(v) {
+            val textPrimary: TextView = v.findViewById(R.id.text_place_primary)
+            val textSecondary: TextView = v.findViewById(R.id.text_place_secondary)
+        }
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SuggestionViewHolder {
+            val v = LayoutInflater.from(parent.context).inflate(R.layout.item_place_suggestion, parent, false)
+            return SuggestionViewHolder(v)
+        }
+
+        override fun getItemCount(): Int = list.size
+
+        override fun onBindViewHolder(holder: SuggestionViewHolder, position: Int) {
+            val item = list[position]
+            holder.textPrimary.text = item.primaryText
+            holder.textSecondary.text = item.secondaryText
+            holder.itemView.setOnClickListener { onItemClick(item) }
         }
     }
 }

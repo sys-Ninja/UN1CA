@@ -1,0 +1,56 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="method_entries">
+        <item>Egyptian General Authority of Survey</item>
+        <item>Umm Al-Qura (Makkah)</item>
+        <item>Muslim World League</item>
+        <item>University of Islamic Sciences, Karachi</item>
+        <item>ISNA (North America)</item>
+        <item>Dubai</item>
+        <item>Kuwait</item>
+        <item>Qatar</item>
+        <item>Diyanet (Turkey)</item>
+        <item>Institute of Geophysics, Tehran</item>
+        <item>Moonsighting Committee</item>
+    </string-array>
+
+    <string-array name="method_values">
+        <item>egyptian</item>
+        <item>umm_al_qura</item>
+        <item>mwl</item>
+        <item>karachi</item>
+        <item>isna</item>
+        <item>dubai</item>
+        <item>kuwait</item>
+        <item>qatar</item>
+        <item>diyanet</item>
+        <item>tehran</item>
+        <item>moonsighting</item>
+    </string-array>
+
+    <string-array name="madhab_entries">
+        <item>Standard (Shafi\'i, Maliki, Hanbali)</item>
+        <item>Late Asr (Hanafi)</item>
+    </string-array>
+
+    <string-array name="madhab_values">
+        <item>shafi</item>
+        <item>hanafi</item>
+    </string-array>
+
+    <string-array name="early_minutes_entries">
+        <item>5 minutes</item>
+        <item>10 minutes</item>
+        <item>15 minutes</item>
+        <item>20 minutes</item>
+        <item>30 minutes</item>
+    </string-array>
+
+    <string-array name="early_minutes_values">
+        <item>5</item>
+        <item>10</item>
+        <item>15</item>
+        <item>20</item>
+        <item>30</item>
+    </string-array>
+</resources>
