@@ -1,10 +1,9 @@
-﻿package io.mesalabs.unica.prayertimes.location
+package io.mesalabs.unica.prayertimes.location
 
 import android.content.Context
 import android.location.Address
 import android.location.Geocoder
 import android.util.Log
-import com.google.android.gms.common.api.ApiException
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.AutocompletePrediction
 import com.google.android.libraries.places.api.model.AutocompleteSessionToken
@@ -14,6 +13,7 @@ import com.google.android.libraries.places.api.net.FetchPlaceRequest
 import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest
 import com.google.android.libraries.places.api.net.PlacesClient
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import java.util.Locale
 import java.util.TimeZone
@@ -71,7 +71,7 @@ object GooglePlacesHelper {
                     .setSessionToken(sessionToken)
                     .build()
 
-                val response = kotlinx.coroutines.tasks.await(placesClient!!.findAutocompletePredictions(request))
+                val response = placesClient!!.findAutocompletePredictions(request).await()
                 return@withContext response.autocompletePredictions.map { p: AutocompletePrediction ->
                     PlaceSuggestion(
                         placeId = p.placeId,
@@ -130,12 +130,11 @@ object GooglePlacesHelper {
                     .setSessionToken(sessionToken)
                     .build()
 
-                val response = kotlinx.coroutines.tasks.await(placesClient!!.fetchPlace(request))
+                val response = placesClient!!.fetchPlace(request).await()
                 val place = response.place
                 val latLng = place.latLng ?: return@withContext null
                 val name = place.name ?: suggestion.primaryText
 
-                // Reset session token after completion
                 sessionToken = AutocompleteSessionToken.newInstance()
 
                 return@withContext PlaceResolvedLocation(

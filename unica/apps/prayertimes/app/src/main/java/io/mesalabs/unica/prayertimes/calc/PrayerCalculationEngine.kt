@@ -1,4 +1,4 @@
-﻿package io.mesalabs.unica.prayertimes.calc
+package io.mesalabs.unica.prayertimes.calc
 
 import java.util.Calendar
 import java.util.Date

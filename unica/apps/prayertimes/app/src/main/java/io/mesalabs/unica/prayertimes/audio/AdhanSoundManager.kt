@@ -1,4 +1,4 @@
-﻿package io.mesalabs.unica.prayertimes.audio
+package io.mesalabs.unica.prayertimes.audio
 
 import android.content.Context
 import android.media.AudioAttributes

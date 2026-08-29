@@ -1,4 +1,4 @@
-﻿package io.mesalabs.unica.prayertimes
+package io.mesalabs.unica.prayertimes
 
 import android.app.AlarmManager
 import android.app.PendingIntent

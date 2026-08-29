@@ -1,4 +1,4 @@
-﻿package io.mesalabs.unica.prayertimes
+package io.mesalabs.unica.prayertimes
 
 import android.content.BroadcastReceiver
 import android.content.Context

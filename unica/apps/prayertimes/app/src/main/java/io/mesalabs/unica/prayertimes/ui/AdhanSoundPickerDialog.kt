@@ -1,4 +1,4 @@
-﻿package io.mesalabs.unica.prayertimes.ui
+package io.mesalabs.unica.prayertimes.ui
 
 import android.app.AlertDialog
 import android.content.Context
