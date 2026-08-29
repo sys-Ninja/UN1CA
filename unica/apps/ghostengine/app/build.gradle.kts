@@ -5,12 +5,12 @@ plugins {
 
 android {
     namespace = "io.mesalabs.unica.ghostengine"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "io.mesalabs.unica.ghostengine"
         minSdk = 28
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
     }
