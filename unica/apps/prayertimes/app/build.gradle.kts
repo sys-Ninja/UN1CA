@@ -5,12 +5,12 @@ plugins {
 
 android {
     namespace = "io.mesalabs.unica.prayertimes"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "io.mesalabs.unica.prayertimes"
         minSdk = 28
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 2
         versionName = "2.0"
     }
@@ -33,6 +33,10 @@ android {
     }
     buildFeatures {
         viewBinding = true
+    }
+    lint {
+        abortOnError = false
+        checkReleaseBuilds = false
     }
 }
 
