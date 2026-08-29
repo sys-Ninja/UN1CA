@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="unica_screen_translator_settings_title">Live Screen Translator</string>
+    <string name="unica_st_enabled_title">Live In-Place Translation</string>
+    <string name="unica_st_enabled_summary">Translate game dialogues and on-screen text in real-time</string>
+    <string name="unica_st_languages_title">Languages</string>
+    <string name="unica_st_source_lang_title">Source Language</string>
+    <string name="unica_st_target_lang_title">Target Language</string>
+    <string name="unica_st_appearance_title">Control &amp; Game Automation</string>
+    <string name="unica_st_bubble_title">Floating Quick Toggle Bubble</string>
+    <string name="unica_st_bubble_summary">Show One UI floating action bubble on screen</string>
+    <string name="unica_st_auto_games_title">Auto-Translate in Games</string>
+    <string name="unica_st_auto_games_summary">Automatically activate live translation when games launch</string>
+    <string name="unica_st_app_title">Advanced</string>
+    <string name="unica_st_open_title">Screen Translator Customizer</string>
+    <string name="unica_st_open_summary">Configure custom font styling, outline width, and offline models</string>
+</resources>

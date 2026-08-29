@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="unica_screen_translator_settings_title">مترجم الشاشة والألعاب الفوري</string>
+    <string name="unica_st_enabled_title">الترجمة الحية المباشرة في نفس المكان</string>
+    <string name="unica_st_enabled_summary">ترجمة حوارات الألعاب ونصوص الشاشة في الوقت الفعلي في نفس مكانها</string>
+    <string name="unica_st_languages_title">اللغات</string>
+    <string name="unica_st_source_lang_title">لغة المصدر (اللعبة)</string>
+    <string name="unica_st_target_lang_title">لغة الترجمة</string>
+    <string name="unica_st_appearance_title">التحكم والتشغيل التلقائي بالألعاب</string>
+    <string name="unica_st_bubble_title">زر الإجراء العائم السريع</string>
+    <string name="unica_st_bubble_summary">إظهار فقاعة One UI شفافة على حافة الشاشة</string>
+    <string name="unica_st_auto_games_title">الترجمة التلقائية داخل الألعاب</string>
+    <string name="unica_st_auto_games_summary">بدء الترجمة الحية تلقائياً عند فتح الألعاب</string>
+    <string name="unica_st_app_title">متقدم</string>
+    <string name="unica_st_open_title">مخصص مترجم الشاشة</string>
+    <string name="unica_st_open_summary">تخصيص مظهر الخط وإطار الحروف والتحكم في نماذج الذكاء الاصطناعي أوفلاين</string>
+</resources>

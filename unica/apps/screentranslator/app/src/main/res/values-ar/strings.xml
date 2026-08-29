@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">مترجم الشاشة والألعاب الفوري</string>
+    <string name="settings_title">مترجم الشاشة والألعاب</string>
+
+    <string name="pref_service_enabled">الترجمة الحية المباشرة</string>
+    <string name="pref_service_enabled_sum">ترجمة حوارات الألعاب ونصوص الشاشة في الوقت الفعلي في نفس مكانها</string>
+
+    <string name="pref_category_language">اللغات</string>
+    <string name="pref_source_language">لغة المصدر (اللعبة)</string>
+    <string name="pref_target_language">لغة الترجمة</string>
+
+    <string name="pref_category_appearance">المظهر والتحكم</string>
+    <string name="pref_floating_bubble">زر الإجراء العائم</string>
+    <string name="pref_floating_bubble_sum">إظهار فقاعة تحكم سريعة وشفافة على حافة الشاشة</string>
+    <string name="pref_auto_games">الترجمة التلقائية للألعاب</string>
+    <string name="pref_auto_games_sum">بدء الترجمة تلقائياً عند فتح الألعاب</string>
+
+    <string name="service_running_sum">الترجمة الحية قيد التشغيل (استجابة لمس 0ms)</string>
+    <string name="service_started">تم تشغيل المترجم الفوري</string>
+    <string name="permission_denied">يجب السماح بالتقاط الشاشة لتشغيل الترجمة</string>
+    <string name="grant_overlay_permission">يرجى منح إذن الظهور فوق التطبيقات لعرض الترجمة</string>
+    <string name="stop">إيقاف</string>
+</resources>

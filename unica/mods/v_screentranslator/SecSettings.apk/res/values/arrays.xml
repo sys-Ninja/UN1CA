@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="unica_st_source_lang_entries">
+        <item>Auto Detect</item>
+        <item>English</item>
+        <item>Japanese</item>
+        <item>Chinese</item>
+        <item>Korean</item>
+        <item>French</item>
+        <item>German</item>
+        <item>Spanish</item>
+    </string-array>
+    <string-array name="unica_st_source_lang_values">
+        <item>auto</item>
+        <item>en</item>
+        <item>ja</item>
+        <item>zh</item>
+        <item>ko</item>
+        <item>fr</item>
+        <item>de</item>
+        <item>es</item>
+    </string-array>
+
+    <string-array name="unica_st_target_lang_entries">
+        <item>Arabic (العربية)</item>
+        <item>English</item>
+        <item>French</item>
+        <item>Spanish</item>
+        <item>German</item>
+        <item>Turkish</item>
+    </string-array>
+    <string-array name="unica_st_target_lang_values">
+        <item>ar</item>
+        <item>en</item>
+        <item>fr</item>
+        <item>es</item>
+        <item>de</item>
+        <item>tr</item>
+    </string-array>
+</resources>

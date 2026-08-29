@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Live Screen Translator</string>
+    <string name="settings_title">Screen &amp; Game Translator</string>
+
+    <string name="pref_service_enabled">Live Screen Translation</string>
+    <string name="pref_service_enabled_sum">Translate game dialogues and screen text in real-time</string>
+
+    <string name="pref_category_language">Languages</string>
+    <string name="pref_source_language">Source Language</string>
+    <string name="pref_target_language">Target Language</string>
+
+    <string name="pref_category_appearance">Appearance &amp; Control</string>
+    <string name="pref_floating_bubble">Floating Action Button</string>
+    <string name="pref_floating_bubble_sum">Show quick toggle bubble on screen edges</string>
+    <string name="pref_auto_games">Auto-Translate Games</string>
+    <string name="pref_auto_games_sum">Start translation automatically when opening games</string>
+
+    <string name="service_running_sum">Live translation active (0ms touch lag)</string>
+    <string name="service_started">Live Screen Translator started</string>
+    <string name="permission_denied">Screen capture permission required for translation</string>
+    <string name="grant_overlay_permission">Please grant overlay permission to display live subtitles</string>
+    <string name="stop">Stop</string>
+</resources>

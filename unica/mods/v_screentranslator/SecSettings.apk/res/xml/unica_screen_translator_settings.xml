@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:settings="http://schemas.android.com/apk/res-auto">
+
+    <com.samsung.android.settings.widget.SecInsetCategoryPreference />
+
+    <SecSwitchPreference
+        android:key="unica_st_service_enabled"
+        android:title="@string/unica_st_enabled_title"
+        android:summary="@string/unica_st_enabled_summary"
+        settings:controller="io.mesalabs.unica.settings.screentranslator.ScreenTranslatorSystemTogglePreferenceController" />
+
+    <com.samsung.android.settings.widget.SecInsetCategoryPreference />
+
+    <PreferenceCategory android:title="@string/unica_st_languages_title">
+        <SecDropDownPreference
+            android:key="unica_st_source_lang"
+            android:title="@string/unica_st_source_lang_title"
+            android:entries="@array/unica_st_source_lang_entries"
+            android:entryValues="@array/unica_st_source_lang_values"
+            settings:controller="io.mesalabs.unica.settings.screentranslator.ScreenTranslatorSystemListPreferenceController" />
+
+        <SecDropDownPreference
+            android:key="unica_st_target_lang"
+            android:title="@string/unica_st_target_lang_title"
+            android:entries="@array/unica_st_target_lang_entries"
+            android:entryValues="@array/unica_st_target_lang_values"
+            settings:controller="io.mesalabs.unica.settings.screentranslator.ScreenTranslatorSystemListPreferenceController" />
+    </PreferenceCategory>
+
+    <com.samsung.android.settings.widget.SecInsetCategoryPreference />
+
+    <PreferenceCategory android:title="@string/unica_st_appearance_title">
+        <SecSwitchPreference
+            android:key="unica_st_floating_bubble"
+            android:title="@string/unica_st_bubble_title"
+            android:summary="@string/unica_st_bubble_summary"
+            settings:controller="io.mesalabs.unica.settings.screentranslator.ScreenTranslatorSystemTogglePreferenceController" />
+
+        <SecSwitchPreference
+            android:key="unica_st_auto_games"
+            android:title="@string/unica_st_auto_games_title"
+            android:summary="@string/unica_st_auto_games_summary"
+            settings:controller="io.mesalabs.unica.settings.screentranslator.ScreenTranslatorSystemTogglePreferenceController" />
+    </PreferenceCategory>
+
+    <com.samsung.android.settings.widget.SecInsetCategoryPreference />
+
+    <PreferenceCategory android:title="@string/unica_st_app_title">
+        <Preference
+            android:key="unica_st_open"
+            android:title="@string/unica_st_open_title"
+            android:summary="@string/unica_st_open_summary"
+            android:persistent="false">
+            <intent
+                android:action="io.mesalabs.unica.action.SCREEN_TRANSLATOR_SETTINGS"
+                android:targetPackage="io.mesalabs.unica.screentranslator"
+                android:targetClass="io.mesalabs.unica.screentranslator.ScreenTranslatorSettingsActivity" />
+        </Preference>
+    </PreferenceCategory>
+
+</PreferenceScreen>

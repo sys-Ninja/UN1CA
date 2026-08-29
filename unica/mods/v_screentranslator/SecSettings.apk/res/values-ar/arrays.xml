@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="unica_st_source_lang_entries">
+        <item>تعرف تلقائي</item>
+        <item>الإنجليزية</item>
+        <item>اليابانية</item>
+        <item>الصينية</item>
+        <item>الكورية</item>
+        <item>الفرنسية</item>
+        <item>الألمانية</item>
+        <item>الإسبانية</item>
+    </string-array>
+    <string-array name="unica_st_source_lang_values">
+        <item>auto</item>
+        <item>en</item>
+        <item>ja</item>
+        <item>zh</item>
+        <item>ko</item>
+        <item>fr</item>
+        <item>de</item>
+        <item>es</item>
+    </string-array>
+
+    <string-array name="unica_st_target_lang_entries">
+        <item>العربية</item>
+        <item>الإنجليزية</item>
+        <item>الفرنسية</item>
+        <item>الإسبانية</item>
+        <item>الألمانية</item>
+        <item>التركية</item>
+    </string-array>
+    <string-array name="unica_st_target_lang_values">
+        <item>ar</item>
+        <item>en</item>
+        <item>fr</item>
+        <item>es</item>
+        <item>de</item>
+        <item>tr</item>
+    </string-array>
+</resources>
