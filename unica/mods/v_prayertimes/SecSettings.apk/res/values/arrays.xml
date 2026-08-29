@@ -28,7 +28,7 @@
     </string-array>
 
     <string-array name="unica_pt_madhab_entries">
-        <item>Standard (Shafi\'i, Maliki, Hanbali)</item>
+        <item>Standard (Shafi, Maliki, Hanbali)</item>
         <item>Late Asr (Hanafi)</item>
     </string-array>
     <string-array name="unica_pt_madhab_values">
