@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">الكاميرا الشبحية وموقع GPS الخفي</string>
+    <string name="settings_title">إعدادات المحرك الشبحي</string>
+
+    <string name="pref_category_camera">بث الكاميرا الشبحية</string>
+    <string name="pref_ghost_camera_enabled">تفعيل الكاميرا الشبحية</string>
+    <string name="pref_ghost_camera_sum">تغذية فيديو أو صورة من المعرض داخل بث الكاميرا الحية</string>
+    <string name="pref_select_media">اختيار مصدر الوسائط</string>
+    <string name="pref_select_media_sum">اختر فيديو MP4 أو صورة JPG/PNG من الاستوديو</string>
+    <string name="pref_show_camera_tool">زر التبديل العائم للكاميرا</string>
+    <string name="pref_show_camera_tool_sum">إظهار شريط عائم سريع للتبديل بين الكاميرا الحقيقية والشبحية</string>
+
+    <string name="pref_category_location">تزييف الموقع الشبحي (GPS)</string>
+    <string name="pref_stealth_gps_enabled">تفعيل تزييف الموقع الخفي</string>
+    <string name="pref_stealth_gps_sum">تزييف الموقع بدون كشف الـ Mock نهائياً (isMock=false)</string>
+    <string name="pref_search_location">الموقع المزيّف الحالي</string>
+    <string name="pref_floating_joystick">عصا التحكم العائمة (Joystick)</string>
+    <string name="pref_floating_joystick_sum">عصا تحكم على الشاشة للتجول في الخرائط والألعاب</string>
+
+    <string name="search_location_title">البحث عن موقع</string>
+    <string name="search_location_hint">اكتب اسم المدينة أو المعلم...</string>
+    <string name="service_running_sum">المحرك الشبحي نشط (حماية التخفي تعمل)</string>
+    <string name="media_selected">تم تحميل الوسائط بنجاح</string>
+    <string name="grant_overlay_permission">يرجى منح إذن الظهور فوق التطبيقات للأدوات العائمة</string>
+    <string name="cancel">إلغاء</string>
+    <string name="stop">إيقاف</string>
+</resources>

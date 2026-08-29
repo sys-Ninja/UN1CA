@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:settings="http://schemas.android.com/apk/res-auto">
+
+    <com.samsung.android.settings.widget.SecInsetCategoryPreference />
+
+    <PreferenceCategory android:title="@string/unica_ghost_camera_category">
+        <SecSwitchPreference
+            android:key="unica_ghost_camera_enabled"
+            android:title="@string/unica_ghost_camera_title"
+            android:summary="@string/unica_ghost_camera_summary"
+            settings:controller="io.mesalabs.unica.settings.ghostengine.GhostEngineSystemTogglePreferenceController" />
+
+        <SecSwitchPreference
+            android:key="unica_ghost_camera_tool"
+            android:title="@string/unica_ghost_tool_title"
+            android:summary="@string/unica_ghost_tool_summary"
+            settings:controller="io.mesalabs.unica.settings.ghostengine.GhostEngineSystemTogglePreferenceController" />
+    </PreferenceCategory>
+
+    <com.samsung.android.settings.widget.SecInsetCategoryPreference />
+
+    <PreferenceCategory android:title="@string/unica_ghost_gps_category">
+        <SecSwitchPreference
+            android:key="unica_ghost_gps_enabled"
+            android:title="@string/unica_ghost_gps_title"
+            android:summary="@string/unica_ghost_gps_summary"
+            settings:controller="io.mesalabs.unica.settings.ghostengine.GhostEngineSystemTogglePreferenceController" />
+
+        <SecSwitchPreference
+            android:key="unica_ghost_joystick_enabled"
+            android:title="@string/unica_ghost_joystick_title"
+            android:summary="@string/unica_ghost_joystick_summary"
+            settings:controller="io.mesalabs.unica.settings.ghostengine.GhostEngineSystemTogglePreferenceController" />
+    </PreferenceCategory>
+
+    <com.samsung.android.settings.widget.SecInsetCategoryPreference />
+
+    <PreferenceCategory android:title="@string/unica_ghost_app_title">
+        <Preference
+            android:key="unica_ghost_open"
+            android:title="@string/unica_ghost_open_title"
+            android:summary="@string/unica_ghost_open_summary"
+            android:persistent="false">
+            <intent
+                android:action="io.mesalabs.unica.action.GHOST_ENGINE_SETTINGS"
+                android:targetPackage="io.mesalabs.unica.ghostengine"
+                android:targetClass="io.mesalabs.unica.ghostengine.GhostEngineSettingsActivity" />
+        </Preference>
+    </PreferenceCategory>
+
+</PreferenceScreen>

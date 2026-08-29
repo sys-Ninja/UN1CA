@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Ghost Camera &amp; Stealth GPS</string>
+    <string name="settings_title">Ghost Engine Settings</string>
+
+    <string name="pref_category_camera">Ghost Camera Feed</string>
+    <string name="pref_ghost_camera_enabled">Enable Ghost Camera</string>
+    <string name="pref_ghost_camera_sum">Feed custom video or image into camera stream</string>
+    <string name="pref_select_media">Select Media Source</string>
+    <string name="pref_select_media_sum">Choose an MP4 video or JPG/PNG image from gallery</string>
+    <string name="pref_show_camera_tool">Floating Camera Switcher</string>
+    <string name="pref_show_camera_tool_sum">Show quick floating pill to switch feeds while in camera apps</string>
+
+    <string name="pref_category_location">Stealth GPS Spoofer</string>
+    <string name="pref_stealth_gps_enabled">Enable Stealth GPS</string>
+    <string name="pref_stealth_gps_sum">Spoof location without mock detection (isMock=false)</string>
+    <string name="pref_search_location">Spoofed Location</string>
+    <string name="pref_floating_joystick">Floating Joystick</string>
+    <string name="pref_floating_joystick_sum">On-screen joystick for manual movement in games and maps</string>
+
+    <string name="search_location_title">Search Location</string>
+    <string name="search_location_hint">Type city name or place...</string>
+    <string name="service_running_sum">Ghost Engine active (Stealth protection on)</string>
+    <string name="media_selected">Media source loaded successfully</string>
+    <string name="grant_overlay_permission">Please grant overlay permission for floating controls</string>
+    <string name="cancel">Cancel</string>
+    <string name="stop">Stop</string>
+</resources>

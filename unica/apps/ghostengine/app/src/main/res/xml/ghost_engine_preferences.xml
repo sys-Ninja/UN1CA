@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory
+        app:title="@string/pref_category_camera"
+        app:iconSpaceReserved="false">
+
+        <SwitchPreferenceCompat
+            app:key="pref_ghost_camera_enabled"
+            app:title="@string/pref_ghost_camera_enabled"
+            app:summary="@string/pref_ghost_camera_sum"
+            app:iconSpaceReserved="false" />
+
+        <Preference
+            app:key="pref_select_media"
+            app:title="@string/pref_select_media"
+            app:summary="@string/pref_select_media_sum"
+            app:iconSpaceReserved="false" />
+
+        <SwitchPreferenceCompat
+            app:key="pref_show_camera_tool"
+            app:title="@string/pref_show_camera_tool"
+            app:summary="@string/pref_show_camera_tool_sum"
+            app:defaultValue="true"
+            app:iconSpaceReserved="false" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:title="@string/pref_category_location"
+        app:iconSpaceReserved="false">
+
+        <SwitchPreferenceCompat
+            app:key="pref_stealth_gps_enabled"
+            app:title="@string/pref_stealth_gps_enabled"
+            app:summary="@string/pref_stealth_gps_sum"
+            app:iconSpaceReserved="false" />
+
+        <Preference
+            app:key="pref_search_location"
+            app:title="@string/pref_search_location"
+            app:iconSpaceReserved="false" />
+
+        <SwitchPreferenceCompat
+            app:key="pref_floating_joystick"
+            app:title="@string/pref_floating_joystick"
+            app:summary="@string/pref_floating_joystick_sum"
+            app:defaultValue="false"
+            app:iconSpaceReserved="false" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

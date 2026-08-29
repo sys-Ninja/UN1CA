@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="unica_ghost_engine_settings_title">Ghost Engine</string>
+    <string name="unica_ghost_camera_category">Ghost Camera Feed</string>
+    <string name="unica_ghost_camera_title">Virtual Camera Injection</string>
+    <string name="unica_ghost_camera_summary">Inject custom media stream directly into live camera apps</string>
+    <string name="unica_ghost_tool_title">Floating Camera Tool</string>
+    <string name="unica_ghost_tool_summary">Show on-screen pill to switch or pause feed while in camera</string>
+    <string name="unica_ghost_gps_category">Stealth GPS</string>
+    <string name="unica_ghost_gps_title">Undetectable GPS Mock</string>
+    <string name="unica_ghost_gps_summary">Spoof coordinates with hardware satellite signatures (isMock=false)</string>
+    <string name="unica_ghost_joystick_title">Floating Joystick</string>
+    <string name="unica_ghost_joystick_summary">Control location movement in real-time with on-screen joystick</string>
+    <string name="unica_ghost_app_title">Media &amp; Location Customizer</string>
+    <string name="unica_ghost_open_title">Ghost Engine Manager</string>
+    <string name="unica_ghost_open_summary">Pick video/photo source and search world map locations</string>
+</resources>

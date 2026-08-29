@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="140dp"
+    android:layout_height="140dp"
+    android:background="@drawable/bg_joystick_circle">
+
+    <ImageButton
+        android:id="@+id/btn_up"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_gravity="top|center_horizontal"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:src="@android:drawable/arrow_up_float"
+        android:contentDescription="Up" />
+
+    <ImageButton
+        android:id="@+id/btn_down"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_gravity="bottom|center_horizontal"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:src="@android:drawable/arrow_down_float"
+        android:contentDescription="Down" />
+
+    <ImageButton
+        android:id="@+id/btn_left"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_gravity="start|center_vertical"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:src="@android:drawable/ic_media_previous"
+        android:contentDescription="Left" />
+
+    <ImageButton
+        android:id="@+id/btn_right"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_gravity="end|center_vertical"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:src="@android:drawable/ic_media_next"
+        android:contentDescription="Right" />
+
+    <ImageButton
+        android:id="@+id/btn_speed_toggle"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_gravity="center"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:src="@android:drawable/ic_menu_directions"
+        android:contentDescription="Speed" />
+
+</FrameLayout>
