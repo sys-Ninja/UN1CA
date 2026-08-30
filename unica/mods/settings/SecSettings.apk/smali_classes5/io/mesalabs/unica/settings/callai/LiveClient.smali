@@ -1102,3 +1102,27 @@
     .line 131
     return-void
 .end method
+
+.method public isPlaying()Z
+    .registers 5
+
+    invoke-static {}, Ljava/lang/System;->currentTimeMillis()J
+
+    move-result-wide v0
+
+    iget-wide v2, p0, Lio/mesalabs/unica/settings/callai/LiveClient;->mPlayoutEnd:J
+
+    cmp-long v0, v2, v0
+
+    if-lez v0, :cond_a
+
+    const/4 v0, 0x1
+
+    return v0
+
+    :cond_a
+    const/4 v0, 0x0
+
+    return v0
+.end method
+

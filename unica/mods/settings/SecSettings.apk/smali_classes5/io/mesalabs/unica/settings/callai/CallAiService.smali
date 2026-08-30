@@ -446,7 +446,7 @@
 
     move-result v7
 
-    const/16 v8, 0x2bc
+    const/16 v8, 0x3e8
 
     const/4 v9, 0x1
 
@@ -815,12 +815,37 @@
     :cond_1e
     nop
 
+    invoke-static {v3, v2}, Lio/mesalabs/unica/settings/callai/Pcm;->rms([SI)I
+
+    move-result v6
+
+    invoke-virtual {p1}, Lio/mesalabs/unica/settings/callai/LiveClient;->isPlaying()Z
+
+    move-result v7
+
+    if-eqz v7, :cond_idle_gate
+
+    const/16 v7, 0x898
+
+    if-ge v6, v7, :cond_send_audio
+
+    goto :goto_reset_buf
+
+    :cond_idle_gate
+    const/16 v7, 0x258
+
+    if-ge v6, v7, :cond_send_audio
+
+    goto :goto_reset_buf
+
+    :cond_send_audio
     .line 181
     :try_start_1f
     invoke-virtual {p1, v3, v2}, Lio/mesalabs/unica/settings/callai/LiveClient;->sendAudio([SI)V
     :try_end_22
     .catch Ljava/lang/Exception; {:try_start_1f .. :try_end_22} :catch_24
 
+    :goto_reset_buf
     .line 185
     move v5, v4
 
