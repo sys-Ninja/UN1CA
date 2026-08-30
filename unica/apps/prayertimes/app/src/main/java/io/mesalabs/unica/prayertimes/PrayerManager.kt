@@ -5,9 +5,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.util.Log
-import io.mesalabs.unica.prayertimes.calc.CalculationParameters
 import io.mesalabs.unica.prayertimes.calc.Prayer
-import io.mesalabs.unica.prayertimes.calc.PrayerCalculationEngine
 import io.mesalabs.unica.prayertimes.calc.PrayerTimesResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -16,10 +14,8 @@ import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
-import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
-import java.util.Locale
 import java.util.TimeZone
 
 object PrayerManager {
@@ -40,47 +36,110 @@ object PrayerManager {
     )
 
     fun getTodayPrayerTimes(ctx: Context): PrayerTimesResult? {
-        val prefs = Prefs.get(ctx)
-        if (prefs.latitude == 0f && prefs.longitude == 0f) return null
-
-        if (prefs.useOnlineApi) {
-            val onlineResult = parseTodayFromOnlineCache(ctx)
-            if (onlineResult != null) return onlineResult
-        }
-
-        return calculateLocally(ctx, Calendar.getInstance())
+        return getPrayerTimesForDay(ctx, 0)
     }
 
-    fun calculateLocally(ctx: Context, cal: Calendar): PrayerTimesResult? {
+    fun getPrayerTimesForDay(ctx: Context, dayOffset: Int): PrayerTimesResult? {
         val prefs = Prefs.get(ctx)
-        if (prefs.latitude == 0f && prefs.longitude == 0f) return null
+        if (prefs.cachedTimings.isEmpty()) return null
 
-        val tz = if (prefs.timeZoneId.isNotEmpty()) {
-            TimeZone.getTimeZone(prefs.timeZoneId)
-        } else {
-            TimeZone.getDefault()
+        try {
+            val json = JSONObject(prefs.cachedTimings)
+            val dataArray = json.optJSONArray("data") ?: return null
+
+            val targetCal = Calendar.getInstance().apply {
+                if (dayOffset != 0) add(Calendar.DAY_OF_MONTH, dayOffset)
+            }
+            val targetDay = targetCal.get(Calendar.DAY_OF_MONTH)
+            val targetMonth = targetCal.get(Calendar.MONTH) + 1
+            val targetYear = targetCal.get(Calendar.YEAR)
+
+            // Find matching day object in data array
+            var dayObj: JSONObject? = null
+            for (i in 0 until dataArray.length()) {
+                val item = dataArray.optJSONObject(i) ?: continue
+                val greg = item.optJSONObject("date")?.optJSONObject("gregorian") ?: continue
+                val day = greg.optString("day").toIntOrNull() ?: greg.optInt("day", -1)
+                val month = greg.optJSONObject("month")?.optInt("number", -1) ?: -1
+                val year = greg.optString("year").toIntOrNull() ?: greg.optInt("year", -1)
+
+                if (day == targetDay && (month == -1 || month == targetMonth) && (year == -1 || year == targetYear)) {
+                    dayObj = item
+                    break
+                }
+            }
+
+            // Fallback to index if exact date match not found
+            if (dayObj == null && targetDay - 1 in 0 until dataArray.length()) {
+                dayObj = dataArray.optJSONObject(targetDay - 1)
+            }
+
+            if (dayObj == null) return null
+            val timings = dayObj.optJSONObject("timings") ?: return null
+
+            fun parseMillis(prayerKey: String, offsetMinutes: Int = 0): Long {
+                val rawStr = timings.optString(prayerKey, "").trim()
+                if (rawStr.isEmpty()) return 0L
+                val timeStr = rawStr.substringBefore(" ").trim()
+                val parts = timeStr.split(":")
+                if (parts.size < 2) return 0L
+
+                val hour = parts[0].toIntOrNull() ?: return 0L
+                val minute = parts[1].toIntOrNull() ?: return 0L
+
+                val cal = Calendar.getInstance().apply {
+                    if (dayOffset != 0) add(Calendar.DAY_OF_MONTH, dayOffset)
+                    set(Calendar.HOUR_OF_DAY, hour)
+                    set(Calendar.MINUTE, minute)
+                    set(Calendar.SECOND, 0)
+                    set(Calendar.MILLISECOND, 0)
+                    if (offsetMinutes != 0) {
+                        add(Calendar.MINUTE, offsetMinutes)
+                    }
+                }
+                return cal.timeInMillis
+            }
+
+            val fajr = parseMillis("Fajr", prefs.fajrOffset)
+            val sunrise = parseMillis("Sunrise", prefs.sunriseOffset)
+            val dhuhr = parseMillis("Dhuhr", prefs.dhuhrOffset)
+            val asr = parseMillis("Asr", prefs.asrOffset)
+            val maghrib = parseMillis("Maghrib", prefs.maghribOffset)
+            val isha = parseMillis("Isha", prefs.ishaOffset)
+
+            if (fajr > 0L && dhuhr > 0L) {
+                return PrayerTimesResult(
+                    fajr = fajr,
+                    sunrise = sunrise,
+                    dhuhr = dhuhr,
+                    asr = asr,
+                    maghrib = maghrib,
+                    isha = isha,
+                    date = targetCal.time,
+                    latitude = prefs.latitude.toDouble(),
+                    longitude = prefs.longitude.toDouble(),
+                    timeZone = TimeZone.getDefault()
+                )
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Parsing online cache failed", e)
         }
-
-        val params = CalculationParameters.getByKey(prefs.calculationMethodKey)
-        val madhab = prefs.getMadhab()
-        val highLat = prefs.getHighLatitudeRule()
-        val offsets = prefs.getOffsetsMap()
-
-        return PrayerCalculationEngine.calculate(
-            latitude = prefs.latitude.toDouble(),
-            longitude = prefs.longitude.toDouble(),
-            calendar = cal,
-            timeZone = tz,
-            params = params,
-            madhab = madhab,
-            highLatRule = highLat,
-            offsets = offsets
-        )
+        return null
     }
 
     suspend fun fetchAndCacheTimings(ctx: Context): Boolean = withContext(Dispatchers.IO) {
         val prefs = Prefs.get(ctx)
-        if (prefs.latitude == 0f && prefs.longitude == 0f) return@withContext false
+        var lat = prefs.latitude
+        var lng = prefs.longitude
+
+        // Default to Cairo coordinates if not set
+        if (lat == 0f && lng == 0f) {
+            lat = 30.0444f
+            lng = 31.2357f
+            prefs.latitude = lat
+            prefs.longitude = lng
+            prefs.cityName = "Cairo"
+        }
 
         try {
             val cal = Calendar.getInstance()
@@ -89,7 +148,7 @@ object PrayerManager {
             val methodId = ONLINE_METHOD_MAP[prefs.calculationMethodKey.lowercase()] ?: 5
             val school = if (prefs.madhabKey.lowercase() == "hanafi") 1 else 0
 
-            val urlString = "https://api.aladhan.com/v1/calendar/$year/$month?latitude=${prefs.latitude}&longitude=${prefs.longitude}&method=$methodId&school=$school"
+            val urlString = "https://api.aladhan.com/v1/calendar/$year/$month?latitude=$lat&longitude=$lng&method=$methodId&school=$school"
             val url = URL(urlString)
             val conn = (url.openConnection() as HttpURLConnection).apply {
                 requestMethod = "GET"
@@ -106,6 +165,7 @@ object PrayerManager {
                 if (json.optInt("code") == 200) {
                     prefs.cachedTimings = response
                     prefs.lastFetchTime = System.currentTimeMillis()
+                    scheduleNextPrayer(ctx)
                     return@withContext true
                 }
             }
@@ -113,56 +173,6 @@ object PrayerManager {
             Log.e(TAG, "Online API fetch failed", e)
         }
         return@withContext false
-    }
-
-    private fun parseTodayFromOnlineCache(ctx: Context): PrayerTimesResult? {
-        val prefs = Prefs.get(ctx)
-        if (prefs.cachedTimings.isEmpty()) return null
-
-        try {
-            val json = JSONObject(prefs.cachedTimings)
-            val dataArray = json.optJSONArray("data") ?: return null
-            val now = Calendar.getInstance()
-            val dayIndex = now.get(Calendar.DAY_OF_MONTH) - 1
-
-            val dayObj = dataArray.optJSONObject(dayIndex) ?: return null
-            val timings = dayObj.optJSONObject("timings") ?: return null
-            val dateStr = dayObj.optJSONObject("date")?.optJSONObject("gregorian")?.optString("date") ?: return null
-
-            val sdf = SimpleDateFormat("dd-MM-yyyy HH:mm", Locale.US).apply {
-                timeZone = if (prefs.timeZoneId.isNotEmpty()) TimeZone.getTimeZone(prefs.timeZoneId) else TimeZone.getDefault()
-            }
-
-            fun parseMillis(prayerKey: String): Long {
-                val timeStr = timings.optString(prayerKey).substringBefore(" ")
-                return sdf.parse("$dateStr $timeStr")?.time ?: 0L
-            }
-
-            val fajr = parseMillis("Fajr")
-            val sunrise = parseMillis("Sunrise")
-            val dhuhr = parseMillis("Dhuhr")
-            val asr = parseMillis("Asr")
-            val maghrib = parseMillis("Maghrib")
-            val isha = parseMillis("Isha")
-
-            if (fajr > 0L && dhuhr > 0L) {
-                return PrayerTimesResult(
-                    fajr = fajr,
-                    sunrise = sunrise,
-                    dhuhr = dhuhr,
-                    asr = asr,
-                    maghrib = maghrib,
-                    isha = isha,
-                    date = now.time,
-                    latitude = prefs.latitude.toDouble(),
-                    longitude = prefs.longitude.toDouble(),
-                    timeZone = sdf.timeZone
-                )
-            }
-        } catch (e: Exception) {
-            Log.e(TAG, "Parsing online cache failed", e)
-        }
-        return null
     }
 
     fun scheduleNextPrayer(ctx: Context) {
@@ -175,16 +185,15 @@ object PrayerManager {
         val now = System.currentTimeMillis()
         var nextPrayer: Pair<Prayer, Long>? = null
 
-        // Check today
+        // 1. Check today's upcoming prayers
         val todayResult = getTodayPrayerTimes(ctx)
         if (todayResult != null) {
             nextPrayer = todayResult.getNextPrayer(now)
         }
 
-        // If no more prayers today, check tomorrow
+        // 2. If all prayers for today passed, schedule tomorrow's Fajr
         if (nextPrayer == null) {
-            val tomorrowCal = Calendar.getInstance().apply { add(Calendar.DAY_OF_MONTH, 1) }
-            val tomorrowResult = calculateLocally(ctx, tomorrowCal)
+            val tomorrowResult = getPrayerTimesForDay(ctx, 1)
             if (tomorrowResult != null) {
                 nextPrayer = tomorrowResult.getNextPrayer(now)
             }
@@ -192,15 +201,14 @@ object PrayerManager {
 
         if (nextPrayer != null) {
             val (prayer, timeMillis) = nextPrayer
-            // Don't sound alarm for Sunrise
             if (prayer != Prayer.SUNRISE) {
                 Log.i(TAG, "Scheduling alarm for ${prayer.name} at ${Date(timeMillis)}")
                 setExactAlarm(ctx, prayer.name, timeMillis)
             } else {
-                // If Sunrise is next, schedule for the one after sunrise (Dhuhr)
-                val afterSunrise = todayResult?.getNextPrayer(timeMillis + 1000)
-                if (afterSunrise != null && afterSunrise.first != Prayer.SUNRISE) {
-                    setExactAlarm(ctx, afterSunrise.first.name, afterSunrise.second)
+                // If sunrise is next, schedule for Dhuhr
+                val dhuhrTime = todayResult?.dhuhr ?: 0L
+                if (dhuhrTime > now) {
+                    setExactAlarm(ctx, Prayer.DHUHR.name, dhuhrTime)
                 }
             }
         }
@@ -220,8 +228,8 @@ object PrayerManager {
 
         try {
             am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, timeMillis, pi)
-        } catch (e: SecurityException) {
-            Log.e(TAG, "Exact alarm permission missing", e)
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to set exact alarm", e)
         }
     }
 
@@ -232,8 +240,10 @@ object PrayerManager {
             ctx,
             1001,
             intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE
         )
-        am.cancel(pi)
+        if (pi != null) {
+            am.cancel(pi)
+        }
     }
 }

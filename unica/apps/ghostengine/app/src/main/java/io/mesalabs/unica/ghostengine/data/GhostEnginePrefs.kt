@@ -19,6 +19,27 @@ class GhostEnginePrefs private constructor(private val context: Context) {
             sp.edit().putString("ghost_media_uri", value).apply()
         }
 
+    var mediaSlot1: String?
+        get() = Settings.System.getString(resolver, "unica_ghost_slot1") ?: sp.getString("ghost_slot1", null)
+        set(value) {
+            Settings.System.putString(resolver, "unica_ghost_slot1", value)
+            sp.edit().putString("ghost_slot1", value).apply()
+        }
+
+    var mediaSlot2: String?
+        get() = Settings.System.getString(resolver, "unica_ghost_slot2") ?: sp.getString("ghost_slot2", null)
+        set(value) {
+            Settings.System.putString(resolver, "unica_ghost_slot2", value)
+            sp.edit().putString("ghost_slot2", value).apply()
+        }
+
+    var mediaSlot3: String?
+        get() = Settings.System.getString(resolver, "unica_ghost_slot3") ?: sp.getString("ghost_slot3", null)
+        set(value) {
+            Settings.System.putString(resolver, "unica_ghost_slot3", value)
+            sp.edit().putString("ghost_slot3", value).apply()
+        }
+
     var isVideoMedia: Boolean
         get() = Settings.System.getInt(resolver, "unica_ghost_is_video", 0) == 1
         set(value) { Settings.System.putInt(resolver, "unica_ghost_is_video", if (value) 1 else 0) }

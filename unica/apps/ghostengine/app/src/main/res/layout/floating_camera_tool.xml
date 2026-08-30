@@ -10,19 +10,67 @@
 
     <ImageButton
         android:id="@+id/btn_ghost_toggle"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
+        android:layout_width="34dp"
+        android:layout_height="34dp"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:src="@android:drawable/ic_menu_camera"
+        android:tint="#FFFFFF"
         android:contentDescription="Toggle Ghost" />
+
+    <TextView
+        android:id="@+id/btn_slot_1"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginStart="6dp"
+        android:gravity="center"
+        android:text="1"
+        android:textSize="13sp"
+        android:textStyle="bold"
+        android:textColor="#FFFFFF"
+        android:background="?attr/selectableItemBackgroundBorderless" />
+
+    <TextView
+        android:id="@+id/btn_slot_2"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginStart="4dp"
+        android:gravity="center"
+        android:text="2"
+        android:textSize="13sp"
+        android:textStyle="bold"
+        android:textColor="#FFFFFF"
+        android:background="?attr/selectableItemBackgroundBorderless" />
+
+    <TextView
+        android:id="@+id/btn_slot_3"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginStart="4dp"
+        android:gravity="center"
+        android:text="3"
+        android:textSize="13sp"
+        android:textStyle="bold"
+        android:textColor="#FFFFFF"
+        android:background="?attr/selectableItemBackgroundBorderless" />
+
+    <ImageButton
+        android:id="@+id/btn_next_media"
+        android:layout_width="34dp"
+        android:layout_height="34dp"
+        android:layout_marginStart="6dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:src="@android:drawable/ic_media_next"
+        android:tint="#FFFFFF"
+        android:contentDescription="Next Slot" />
 
     <ImageButton
         android:id="@+id/btn_pick_media"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
-        android:layout_marginStart="8dp"
+        android:layout_width="34dp"
+        android:layout_height="34dp"
+        android:layout_marginStart="4dp"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:src="@android:drawable/ic_menu_gallery"
+        android:tint="#FFFFFF"
         android:contentDescription="Pick Media" />
 
 </LinearLayout>
