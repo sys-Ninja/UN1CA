@@ -1,64 +1,77 @@
 package io.mesalabs.unica.ghostengine.data
 
 import android.content.Context
-import android.content.SharedPreferences
+import android.provider.Settings
 
-class GhostEnginePrefs private constructor(context: Context) {
-    private val prefs: SharedPreferences = context.getSharedPreferences("ghost_engine_prefs", Context.MODE_PRIVATE)
+class GhostEnginePrefs private constructor(private val context: Context) {
+    private val resolver = context.contentResolver
+    private val sp = context.getSharedPreferences("ghost_engine_prefs", Context.MODE_PRIVATE)
 
     // Ghost Camera Settings
     var isGhostCameraEnabled: Boolean
-        get() = prefs.getBoolean("ghost_camera_enabled", false)
-        set(value) = prefs.edit().putBoolean("ghost_camera_enabled", value).apply()
+        get() = Settings.System.getInt(resolver, "unica_ghost_camera_enabled", 0) == 1
+        set(value) { Settings.System.putInt(resolver, "unica_ghost_camera_enabled", if (value) 1 else 0) }
 
     var mediaUri: String?
-        get() = prefs.getString("ghost_media_uri", null)
-        set(value) = prefs.edit().putString("ghost_media_uri", value).apply()
+        get() = Settings.System.getString(resolver, "unica_ghost_media_uri") ?: sp.getString("ghost_media_uri", null)
+        set(value) {
+            Settings.System.putString(resolver, "unica_ghost_media_uri", value)
+            sp.edit().putString("ghost_media_uri", value).apply()
+        }
 
     var isVideoMedia: Boolean
-        get() = prefs.getBoolean("is_video_media", false)
-        set(value) = prefs.edit().putBoolean("is_video_media", value).apply()
+        get() = Settings.System.getInt(resolver, "unica_ghost_is_video", 0) == 1
+        set(value) { Settings.System.putInt(resolver, "unica_ghost_is_video", if (value) 1 else 0) }
 
     var showCameraTool: Boolean
-        get() = prefs.getBoolean("show_camera_tool", true)
-        set(value) = prefs.edit().putBoolean("show_camera_tool", value).apply()
+        get() = Settings.System.getInt(resolver, "unica_ghost_camera_tool", 1) == 1
+        set(value) { Settings.System.putInt(resolver, "unica_ghost_camera_tool", if (value) 1 else 0) }
 
     // Stealth GPS Settings
     var isStealthGpsEnabled: Boolean
-        get() = prefs.getBoolean("stealth_gps_enabled", false)
-        set(value) = prefs.edit().putBoolean("stealth_gps_enabled", value).apply()
+        get() = Settings.System.getInt(resolver, "unica_ghost_gps_enabled", 0) == 1
+        set(value) { Settings.System.putInt(resolver, "unica_ghost_gps_enabled", if (value) 1 else 0) }
 
     var spoofedLatitude: Double
-        get() = java.lang.Double.longBitsToDouble(prefs.getLong("spoofed_lat", java.lang.Double.doubleToRawLongBits(21.4225))) // Makkah default
-        set(value) = prefs.edit().putLong("spoofed_lat", java.lang.Double.doubleToRawLongBits(value)).apply()
+        get() {
+            val s = Settings.System.getString(resolver, "unica_ghost_lat")
+            return s?.toDoubleOrNull() ?: 21.4225 // Makkah default
+        }
+        set(value) { Settings.System.putString(resolver, "unica_ghost_lat", value.toString()) }
 
     var spoofedLongitude: Double
-        get() = java.lang.Double.longBitsToDouble(prefs.getLong("spoofed_lng", java.lang.Double.doubleToRawLongBits(39.8262)))
-        set(value) = prefs.edit().putLong("spoofed_lng", java.lang.Double.doubleToRawLongBits(value)).apply()
+        get() {
+            val s = Settings.System.getString(resolver, "unica_ghost_lng")
+            return s?.toDoubleOrNull() ?: 39.8262
+        }
+        set(value) { Settings.System.putString(resolver, "unica_ghost_lng", value.toString()) }
 
     var spoofedAltitude: Double
-        get() = java.lang.Double.longBitsToDouble(prefs.getLong("spoofed_alt", java.lang.Double.doubleToRawLongBits(300.0)))
-        set(value) = prefs.edit().putLong("spoofed_alt", java.lang.Double.doubleToRawLongBits(value)).apply()
+        get() {
+            val s = Settings.System.getString(resolver, "unica_ghost_alt")
+            return s?.toDoubleOrNull() ?: 300.0
+        }
+        set(value) { Settings.System.putString(resolver, "unica_ghost_alt", value.toString()) }
 
     var movementSpeed: Float
-        get() = prefs.getFloat("movement_speed", 1.4f)
-        set(value) = prefs.edit().putFloat("movement_speed", value).apply()
+        get() = try { Settings.System.getFloat(resolver, "unica_ghost_speed") } catch (_: Exception) { 1.4f }
+        set(value) { Settings.System.putFloat(resolver, "unica_ghost_speed", value) }
 
     var showFloatingJoystick: Boolean
-        get() = prefs.getBoolean("show_floating_joystick", false)
-        set(value) = prefs.edit().putBoolean("show_floating_joystick", value).apply()
+        get() = Settings.System.getInt(resolver, "unica_ghost_joystick_enabled", 0) == 1
+        set(value) { Settings.System.putInt(resolver, "unica_ghost_joystick_enabled", if (value) 1 else 0) }
 
     var isPerAppGps: Boolean
-        get() = prefs.getBoolean("per_app_gps", false)
-        set(value) = prefs.edit().putBoolean("per_app_gps", value).apply()
+        get() = Settings.System.getInt(resolver, "unica_ghost_per_app", 0) == 1
+        set(value) { Settings.System.putInt(resolver, "unica_ghost_per_app", if (value) 1 else 0) }
 
     var targetPackages: Set<String>
-        get() = prefs.getStringSet("target_packages", emptySet()) ?: emptySet()
-        set(value) = prefs.edit().putStringSet("target_packages", value).apply()
+        get() = sp.getStringSet("target_packages", emptySet()) ?: emptySet()
+        set(value) = sp.edit().putStringSet("target_packages", value).apply()
 
     var googlePlacesApiKey: String
-        get() = prefs.getString("google_places_api_key", "") ?: ""
-        set(value) = prefs.edit().putString("google_places_api_key", value).apply()
+        get() = Settings.System.getString(resolver, "google_places_api_key") ?: sp.getString("google_places_api_key", "") ?: ""
+        set(value) = sp.edit().putString("google_places_api_key", value).apply()
 
     companion object {
         @Volatile private var instance: GhostEnginePrefs? = null

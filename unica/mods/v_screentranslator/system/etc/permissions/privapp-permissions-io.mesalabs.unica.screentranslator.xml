@@ -5,5 +5,7 @@
         <permission name="android.permission.FOREGROUND_SERVICE" />
         <permission name="android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION" />
         <permission name="android.permission.PROJECT_MEDIA" />
+        <permission name="android.permission.POST_NOTIFICATIONS" />
+        <permission name="android.permission.WRITE_SETTINGS" />
     </privapp-permissions>
 </permissions>

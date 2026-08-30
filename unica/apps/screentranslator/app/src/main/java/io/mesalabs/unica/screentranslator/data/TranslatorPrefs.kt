@@ -1,51 +1,52 @@
 package io.mesalabs.unica.screentranslator.data
 
 import android.content.Context
-import android.content.SharedPreferences
 import android.graphics.Color
+import android.provider.Settings
 
-class TranslatorPrefs private constructor(context: Context) {
-    private val prefs: SharedPreferences = context.getSharedPreferences("screen_translator_prefs", Context.MODE_PRIVATE)
+class TranslatorPrefs private constructor(private val context: Context) {
+    private val resolver = context.contentResolver
+    private val sp = context.getSharedPreferences("screen_translator_prefs", Context.MODE_PRIVATE)
 
     var isServiceEnabled: Boolean
-        get() = prefs.getBoolean("service_enabled", false)
-        set(value) = prefs.edit().putBoolean("service_enabled", value).apply()
+        get() = Settings.System.getInt(resolver, "unica_st_service_enabled", 0) == 1
+        set(value) { Settings.System.putInt(resolver, "unica_st_service_enabled", if (value) 1 else 0) }
 
     var sourceLanguage: String
-        get() = prefs.getString("source_language", "auto") ?: "auto"
-        set(value) = prefs.edit().putString("source_language", value).apply()
+        get() = Settings.System.getString(resolver, "unica_st_source_lang") ?: "auto"
+        set(value) { Settings.System.putString(resolver, "unica_st_source_lang", value) }
 
     var targetLanguage: String
-        get() = prefs.getString("target_language", "ar") ?: "ar"
-        set(value) = prefs.edit().putString("target_language", value).apply()
+        get() = Settings.System.getString(resolver, "unica_st_target_lang") ?: "ar"
+        set(value) { Settings.System.putString(resolver, "unica_st_target_lang", value) }
 
     var fontSizeSp: Float
-        get() = prefs.getFloat("font_size_sp", 18f)
-        set(value) = prefs.edit().putFloat("font_size_sp", value).apply()
+        get() = try { Settings.System.getFloat(resolver, "unica_st_font_size") } catch (_: Exception) { 18f }
+        set(value) { Settings.System.putFloat(resolver, "unica_st_font_size", value) }
 
     var textColor: Int
-        get() = prefs.getInt("text_color", Color.WHITE)
-        set(value) = prefs.edit().putInt("text_color", value).apply()
+        get() = Settings.System.getInt(resolver, "unica_st_text_color", Color.WHITE)
+        set(value) { Settings.System.putInt(resolver, "unica_st_text_color", value) }
 
     var strokeColor: Int
-        get() = prefs.getInt("stroke_color", Color.BLACK)
-        set(value) = prefs.edit().putInt("stroke_color", value).apply()
+        get() = Settings.System.getInt(resolver, "unica_st_stroke_color", Color.BLACK)
+        set(value) { Settings.System.putInt(resolver, "unica_st_stroke_color", value) }
 
     var strokeWidth: Float
-        get() = prefs.getFloat("stroke_width", 7f)
-        set(value) = prefs.edit().putFloat("stroke_width", value).apply()
+        get() = try { Settings.System.getFloat(resolver, "unica_st_stroke_width") } catch (_: Exception) { 7f }
+        set(value) { Settings.System.putFloat(resolver, "unica_st_stroke_width", value) }
 
     var showFloatingBubble: Boolean
-        get() = prefs.getBoolean("show_floating_bubble", true)
-        set(value) = prefs.edit().putBoolean("show_floating_bubble", value).apply()
+        get() = Settings.System.getInt(resolver, "unica_st_floating_bubble", 1) == 1
+        set(value) { Settings.System.putInt(resolver, "unica_st_floating_bubble", if (value) 1 else 0) }
 
     var autoTranslateGames: Boolean
-        get() = prefs.getBoolean("auto_translate_games", true)
-        set(value) = prefs.edit().putBoolean("auto_translate_games", value).apply()
+        get() = Settings.System.getInt(resolver, "unica_st_auto_games", 1) == 1
+        set(value) { Settings.System.putInt(resolver, "unica_st_auto_games", if (value) 1 else 0) }
 
     var fpsCap: Int
-        get() = prefs.getInt("fps_cap", 8)
-        set(value) = prefs.edit().putInt("fps_cap", value).apply()
+        get() = Settings.System.getInt(resolver, "unica_st_fps_cap", 8)
+        set(value) { Settings.System.putInt(resolver, "unica_st_fps_cap", value) }
 
     companion object {
         @Volatile private var instance: TranslatorPrefs? = null

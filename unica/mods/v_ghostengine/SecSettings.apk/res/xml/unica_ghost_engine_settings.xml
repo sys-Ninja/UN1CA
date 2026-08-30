@@ -34,19 +34,4 @@
             settings:controller="io.mesalabs.unica.settings.ghostengine.GhostEngineSystemTogglePreferenceController" />
     </PreferenceCategory>
 
-    <com.samsung.android.settings.widget.SecInsetCategoryPreference />
-
-    <PreferenceCategory android:title="@string/unica_ghost_app_title">
-        <Preference
-            android:key="unica_ghost_open"
-            android:title="@string/unica_ghost_open_title"
-            android:summary="@string/unica_ghost_open_summary"
-            android:persistent="false">
-            <intent
-                android:action="io.mesalabs.unica.action.GHOST_ENGINE_SETTINGS"
-                android:targetPackage="io.mesalabs.unica.ghostengine"
-                android:targetClass="io.mesalabs.unica.ghostengine.GhostEngineSettingsActivity" />
-        </Preference>
-    </PreferenceCategory>
-
 </PreferenceScreen>
