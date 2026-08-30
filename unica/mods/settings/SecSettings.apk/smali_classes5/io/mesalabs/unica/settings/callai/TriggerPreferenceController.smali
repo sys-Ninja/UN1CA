@@ -19,7 +19,7 @@
     .registers 2
 
     .line 6
-    const-string v0, "manual"
+    const-string v0, "all"
 
     return-object v0
 .end method

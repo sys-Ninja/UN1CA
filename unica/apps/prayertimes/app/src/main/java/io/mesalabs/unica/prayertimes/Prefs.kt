@@ -10,9 +10,14 @@ import java.util.TimeZone
 class Prefs private constructor(ctx: Context) {
     private val prefs: SharedPreferences = ctx.getSharedPreferences("prayer_times_prefs", Context.MODE_PRIVATE)
 
+    private val resolver = ctx.contentResolver
+
     var isEnabled: Boolean
-        get() = prefs.getBoolean("enabled", false)
-        set(value) = prefs.edit().putBoolean("enabled", value).apply()
+        get() = Settings.System.getInt(resolver, "unica_prayer_times_enabled", 0) == 1
+        set(value) {
+            Settings.System.putInt(resolver, "unica_prayer_times_enabled", if (value) 1 else 0)
+            prefs.edit().putBoolean("enabled", value).apply()
+        }
 
     var latitude: Float
         get() = prefs.getFloat("latitude", 0f)
@@ -31,16 +36,25 @@ class Prefs private constructor(ctx: Context) {
         set(value) = prefs.edit().putString("timezone_id", value).apply()
 
     var useOnlineApi: Boolean
-        get() = prefs.getBoolean("use_online_api", true)
-        set(value) = prefs.edit().putBoolean("use_online_api", value).apply()
+        get() = Settings.System.getInt(resolver, "unica_prayer_times_online_sync", 1) == 1
+        set(value) {
+            Settings.System.putInt(resolver, "unica_prayer_times_online_sync", if (value) 1 else 0)
+            prefs.edit().putBoolean("use_online_api", value).apply()
+        }
 
     var calculationMethodKey: String
-        get() = prefs.getString("calculation_method", "egyptian") ?: "egyptian"
-        set(value) = prefs.edit().putString("calculation_method", value).apply()
+        get() = Settings.System.getString(resolver, "unica_prayer_times_method") ?: prefs.getString("calculation_method", "egyptian") ?: "egyptian"
+        set(value) {
+            Settings.System.putString(resolver, "unica_prayer_times_method", value)
+            prefs.edit().putString("calculation_method", value).apply()
+        }
 
     var madhabKey: String
-        get() = prefs.getString("madhab", "shafi") ?: "shafi"
-        set(value) = prefs.edit().putString("madhab", value).apply()
+        get() = Settings.System.getString(resolver, "unica_prayer_times_madhab") ?: prefs.getString("madhab", "shafi") ?: "shafi"
+        set(value) {
+            Settings.System.putString(resolver, "unica_prayer_times_madhab", value)
+            prefs.edit().putString("madhab", value).apply()
+        }
 
     var highLatRuleKey: String
         get() = prefs.getString("high_lat_rule", "middle_of_the_night") ?: "middle_of_the_night"
@@ -71,12 +85,21 @@ class Prefs private constructor(ctx: Context) {
         set(value) = prefs.edit().putInt("offset_isha", value).apply()
 
     var showEarlyWarning: Boolean
-        get() = prefs.getBoolean("show_early_warning", false)
-        set(value) = prefs.edit().putBoolean("show_early_warning", value).apply()
+        get() = Settings.System.getInt(resolver, "unica_prayer_times_early_warning", 0) == 1
+        set(value) {
+            Settings.System.putInt(resolver, "unica_prayer_times_early_warning", if (value) 1 else 0)
+            prefs.edit().putBoolean("show_early_warning", value).apply()
+        }
 
     var earlyWarningMinutes: Int
-        get() = prefs.getInt("early_warning_minutes", 10)
-        set(value) = prefs.edit().putInt("early_warning_minutes", value).apply()
+        get() = try {
+            Settings.System.getString(resolver, "unica_prayer_times_early_minutes")?.toIntOrNull()
+                ?: prefs.getInt("early_warning_minutes", 10)
+        } catch (_: Exception) { 10 }
+        set(value) {
+            Settings.System.putString(resolver, "unica_prayer_times_early_minutes", value.toString())
+            prefs.edit().putInt("early_warning_minutes", value).apply()
+        }
 
     var googlePlacesApiKey: String
         get() = prefs.getString("google_places_key", "") ?: ""

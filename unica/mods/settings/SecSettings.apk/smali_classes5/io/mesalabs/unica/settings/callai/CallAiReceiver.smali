@@ -59,7 +59,7 @@
     .line 47
     const-string v0, "unica_ca_trigger"
 
-    const-string v1, "manual"
+    const-string v1, "all"
 
     invoke-static {p0, v0, v1}, Lio/mesalabs/unica/settings/callai/CallAiConfig;->get(Landroid/content/Context;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
 

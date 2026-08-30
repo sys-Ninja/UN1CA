@@ -51,19 +51,4 @@
             settings:controller="io.mesalabs.unica.settings.prayertimes.PrayerTimesSystemListPreferenceController" />
     </PreferenceCategory>
 
-    <com.samsung.android.settings.widget.SecInsetCategoryPreference />
-
-    <PreferenceCategory android:title="@string/unica_pt_app_title">
-        <Preference
-            android:key="unica_pt_open"
-            android:title="@string/unica_pt_open_title"
-            android:summary="@string/unica_pt_open_summary"
-            android:persistent="false">
-            <intent
-                android:action="io.mesalabs.unica.action.PRAYER_TIMES_SETTINGS"
-                android:targetPackage="io.mesalabs.unica.prayertimes"
-                android:targetClass="io.mesalabs.unica.prayertimes.PrayerTimesSettingsActivity" />
-        </Preference>
-    </PreferenceCategory>
-
 </PreferenceScreen>

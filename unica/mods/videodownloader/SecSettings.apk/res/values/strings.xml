@@ -21,5 +21,7 @@
     <string name="unica_dl_organize_playlists_summary">Create a subfolder for each playlist</string>
     <string name="unica_dl_supported_sites_title">Supported Sites</string>
     <string name="unica_dl_supported_sites_summary">View the list of websites supported by yt-dlp</string>
+    <string name="pref_universal_extractor">Universal Mode (All Websites)</string>
+    <string name="pref_universal_extractor_sum">Automatically attempt downloading from any copied media link without filtering</string>
 
 </resources>

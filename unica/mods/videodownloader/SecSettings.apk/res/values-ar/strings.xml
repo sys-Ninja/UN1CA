@@ -6,4 +6,6 @@
     <string name="unica_dl_clipboard_title">مراقبة الحافظة</string>
     <string name="unica_dl_clipboard_summary">اكتشاف روابط الوسائط تلقائياً عند نسخها</string>
     <string name="unica_dl_open_title">عرض التنزيلات</string>
+    <string name="pref_universal_extractor">الوضع الشامل (جميع المواقع)</string>
+    <string name="pref_universal_extractor_sum">محاولة التنزيل تلقائياً من أي رابط وسائط يتم نسخه دون تقييد</string>
 </resources>

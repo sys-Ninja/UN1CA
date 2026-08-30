@@ -12,6 +12,12 @@
         android:summary="@string/unica_dl_enabled_summary"
         settings:controller="io.mesalabs.unica.settings.downloader.DownloaderSystemTogglePreferenceController" />
 
+    <SecSwitchPreference
+        android:key="unica_dl_universal"
+        android:title="@string/pref_universal_extractor"
+        android:summary="@string/pref_universal_extractor_sum"
+        settings:controller="io.mesalabs.unica.settings.downloader.DownloaderSystemTogglePreferenceController" />
+
     <com.samsung.android.settings.widget.SecInsetCategoryPreference />
 
     <!-- General Settings -->
