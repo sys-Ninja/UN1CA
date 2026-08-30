@@ -31,7 +31,7 @@ class Prefs private constructor(ctx: Context) {
         set(value) = prefs.edit().putString("timezone_id", value).apply()
 
     var useOnlineApi: Boolean
-        get() = prefs.getBoolean("use_online_api", false)
+        get() = prefs.getBoolean("use_online_api", true)
         set(value) = prefs.edit().putBoolean("use_online_api", value).apply()
 
     var calculationMethodKey: String
