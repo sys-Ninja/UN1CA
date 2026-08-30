@@ -63,7 +63,7 @@
 .method public bridge synthetic getSliceHighlightMenuRes()I
     .locals 0
     const/4 p0, 0x0
-    return-object p0
+    return p0
 .end method
 
 .method public bridge synthetic getStatusText()Ljava/lang/String;
@@ -81,7 +81,7 @@
 .method public bridge synthetic hasAsyncUpdate()Z
     .locals 0
     const/4 p0, 0x0
-    return-object p0
+    return p0
 .end method
 
 .method public bridge synthetic ignoreUserInteraction()V
@@ -92,19 +92,19 @@
 .method public bridge synthetic isControllable()Z
     .locals 0
     const/4 p0, 0x0
-    return-object p0
+    return p0
 .end method
 
 .method public bridge synthetic isPublicSlice()Z
     .locals 0
     const/4 p0, 0x0
-    return-object p0
+    return p0
 .end method
 
 .method public bridge synthetic isSliceable()Z
     .locals 0
     const/4 p0, 0x0
-    return-object p0
+    return p0
 .end method
 
 .method public bridge synthetic needUserInteraction(Ljava/lang/Object;)I
@@ -128,5 +128,5 @@
 .method public bridge synthetic useDynamicSliceSummary()Z
     .locals 0
     const/4 p0, 0x0
-    return-object p0
+    return p0
 .end method
