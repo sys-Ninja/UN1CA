@@ -141,8 +141,7 @@ class PrayerTimesFragment : PreferenceFragmentCompat() {
         var next = result.getNextPrayer(now)
 
         if (next == null) {
-            val tomorrowCal = Calendar.getInstance().apply { add(Calendar.DAY_OF_MONTH, 1) }
-            val tomorrowResult = PrayerManager.calculateLocally(requireContext(), tomorrowCal)
+            val tomorrowResult = PrayerManager.getPrayerTimesForDay(requireContext(), 1)
             next = tomorrowResult?.getNextPrayer(now)
         }
         return next
