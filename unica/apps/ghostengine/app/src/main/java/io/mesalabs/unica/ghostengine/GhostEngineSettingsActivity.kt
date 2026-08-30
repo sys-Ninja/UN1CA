@@ -228,7 +228,7 @@ class GhostEngineFragment(private val onPickMediaRequested: () -> Unit) : Prefer
         val adapter = PlacesAdapter { prediction: PlacePrediction ->
             lifecycleScope.launch {
                 progress.visibility = View.VISIBLE
-                val details = GooglePlacesHelper.fetchPlaceDetails(ctx, prediction.placeId)
+                val details = GooglePlacesHelper.fetchPlaceDetails(prediction.placeId)
                 progress.visibility = View.GONE
                 if (details != null) {
                     prefs.spoofedLatitude = details.latitude
