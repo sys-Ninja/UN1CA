@@ -86,18 +86,20 @@ class ClipboardMonitorService : Service() {
 
     override fun onBind(intent: Intent?): IBinder? = null
 
-    private fun firstMediaUrl(text: String): String? {
+        private fun firstMediaUrl(text: String): String? {
+        val prefs = Prefs.get(this)
         val m = Patterns.WEB_URL.matcher(text)
         while (m.find()) {
             var u = m.group() ?: continue
             if (!u.startsWith("http")) continue
-            // Strip trailing punctuation that might have been included in the match
             u = u.trimEnd('.', ',', '!', '?', ';', ')', ']')
+            if (prefs.universalExtractor) return u
             val host = try { Uri.parse(u).host?.lowercase() ?: "" } catch (e: Exception) { "" }
             if (MEDIA_HOSTS.any { host == it || host.endsWith(".$it") }) return u
         }
         return null
     }
+
 
     private fun offerDownload(url: String) {
         val pi = PendingIntent.getActivity(

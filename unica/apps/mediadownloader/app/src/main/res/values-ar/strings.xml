@@ -79,4 +79,6 @@
     <string name="updating">جارٍ التحديث…</string>
     <string name="update_ok">تم تحديث المستخرجات</string>
     <string name="update_failed">فشل التحديث</string>
+    <string name="pref_universal_extractor">الوضع الشامل (دعم جميع المواقع)</string>
+    <string name="pref_universal_extractor_sum">التعرف التلقائي على روابط الفيديو من أي موقع تدعمه المكتبة</string>
 </resources>

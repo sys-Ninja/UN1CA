@@ -38,6 +38,17 @@ class SettingsActivity : AppCompatActivity() {
             val prefs = Prefs.get(ctx)
             val screen = preferenceManager.createPreferenceScreen(ctx)
 
+                        screen.addPreference(SwitchPreferenceCompat(ctx).apply {
+                key = "universal_extractor"
+                setTitle(R.string.pref_universal_extractor)
+                setSummary(R.string.pref_universal_extractor_sum)
+                isChecked = prefs.universalExtractor
+                setOnPreferenceChangeListener { _, v ->
+                    prefs.universalExtractor = v as Boolean
+                    true
+                }
+            })
+
             screen.addPreference(SwitchPreferenceCompat(ctx).apply {
                 key = "enabled"
                 setTitle(R.string.pref_enabled)
@@ -131,6 +142,17 @@ class SettingsActivity : AppCompatActivity() {
                 isSelectable = false
             })
 
+                        screen.addPreference(SwitchPreferenceCompat(ctx).apply {
+                key = "universal_extractor"
+                setTitle(R.string.pref_universal_extractor)
+                setSummary(R.string.pref_universal_extractor_sum)
+                isChecked = prefs.universalExtractor
+                setOnPreferenceChangeListener { _, v ->
+                    prefs.universalExtractor = v as Boolean
+                    true
+                }
+            })
+
             screen.addPreference(SwitchPreferenceCompat(ctx).apply {
                 key = "organize_playlists"
                 setTitle(R.string.pref_organize_playlists)
@@ -138,6 +160,17 @@ class SettingsActivity : AppCompatActivity() {
                 isChecked = prefs.organizePlaylists
                 setOnPreferenceChangeListener { _, v ->
                     prefs.organizePlaylists = v as Boolean; true
+                }
+            })
+
+                        screen.addPreference(SwitchPreferenceCompat(ctx).apply {
+                key = "universal_extractor"
+                setTitle(R.string.pref_universal_extractor)
+                setSummary(R.string.pref_universal_extractor_sum)
+                isChecked = prefs.universalExtractor
+                setOnPreferenceChangeListener { _, v ->
+                    prefs.universalExtractor = v as Boolean
+                    true
                 }
             })
 
@@ -149,6 +182,17 @@ class SettingsActivity : AppCompatActivity() {
                 setOnPreferenceChangeListener { _, v ->
                     prefs.autoUpdate = v as Boolean
                     if (v) App.instance.scheduleUpdate() else App.instance.cancelUpdate()
+                    true
+                }
+            })
+
+                        screen.addPreference(SwitchPreferenceCompat(ctx).apply {
+                key = "universal_extractor"
+                setTitle(R.string.pref_universal_extractor)
+                setSummary(R.string.pref_universal_extractor_sum)
+                isChecked = prefs.universalExtractor
+                setOnPreferenceChangeListener { _, v ->
+                    prefs.universalExtractor = v as Boolean
                     true
                 }
             })

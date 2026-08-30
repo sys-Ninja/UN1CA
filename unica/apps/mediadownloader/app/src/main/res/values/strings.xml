@@ -80,4 +80,6 @@
     <string name="updating">Updating…</string>
     <string name="update_ok">Extractors updated</string>
     <string name="update_failed">Update failed</string>
+    <string name="pref_universal_extractor">Universal Mode (All Websites)</string>
+    <string name="pref_universal_extractor_sum">Detect media links from any supported website automatically</string>
 </resources>

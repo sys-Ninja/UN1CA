@@ -23,6 +23,10 @@ class Prefs private constructor(private val ctx: Context) {
         get() = Settings.System.getInt(resolver, "unica_dl_auto_update", 1) == 1
         set(v) = Settings.System.putInt(resolver, "unica_dl_auto_update", if (v) 1 else 0).let { }
 
+        var universalExtractor: Boolean
+        get() = Settings.System.getInt(resolver, "unica_dl_universal", 0) == 1
+        set(v) = Settings.System.putInt(resolver, "unica_dl_universal", if (v) 1 else 0).let { }
+
     var clipboardMonitor: Boolean
         get() = Settings.System.getInt(resolver, "unica_dl_clipboard", 1) == 1
         set(v) = Settings.System.putInt(resolver, "unica_dl_clipboard", if (v) 1 else 0).let { }
