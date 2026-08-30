@@ -9,8 +9,11 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ProgressBar
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
@@ -25,6 +28,7 @@ import androidx.recyclerview.widget.RecyclerView
 import io.mesalabs.unica.ghostengine.camera.GhostCameraService
 import io.mesalabs.unica.ghostengine.data.GhostEnginePrefs
 import io.mesalabs.unica.ghostengine.location.GooglePlacesHelper
+import io.mesalabs.unica.ghostengine.location.PlacePrediction
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -216,16 +220,16 @@ class GhostEngineFragment(private val onPickMediaRequested: () -> Unit) : Prefer
         val ctx = requireContext()
         val prefs = GhostEnginePrefs.get(ctx)
         val dialogView = LayoutInflater.from(ctx).inflate(R.layout.dialog_location_search, null)
-        val editQuery = dialogView.findViewById<EditText>(R.id.edit_search_query)
-        val progress = dialogView.findViewById<ProgressBar>(R.id.search_progress)
-        val recycler = dialogView.findViewById<RecyclerView>(R.id.recycler_places)
+        val editQuery = dialogView.findViewById<EditText>(R.id.edit_search_city)
+        val progress = dialogView.findViewById<ProgressBar>(R.id.progress_searching)
+        val recycler = dialogView.findViewById<RecyclerView>(R.id.recycler_predictions)
 
         recycler.layoutManager = LinearLayoutManager(ctx)
-        val adapter = PlacesAdapter { prediction ->
+        val adapter = PlacesAdapter { prediction: PlacePrediction ->
             lifecycleScope.launch {
-                progress.visibility = ProgressBar.VISIBLE
-                val details = GooglePlacesHelper.fetchPlaceDetails(prediction.placeId)
-                progress.visibility = ProgressBar.GONE
+                progress.visibility = View.VISIBLE
+                val details = GooglePlacesHelper.fetchPlaceDetails(ctx, prediction.placeId)
+                progress.visibility = View.GONE
                 if (details != null) {
                     prefs.spoofedLatitude = details.latitude
                     prefs.spoofedLongitude = details.longitude
@@ -249,9 +253,9 @@ class GhostEngineFragment(private val onPickMediaRequested: () -> Unit) : Prefer
             if (query.trim().length >= 2) {
                 searchJob = lifecycleScope.launch {
                     delay(300)
-                    progress.visibility = ProgressBar.VISIBLE
+                    progress.visibility = View.VISIBLE
                     val results = GooglePlacesHelper.searchPlaces(ctx, query)
-                    progress.visibility = ProgressBar.GONE
+                    progress.visibility = View.GONE
                     adapter.submit(results)
                 }
             } else {
@@ -260,5 +264,38 @@ class GhostEngineFragment(private val onPickMediaRequested: () -> Unit) : Prefer
         }
 
         dialog.show()
+    }
+}
+
+class PlacesAdapter(
+    private val onItemClick: (PlacePrediction) -> Unit
+) : RecyclerView.Adapter<PlacesAdapter.ViewHolder>() {
+
+    private val items = mutableListOf<PlacePrediction>()
+
+    fun submit(newItems: List<PlacePrediction>) {
+        items.clear()
+        items.addAll(newItems)
+        notifyDataSetChanged()
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.item_place_prediction, parent, false)
+        return ViewHolder(view)
+    }
+
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        val item = items[position]
+        holder.primaryText.text = item.primaryText
+        holder.secondaryText.text = item.secondaryText
+        holder.itemView.setOnClickListener { onItemClick(item) }
+    }
+
+    override fun getItemCount(): Int = items.size
+
+    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val primaryText: TextView = view.findViewById(R.id.text_prediction_primary)
+        val secondaryText: TextView = view.findViewById(R.id.text_prediction_secondary)
     }
 }
