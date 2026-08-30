@@ -1,8 +1,9 @@
 package io.mesalabs.unica.ghostengine
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.content.pm.ApplicationInfo
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -99,11 +100,7 @@ class GhostEngineFragment(private val onPickMediaRequested: () -> Unit) : Prefer
             setOnPreferenceChangeListener { _, newValue ->
                 val enabled = newValue as Boolean
                 prefs.isGhostCameraEnabled = enabled
-                if (enabled || prefs.isStealthGpsEnabled) {
-                    act.startGhostService()
-                } else {
-                    act.stopGhostService()
-                }
+                if (enabled) act.startGhostService() else act.stopGhostService()
                 true
             }
         }
@@ -115,24 +112,28 @@ class GhostEngineFragment(private val onPickMediaRequested: () -> Unit) : Prefer
             }
         }
 
+        findPreference<SwitchPreferenceCompat>("pref_show_camera_tool")?.apply {
+            isChecked = prefs.showCameraTool
+            setOnPreferenceChangeListener { _, newValue ->
+                prefs.showCameraTool = newValue as Boolean
+                true
+            }
+        }
+
         findPreference<SwitchPreferenceCompat>("pref_stealth_gps_enabled")?.apply {
             isChecked = prefs.isStealthGpsEnabled
             setOnPreferenceChangeListener { _, newValue ->
                 val enabled = newValue as Boolean
                 prefs.isStealthGpsEnabled = enabled
-                if (enabled || prefs.isGhostCameraEnabled) {
-                    act.startGhostService()
-                } else {
-                    act.stopGhostService()
-                }
+                if (enabled) act.startGhostService() else act.stopGhostService()
                 true
             }
         }
 
         findPreference<Preference>("pref_search_location")?.apply {
-            summary = "${prefs.spoofedLatitude}, ${prefs.spoofedLongitude}"
+            summary = "${String.format("%.4f", prefs.spoofedLatitude)}, ${String.format("%.4f", prefs.spoofedLongitude)}"
             setOnPreferenceClickListener {
-                showLocationSearchDialog()
+                showLocationSearchDialog(this)
                 true
             }
         }
@@ -141,23 +142,99 @@ class GhostEngineFragment(private val onPickMediaRequested: () -> Unit) : Prefer
             isChecked = prefs.showFloatingJoystick
             setOnPreferenceChangeListener { _, newValue ->
                 prefs.showFloatingJoystick = newValue as Boolean
-                if (prefs.isStealthGpsEnabled) {
-                    act.startGhostService()
-                }
+                if (prefs.isStealthGpsEnabled) act.startGhostService()
+                true
+            }
+        }
+
+        val perAppPref = findPreference<SwitchPreferenceCompat>("pref_per_app_gps")
+        val targetAppsPref = findPreference<Preference>("pref_select_target_apps")
+
+        perAppPref?.apply {
+            isChecked = prefs.isPerAppGps
+            setOnPreferenceChangeListener { _, newValue ->
+                val perApp = newValue as Boolean
+                prefs.isPerAppGps = perApp
+                targetAppsPref?.isEnabled = perApp
+                updateTargetAppsSummary(targetAppsPref, prefs)
+                true
+            }
+        }
+
+        targetAppsPref?.apply {
+            isEnabled = prefs.isPerAppGps
+            updateTargetAppsSummary(this, prefs)
+            setOnPreferenceClickListener {
+                showTargetAppsDialog(this, prefs)
                 true
             }
         }
     }
 
-    private fun showLocationSearchDialog() {
+    private fun updateTargetAppsSummary(pref: Preference?, prefs: GhostEnginePrefs) {
+        if (pref == null) return
+        if (!prefs.isPerAppGps || prefs.targetPackages.isEmpty()) {
+            pref.summary = getString(R.string.all_apps_selected)
+        } else {
+            pref.summary = getString(R.string.apps_selected_format, prefs.targetPackages.size)
+        }
+    }
+
+    private fun showTargetAppsDialog(pref: Preference, prefs: GhostEnginePrefs) {
+        val pm = requireContext().packageManager
+        val mainIntent = Intent(Intent.ACTION_MAIN, null).apply {
+            addCategory(Intent.CATEGORY_LAUNCHER)
+        }
+        val apps = pm.queryIntentActivities(mainIntent, 0)
+            .map { it.activityInfo.applicationInfo }
+            .distinctBy { it.packageName }
+            .sortedBy { pm.getApplicationLabel(it).toString().lowercase() }
+
+        val appNames = apps.map { pm.getApplicationLabel(it).toString() }.toTypedArray()
+        val appPackages = apps.map { it.packageName }
+        val checkedItems = BooleanArray(apps.size) { i ->
+            prefs.targetPackages.contains(appPackages[i])
+        }
+
+        val selectedPackages = prefs.targetPackages.toMutableSet()
+
+        AlertDialog.Builder(requireContext())
+            .setTitle(R.string.select_apps_dialog_title)
+            .setMultiChoiceItems(appNames, checkedItems) { _, which, isChecked ->
+                val pkg = appPackages[which]
+                if (isChecked) selectedPackages.add(pkg) else selectedPackages.remove(pkg)
+            }
+            .setPositiveButton(R.string.save) { _, _ ->
+                prefs.targetPackages = selectedPackages
+                updateTargetAppsSummary(pref, prefs)
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
+    }
+
+    private fun showLocationSearchDialog(pref: Preference) {
         val ctx = requireContext()
         val prefs = GhostEnginePrefs.get(ctx)
         val dialogView = LayoutInflater.from(ctx).inflate(R.layout.dialog_location_search, null)
-        val editSearch = dialogView.findViewById<EditText>(R.id.edit_search_city)
-        val progress = dialogView.findViewById<ProgressBar>(R.id.progress_searching)
-        val recycler = dialogView.findViewById<RecyclerView>(R.id.recycler_predictions)
+        val editQuery = dialogView.findViewById<EditText>(R.id.edit_search_query)
+        val progress = dialogView.findViewById<ProgressBar>(R.id.search_progress)
+        val recycler = dialogView.findViewById<RecyclerView>(R.id.recycler_places)
 
-        var searchJob: Job? = null
+        recycler.layoutManager = LinearLayoutManager(ctx)
+        val adapter = PlacesAdapter { prediction ->
+            lifecycleScope.launch {
+                progress.visibility = ProgressBar.VISIBLE
+                val details = GooglePlacesHelper.fetchPlaceDetails(prediction.placeId)
+                progress.visibility = ProgressBar.GONE
+                if (details != null) {
+                    prefs.spoofedLatitude = details.latitude
+                    prefs.spoofedLongitude = details.longitude
+                    pref.summary = "${String.format("%.4f", details.latitude)}, ${String.format("%.4f", details.longitude)}"
+                    Toast.makeText(ctx, "Location: ${details.name}", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+        recycler.adapter = adapter
 
         val dialog = AlertDialog.Builder(ctx)
             .setTitle(R.string.search_location_title)
@@ -165,62 +242,23 @@ class GhostEngineFragment(private val onPickMediaRequested: () -> Unit) : Prefer
             .setNegativeButton(R.string.cancel, null)
             .create()
 
-        recycler.layoutManager = LinearLayoutManager(ctx)
-
-        editSearch.doAfterTextChanged { text ->
-            searchJob?.cancel()
+        var searchJob: Job? = null
+        editQuery.doAfterTextChanged { text ->
             val query = text?.toString() ?: ""
-            if (query.length >= 2) {
-                progress.visibility = android.view.View.VISIBLE
-                searchJob = viewLifecycleOwner.lifecycleScope.launch {
+            searchJob?.cancel()
+            if (query.trim().length >= 2) {
+                searchJob = lifecycleScope.launch {
                     delay(300)
+                    progress.visibility = ProgressBar.VISIBLE
                     val results = GooglePlacesHelper.searchPlaces(ctx, query)
-                    progress.visibility = android.view.View.GONE
-                    // Simple adapter
-                    recycler.adapter = SimplePlaceAdapter(results) { prediction ->
-                        viewLifecycleOwner.lifecycleScope.launch {
-                            val details = GooglePlacesHelper.fetchPlaceDetails(prediction.placeId)
-                            if (details != null) {
-                                prefs.spoofedLatitude = details.latitude
-                                prefs.spoofedLongitude = details.longitude
-                                findPreference<Preference>("pref_search_location")?.summary =
-                                    "${details.latitude}, ${details.longitude}"
-                                Toast.makeText(ctx, details.name, Toast.LENGTH_SHORT).show()
-                                dialog.dismiss()
-                            }
-                        }
-                    }
+                    progress.visibility = ProgressBar.GONE
+                    adapter.submit(results)
                 }
             } else {
-                progress.visibility = android.view.View.GONE
+                adapter.submit(emptyList())
             }
         }
 
         dialog.show()
     }
-}
-
-class SimplePlaceAdapter(
-    private val items: List<io.mesalabs.unica.ghostengine.location.PlacePrediction>,
-    private val onClick: (io.mesalabs.unica.ghostengine.location.PlacePrediction) -> Unit
-) : RecyclerView.Adapter<SimplePlaceAdapter.ViewHolder>() {
-
-    class ViewHolder(v: android.view.View) : RecyclerView.ViewHolder(v) {
-        val textPrimary: android.widget.TextView = v.findViewById(R.id.text_prediction_primary)
-        val textSecondary: android.widget.TextView = v.findViewById(R.id.text_prediction_secondary)
-    }
-
-    override fun onCreateViewHolder(parent: android.view.ViewGroup, viewType: Int): ViewHolder {
-        val v = LayoutInflater.from(parent.context).inflate(R.layout.item_place_prediction, parent, false)
-        return ViewHolder(v)
-    }
-
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val item = items[position]
-        holder.textPrimary.text = item.primaryText
-        holder.textSecondary.text = item.secondaryText
-        holder.itemView.setOnClickListener { onClick(item) }
-    }
-
-    override fun getItemCount(): Int = items.size
 }

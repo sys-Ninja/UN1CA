@@ -49,6 +49,19 @@
             app:defaultValue="false"
             app:iconSpaceReserved="false" />
 
+        <SwitchPreferenceCompat
+            app:key="pref_per_app_gps"
+            app:title="@string/pref_per_app_gps"
+            app:summary="@string/pref_per_app_gps_sum"
+            app:defaultValue="false"
+            app:iconSpaceReserved="false" />
+
+        <Preference
+            app:key="pref_select_target_apps"
+            app:title="@string/pref_select_target_apps"
+            app:summary="@string/all_apps_selected"
+            app:iconSpaceReserved="false" />
+
     </PreferenceCategory>
 
 </PreferenceScreen>

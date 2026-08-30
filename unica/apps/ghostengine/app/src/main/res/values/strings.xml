@@ -17,6 +17,13 @@
     <string name="pref_search_location">Spoofed Location</string>
     <string name="pref_floating_joystick">Floating Joystick</string>
     <string name="pref_floating_joystick_sum">On-screen joystick for manual movement in games and maps</string>
+    
+    <string name="pref_per_app_gps">Target Specific Apps Only</string>
+    <string name="pref_per_app_gps_sum">Apply spoofed location only to selected apps (Whitelist)</string>
+    <string name="pref_select_target_apps">Select Target Apps</string>
+    <string name="select_apps_dialog_title">Select Apps to Spoof</string>
+    <string name="all_apps_selected">All installed apps</string>
+    <string name="apps_selected_format">%1$d apps selected</string>
 
     <string name="search_location_title">Search Location</string>
     <string name="search_location_hint">Type city name or place...</string>
@@ -24,5 +31,6 @@
     <string name="media_selected">Media source loaded successfully</string>
     <string name="grant_overlay_permission">Please grant overlay permission for floating controls</string>
     <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
     <string name="stop">Stop</string>
 </resources>

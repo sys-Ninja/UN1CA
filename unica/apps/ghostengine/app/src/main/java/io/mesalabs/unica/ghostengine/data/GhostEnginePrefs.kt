@@ -40,13 +40,21 @@ class GhostEnginePrefs private constructor(context: Context) {
         get() = java.lang.Double.longBitsToDouble(prefs.getLong("spoofed_alt", java.lang.Double.doubleToRawLongBits(300.0)))
         set(value) = prefs.edit().putLong("spoofed_alt", java.lang.Double.doubleToRawLongBits(value)).apply()
 
-    var movementSpeed: Float // Speed in meters per second (Walk: 1.4 m/s, Cycle: 4.5 m/s, Drive: 14.0 m/s)
+    var movementSpeed: Float
         get() = prefs.getFloat("movement_speed", 1.4f)
         set(value) = prefs.edit().putFloat("movement_speed", value).apply()
 
     var showFloatingJoystick: Boolean
         get() = prefs.getBoolean("show_floating_joystick", false)
         set(value) = prefs.edit().putBoolean("show_floating_joystick", value).apply()
+
+    var isPerAppGps: Boolean
+        get() = prefs.getBoolean("per_app_gps", false)
+        set(value) = prefs.edit().putBoolean("per_app_gps", value).apply()
+
+    var targetPackages: Set<String>
+        get() = prefs.getStringSet("target_packages", emptySet()) ?: emptySet()
+        set(value) = prefs.edit().putStringSet("target_packages", value).apply()
 
     var googlePlacesApiKey: String
         get() = prefs.getString("google_places_api_key", "") ?: ""
