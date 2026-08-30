@@ -136,6 +136,18 @@
 
     invoke-virtual {p0, v0}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
+    move-result-object p0
+
+    const-string v0, "\nIf the caller wants to end the call, says goodbye, or the conversation is finished, say a polite brief goodbye and append [HANGUP] at the end of your reply."
+
+    invoke-virtual {p0, v0}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    move-result-object p0
+
+    const-string v0, "\nIf the caller is trolling, laughing, joking around, or wasting time without a serious purpose, do not entertain them. Politely say goodbye and append [HANGUP] at the end of your reply."
+
+    invoke-virtual {p0, v0}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
     .line 53
     invoke-virtual {v1}, Ljava/lang/String;->isEmpty()Z
 

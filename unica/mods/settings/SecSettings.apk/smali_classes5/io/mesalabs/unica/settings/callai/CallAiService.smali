@@ -247,6 +247,64 @@
 
     .line 224
     :cond_78
+    const-string v4, "[HANGUP]"
+
+    invoke-virtual {v2, v4}, Ljava/lang/String;->contains(Ljava/lang/CharSequence;)Z
+
+    move-result v4
+
+    if-nez v4, :cond_78_hangup
+
+    const-string v4, "[hangup]"
+
+    invoke-virtual {v2, v4}, Ljava/lang/String;->contains(Ljava/lang/CharSequence;)Z
+
+    move-result v4
+
+    :cond_78_hangup
+    if-eqz v4, :cond_normal_speak
+
+    const-string v4, "\\[(?i)hangup\\]"
+
+    const-string v5, ""
+
+    invoke-virtual {v2, v4, v5}, Ljava/lang/String;->replaceAll(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+
+    move-result-object v2
+
+    invoke-virtual {v2}, Ljava/lang/String;->trim()Ljava/lang/String;
+
+    move-result-object v2
+
+    invoke-virtual {v2}, Ljava/lang/String;->isEmpty()Z
+
+    move-result v4
+
+    if-nez v4, :cond_78_end_call
+
+    invoke-direct {p0, v2}, Lio/mesalabs/unica/settings/callai/CallAiService;->speak(Ljava/lang/String;)V
+
+    :cond_78_end_call
+    const-class v2, Landroid/telecom/TelecomManager;
+
+    invoke-virtual {p0, v2}, Lio/mesalabs/unica/settings/callai/CallAiService;->getSystemService(Ljava/lang/Class;)Ljava/lang/Object;
+
+    move-result-object v2
+
+    check-cast v2, Landroid/telecom/TelecomManager;
+
+    if-eqz v2, :cond_78_exit
+
+    :try_start_end_call
+    invoke-virtual {v2}, Landroid/telecom/TelecomManager;->endCall()Z
+    :try_end_end_call
+    .catch Ljava/lang/Exception; {:try_start_end_call .. :try_end_end_call} :catch_end_call
+
+    :catch_end_call
+    :cond_78_exit
+    goto/16 :goto_ae
+
+    :cond_normal_speak
     new-instance v4, Lio/mesalabs/unica/settings/callai/LlmClient$Turn;
 
     invoke-direct {v4, v3, v2}, Lio/mesalabs/unica/settings/callai/LlmClient$Turn;-><init>(Ljava/lang/String;Ljava/lang/String;)V
