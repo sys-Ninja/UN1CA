@@ -2,6 +2,7 @@ package io.mesalabs.unica.prayertimes
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.provider.Settings
 import io.mesalabs.unica.prayertimes.calc.HighLatitudeRule
 import io.mesalabs.unica.prayertimes.calc.Madhab
 import io.mesalabs.unica.prayertimes.calc.Prayer
