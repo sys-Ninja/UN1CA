@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="unica_family_settings_title">درع حماية العائلة</string>
+    <string name="unica_family_enabled_title">تفعيل درع حماية العائلة</string>
+    <string name="unica_family_enabled_summary">حظر كافة المواقع الإباحية، المحتوى الخبيث، والنطاقات غير الآمنة</string>
+    <string name="unica_family_protection_category">خيارات الأمان والفلترة</string>
+    <string name="unica_family_safesearch_title">فرض البحث الآمن (SafeSearch)</string>
+    <string name="unica_family_safesearch_summary">إجبار تفعيل البحث الآمن على Google و Bing ووضع تقييد المحتوى على YouTube</string>
+    <string name="unica_family_malware_title">الحماية من البرمجيات الخبيثة</string>
+    <string name="unica_family_malware_summary">حظر روابط الاحتيال والتصيد والبرمجيات الضارة تلقائياً</string>
+    <string name="unica_family_status_category">حالة الحماية</string>
+    <string name="unica_family_info_title">حماية سحابية مستمرة 24/7</string>
+    <string name="unica_family_info_summary">تعمل الحماية عبر خوادم Cloudflare Family و CleanBrowsing العالمية المشفرة. متوافقة 100% مع شبكات الـ VPN.</string>
+</resources>

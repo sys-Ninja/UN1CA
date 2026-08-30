@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="unica_family_settings_title">Family Shield</string>
+    <string name="unica_family_enabled_title">Enable Family Shield</string>
+    <string name="unica_family_enabled_summary">Block all adult websites, explicit content, and malicious domains globally</string>
+    <string name="unica_family_protection_category">Protection &amp; Safety</string>
+    <string name="unica_family_safesearch_title">Enforce SafeSearch</string>
+    <string name="unica_family_safesearch_summary">Force strict SafeSearch on Google, Bing, and YouTube Restricted Mode</string>
+    <string name="unica_family_malware_title">Malware &amp; Phishing Defense</string>
+    <string name="unica_family_malware_summary">Block known phishing, malware, and ransomware domains automatically</string>
+    <string name="unica_family_status_category">Protection Status</string>
+    <string name="unica_family_info_title">Zero-Maintenance Cloud Protection</string>
+    <string name="unica_family_info_summary">Active protection powered by Cloudflare Anycast &amp; CleanBrowsing Family DNS. 100% compatible with VPN connections.</string>
+</resources>

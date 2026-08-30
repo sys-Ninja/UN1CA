@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:settings="http://schemas.android.com/apk/res-auto">
+
+    <com.samsung.android.settings.widget.SecInsetCategoryPreference />
+
+    <SecSwitchPreference
+        android:key="unica_family_shield_enabled"
+        android:title="@string/unica_family_enabled_title"
+        android:summary="@string/unica_family_enabled_summary"
+        settings:controller="io.mesalabs.unica.settings.familyshield.FamilyShieldSystemTogglePreferenceController" />
+
+    <com.samsung.android.settings.widget.SecInsetCategoryPreference />
+
+    <PreferenceCategory android:title="@string/unica_family_protection_category">
+        <SecSwitchPreference
+            android:key="unica_family_safesearch"
+            android:title="@string/unica_family_safesearch_title"
+            android:summary="@string/unica_family_safesearch_summary"
+            settings:controller="io.mesalabs.unica.settings.familyshield.FamilyShieldSystemTogglePreferenceController" />
+
+        <SecSwitchPreference
+            android:key="unica_family_malware"
+            android:title="@string/unica_family_malware_title"
+            android:summary="@string/unica_family_malware_summary"
+            settings:controller="io.mesalabs.unica.settings.familyshield.FamilyShieldSystemTogglePreferenceController" />
+    </PreferenceCategory>
+
+    <com.samsung.android.settings.widget.SecInsetCategoryPreference />
+
+    <PreferenceCategory android:title="@string/unica_family_status_category">
+        <Preference
+            android:key="unica_family_info"
+            android:title="@string/unica_family_info_title"
+            android:summary="@string/unica_family_info_summary"
+            android:selectable="false" />
+    </PreferenceCategory>
+
+</PreferenceScreen>
