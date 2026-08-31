@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="unica_st_enabled_title">Screen Translator</string>
+    <string name="unica_screen_translator_settings_title">Screen Translator</string>
     <string name="unica_st_enabled_summary">Translate on-screen text in real time for games, videos and apps</string>
     <string name="unica_st_languages_title">Languages</string>
     <string name="unica_st_source_lang_title">Source Language</string>

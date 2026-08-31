@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="unica_pt_settings_title">Prayer Times</string>
+    <string name="unica_prayer_times_settings_title">Prayer Times</string>
     <string name="unica_pt_next_prayer_title">Next Prayer</string>
     <string name="unica_pt_next_prayer_summary">Syncing with official astronomical servers…</string>
     <string name="unica_pt_enabled_title">Prayer Times</string>

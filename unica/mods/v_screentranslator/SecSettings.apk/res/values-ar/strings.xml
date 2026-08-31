@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="unica_screen_translator_settings_title">المترجم الفوري</string>
     <string name="unica_st_enabled_title">المترجم الفوري</string>
     <string name="unica_st_enabled_summary">ترجمة النصوص المرئية على الشاشة في الوقت الفعلي للألعاب والفيديوهات والتطبيقات</string>
     <string name="unica_st_languages_title">اللغات</string>
