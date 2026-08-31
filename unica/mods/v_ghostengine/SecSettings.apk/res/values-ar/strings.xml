@@ -1,17 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="unica_ghost_engine_settings_title">المحرك الشبحي</string>
-    <string name="unica_ghost_camera_category">بث الكاميرا الشبحية</string>
-    <string name="unica_ghost_camera_title">حقن وتغذية الكاميرا الافتراضية</string>
-    <string name="unica_ghost_camera_summary">تغذية فيديو أو صورة مخصصة مباشرة في تطبيقات الكاميرا الحية</string>
+    <string name="unica_ghost_camera_category">الكاميرا الافتراضية</string>
+    <string name="unica_ghost_camera_title">حقن بث الكاميرا</string>
+    <string name="unica_ghost_camera_summary">حقن صورة أو فيديو مخصص مباشرة في تطبيقات الكاميرا</string>
+    <string name="unica_ghost_select_media_title">اختر صورة أو فيديو</string>
+    <string name="unica_ghost_select_media_summary">اختر مصدر الكاميرا الوهمية من المعرض</string>
     <string name="unica_ghost_tool_title">زر الكاميرا العائم</string>
-    <string name="unica_ghost_tool_summary">إظهار شريط عائم للتبديل السريع بين الكاميرا الحقيقية والشبحية</string>
-    <string name="unica_ghost_gps_category">موقع GPS الخفي</string>
-    <string name="unica_ghost_gps_title">تزييف الموقع الخفي غير القابل للكشف</string>
-    <string name="unica_ghost_gps_summary">تزييف الإحداثيات ببصمات أقمار صناعية واقعية (isMock=false)</string>
+    <string name="unica_ghost_tool_summary">عرض شريط تحكم عائم أثناء استخدام الكاميرا للتبديل السريع</string>
+    <string name="unica_ghost_gps_category">تزوير الموقع الشبحي</string>
+    <string name="unica_ghost_gps_title">تزوير الموقع الخفي غير القابل للكشف</string>
+    <string name="unica_ghost_gps_summary">تزوير الإحداثيات مع إخفاء علامات Mock GPS كاملاً</string>
+    <string name="unica_ghost_location_title">بحث وتحديد الموقع</string>
+    <string name="unica_ghost_location_summary">افتح البحث على الخريطة لاختيار الإحداثيات المزيفة</string>
     <string name="unica_ghost_joystick_title">عصا التحكم العائمة (Joystick)</string>
-    <string name="unica_ghost_joystick_summary">التحكم في حركة الموقع مباشرة بالألعاب والخرائط</string>
-    <string name="unica_ghost_app_title">تخصيص الوسائط والمواقع</string>
-    <string name="unica_ghost_open_title">مدير المحرك الشبحي</string>
-    <string name="unica_ghost_open_summary">اختيار الفيديو/الصورة والبحث في خريطة العالم عبر جوجل</string>
+    <string name="unica_ghost_joystick_summary">تحريك الموقع المزيف في الوقت الفعلي بعصا التحكم المرئية</string>
 </resources>
