@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">درع الخصوصية البصرية</string>
+    <string name="notif_protecting">حماية الشاشة ضد المتلصصين قيد التشغيل</string>
+    <string name="notif_stop">إيقاف</string>
+    <string name="peeping_alert_title">تنبيه: تم رصد متلصص!</string>
+    <string name="peeping_alert_desc">شخص ما ينظر إلى شاشة هاتفك الآن.</string>
+    <string name="peeping_blur_title">الشاشة محمية</string>
+    <string name="peeping_blur_desc">تم رصد وجه إضافي يراقب الشاشة بجانبك.</string>
+    <string name="btn_snooze_text">مع صديقي</string>
+    <string name="btn_snooze_full">أتفرج مع صديق (إيقاف 15 دقيقة)</string>
+    <string name="tile_cowatch_title">وضع المشاركة</string>
+    <string name="tile_cowatch_active">متوقف مؤقتاً (15 دقيقة)</string>
+    <string name="tile_cowatch_inactive">الحماية مفعّلة</string>
+</resources>

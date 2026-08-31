@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<permissions>
+    <privapp-permissions package="io.mesalabs.unica.antipeeping">
+        <permission name="android.permission.CAMERA" />
+        <permission name="android.permission.SYSTEM_ALERT_WINDOW" />
+        <permission name="android.permission.FOREGROUND_SERVICE" />
+        <permission name="android.permission.FOREGROUND_SERVICE_CAMERA" />
+        <permission name="android.permission.POST_NOTIFICATIONS" />
+        <permission name="android.permission.WRITE_SETTINGS" />
+    </privapp-permissions>
+</permissions>

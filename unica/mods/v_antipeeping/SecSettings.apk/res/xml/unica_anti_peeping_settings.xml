@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:settings="http://schemas.android.com/apk/res-auto">
+
+    <com.samsung.android.settings.widget.SecInsetCategoryPreference />
+
+    <SecSwitchPreference
+        android:key="unica_anti_peeping_enabled"
+        android:title="@string/unica_peeping_enabled_title"
+        android:summary="@string/unica_peeping_enabled_summary"
+        settings:controller="io.mesalabs.unica.settings.antipeeping.AntiPeepingSystemTogglePreferenceController" />
+
+    <com.samsung.android.settings.widget.SecInsetCategoryPreference />
+
+    <PreferenceCategory android:title="@string/unica_peeping_reaction_category">
+        <SecDropDownPreference
+            android:key="unica_anti_peeping_action"
+            android:title="@string/unica_peeping_action_title"
+            android:entries="@array/unica_peeping_action_entries"
+            android:entryValues="@array/unica_peeping_action_values"
+            settings:controller="io.mesalabs.unica.settings.antipeeping.AntiPeepingSystemListPreferenceController" />
+
+        <SecSwitchPreference
+            android:key="unica_anti_peeping_auto_pause_video"
+            android:title="@string/unica_peeping_auto_pause_title"
+            android:summary="@string/unica_peeping_auto_pause_summary"
+            settings:controller="io.mesalabs.unica.settings.antipeeping.AntiPeepingSystemTogglePreferenceController" />
+    </PreferenceCategory>
+
+    <com.samsung.android.settings.widget.SecInsetCategoryPreference />
+
+    <PreferenceCategory android:title="@string/unica_peeping_info_category">
+        <Preference
+            android:key="unica_peeping_info"
+            android:title="@string/unica_peeping_info_title"
+            android:summary="@string/unica_peeping_info_summary"
+            android:selectable="false" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

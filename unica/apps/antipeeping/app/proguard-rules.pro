@@ -1,0 +1,2 @@
+-keep class io.mesalabs.unica.antipeeping.** { *; }
+-keep class com.google.mlkit.** { *; }

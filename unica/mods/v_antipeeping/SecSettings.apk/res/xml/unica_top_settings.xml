@@ -1,0 +1,3 @@
+/<\/PreferenceScreen>/i
+    <com.samsung.android.settings.widget.SecInsetCategoryPreference />
+    <io.mesalabs.unica.settings.preference.IconPreference android:icon="@drawable/ic_unica_settings_peeping" android:title="@string/unica_anti_peeping_settings_title" android:key="unica_anti_peeping_settings" android:fragment="io.mesalabs.unica.settings.antipeeping.AntiPeepingSettingsFragment" settings:controller="io.mesalabs.unica.settings.AntiPeepingPreferenceController" />

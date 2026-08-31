@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="unica_anti_peeping_settings_title">Privacy Shield</string>
+    <string name="unica_peeping_enabled_title">Privacy Shield</string>
+    <string name="unica_peeping_enabled_summary">Protect your screen against shoulder surfing and peeping eyes in public</string>
+    <string name="unica_peeping_reaction_category">Security Action &amp; Rules</string>
+    <string name="unica_peeping_action_title">Reaction Mode</string>
+    <string name="unica_peeping_auto_pause_title">Auto-Pause during Videos</string>
+    <string name="unica_peeping_auto_pause_summary">Automatically pause detection when watching full-screen videos</string>
+    <string name="unica_peeping_info_category">How It Works</string>
+    <string name="unica_peeping_info_title">AI On-Device Protection</string>
+    <string name="unica_peeping_info_summary">Using high-precision on-device 3D gaze tracking, your device alerts you immediately when an unauthorized face looks at your screen. You can tap the Co-Watching tile in Quick Settings anytime to pause protection when sharing with a friend.</string>
+</resources>

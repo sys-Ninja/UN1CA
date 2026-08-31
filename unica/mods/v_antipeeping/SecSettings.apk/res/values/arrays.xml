@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="unica_peeping_action_entries">
+        <item>Top Warning Banner</item>
+        <item>Instant Screen Blur</item>
+        <item>Discreet Haptic Buzz</item>
+    </string-array>
+    <string-array name="unica_peeping_action_values">
+        <item>alert</item>
+        <item>blur</item>
+        <item>haptic</item>
+    </string-array>
+</resources>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Privacy Shield</string>
+    <string name="notif_protecting">Shoulder surfing protection active</string>
+    <string name="notif_stop">Stop</string>
+    <string name="peeping_alert_title">Peeping Detected!</string>
+    <string name="peeping_alert_desc">Someone is looking at your screen.</string>
+    <string name="peeping_blur_title">Screen Protected</string>
+    <string name="peeping_blur_desc">A secondary face was detected looking at your device.</string>
+    <string name="btn_snooze_text">Friend with me</string>
+    <string name="btn_snooze_full">Watching with a friend (Pause 15m)</string>
+    <string name="tile_cowatch_title">Co-Watching</string>
+    <string name="tile_cowatch_active">Paused (15m)</string>
+    <string name="tile_cowatch_inactive">Protection Active</string>
+</resources>
