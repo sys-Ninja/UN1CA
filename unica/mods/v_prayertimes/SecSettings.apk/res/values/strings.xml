@@ -1,18 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="unica_prayer_times_settings_title">Prayer Times</string>
-    <string name="unica_pt_enabled_title">Prayer Time Notifications</string>
-    <string name="unica_pt_enabled_summary">Receive alarms and Adhan at prayer times</string>
-    <string name="unica_pt_general_title">Calculation &amp; Method</string>
+    <string name="unica_pt_settings_title">Prayer Times</string>
+    <string name="unica_pt_next_prayer_title">Next Prayer</string>
+    <string name="unica_pt_next_prayer_summary">Syncing with official astronomical servers…</string>
+    <string name="unica_pt_enabled_title">Prayer Times</string>
+    <string name="unica_pt_enabled_summary">Receive automatic Adhan alarms and daily prayer notifications</string>
+    <string name="unica_pt_general_title">Location &amp; Calculation</string>
+    <string name="unica_pt_location_title">Location</string>
+    <string name="unica_pt_location_summary">Set city or use GPS for exact local prayer times</string>
     <string name="unica_pt_method_title">Calculation Method</string>
-    <string name="unica_pt_madhab_title">Asr Method (Madhab)</string>
-    <string name="unica_pt_online_sync_title">Sync with Official Authority</string>
-    <string name="unica_pt_online_sync_summary">Fetch times from official online server instead of local calculation</string>
-    <string name="unica_pt_notifications_title">Notifications &amp; Reminders</string>
+    <string name="unica_pt_madhab_title">Asr Juristic Method (Madhab)</string>
+    <string name="unica_pt_notifications_title">Notifications &amp; Sounds</string>
     <string name="unica_pt_early_warning_title">Early Reminder</string>
-    <string name="unica_pt_early_warning_summary">Get notified before Adhan time</string>
-    <string name="unica_pt_early_minutes_title">Remind me before</string>
-    <string name="unica_pt_app_title">Customization &amp; Location</string>
-    <string name="unica_pt_open_title">Prayer Times Customizer</string>
-    <string name="unica_pt_open_summary">Configure Adhan audio with preview, search location with Google Places, and live countdown</string>
+    <string name="unica_pt_early_warning_summary">Receive notification before Adhan time</string>
+    <string name="unica_pt_early_minutes_title">Remind Before</string>
+    <string name="unica_pt_sounds_title">Adhan Sounds &amp; Muezzins</string>
+    <string name="unica_pt_sounds_summary">Choose Makkah, Madinah, Al-Aqsa, Cairo or custom Adhan tone</string>
 </resources>

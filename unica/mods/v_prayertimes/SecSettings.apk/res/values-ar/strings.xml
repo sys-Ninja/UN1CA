@@ -1,18 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="unica_prayer_times_settings_title">مواقيت الصلاة</string>
-    <string name="unica_pt_enabled_title">إشعارات مواقيت الصلاة</string>
-    <string name="unica_pt_enabled_summary">تلقِّي إشعارات وتنبيهات عند مواقيت الصلاة</string>
-    <string name="unica_pt_general_title">طريقة الحساب والمذهب</string>
-    <string name="unica_pt_method_title">هيئة الحساب</string>
-    <string name="unica_pt_madhab_title">طريقة العصر (المذهب)</string>
-    <string name="unica_pt_online_sync_title">مزامنة مع الهيئة الرسمية</string>
-    <string name="unica_pt_online_sync_summary">جلب المواقيت من خادم رسمي موثوق بدلاً من الحساب المحلي</string>
-    <string name="unica_pt_notifications_title">الإشعارات والتذكيرات</string>
-    <string name="unica_pt_early_warning_title">تنبيه مبكر</string>
-    <string name="unica_pt_early_warning_summary">احصل على إشعار قبل موعد الأذان</string>
+    <string name="unica_pt_settings_title">مواقيت الصلاة</string>
+    <string name="unica_pt_next_prayer_title">الصلاة القادمة</string>
+    <string name="unica_pt_next_prayer_summary">جارٍ المزامنة المباشرة مع الخادم الرسمي…</string>
+    <string name="unica_pt_enabled_title">مواقيت الصلاة</string>
+    <string name="unica_pt_enabled_summary">تلقي تنبيهات الأذان التلقائية وإشعارات الصلوات الخمس</string>
+    <string name="unica_pt_general_title">الموقع وهيئة الحساب</string>
+    <string name="unica_pt_location_title">تحديد الموقع والمدينة</string>
+    <string name="unica_pt_location_summary">اختر مدينتك أو الموقع التلقائي لحساب أوقات دقيقة</string>
+    <string name="unica_pt_method_title">هيئة الحساب الرسمية</string>
+    <string name="unica_pt_madhab_title">طريقة العصر (المذهب الفقهي)</string>
+    <string name="unica_pt_notifications_title">الإشعارات وأصوات الأذان</string>
+    <string name="unica_pt_early_warning_title">تنبيه مبكر قبل الصلاة</string>
+    <string name="unica_pt_early_warning_summary">الحصول على إشعار تنبيه قبل وقت الأذان للاستعداد</string>
     <string name="unica_pt_early_minutes_title">التنبيه قبل الصلاة بـ</string>
-    <string name="unica_pt_app_title">التخصيص والموقع</string>
-    <string name="unica_pt_open_title">مخصص مواقيت الصلاة</string>
-    <string name="unica_pt_open_summary">تخصيص أصوات الأذان مع المعاينة الصوتية، وبحث الموقع بخرائط جوجل، والعد التنازلي الحي</string>
+    <string name="unica_pt_sounds_title">أصوات الأذان والمؤذنين</string>
+    <string name="unica_pt_sounds_summary">اختر أذان الحرم المكي، المدني، الأقصى، القاهرة أو ملف مخصص</string>
 </resources>

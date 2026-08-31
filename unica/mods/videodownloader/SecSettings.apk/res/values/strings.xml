@@ -3,6 +3,8 @@
     <string name="unica_dl_settings_title">Media Downloader</string>
     <string name="unica_dl_enabled_title">Media Downloader</string>
     <string name="unica_dl_enabled_summary">Enable media downloading from supported sites</string>
+    <string name="unica_dl_universal_title">Universal Mode (All Websites)</string>
+    <string name="unica_dl_universal_summary">Automatically attempt downloading from any copied media link without filtering</string>
     <string name="unica_dl_clipboard_title">Clipboard monitoring</string>
     <string name="unica_dl_clipboard_summary">Automatically detect media links when copied</string>
     <string name="unica_dl_open_title">View downloads</string>
@@ -21,7 +23,4 @@
     <string name="unica_dl_organize_playlists_summary">Create a subfolder for each playlist</string>
     <string name="unica_dl_supported_sites_title">Supported Sites</string>
     <string name="unica_dl_supported_sites_summary">View the list of websites supported by yt-dlp</string>
-    <string name="pref_universal_extractor">Universal Mode (All Websites)</string>
-    <string name="pref_universal_extractor_sum">Automatically attempt downloading from any copied media link without filtering</string>
-
 </resources>

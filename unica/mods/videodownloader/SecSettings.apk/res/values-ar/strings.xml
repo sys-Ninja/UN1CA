@@ -3,9 +3,24 @@
     <string name="unica_dl_settings_title">تحميل الوسائط</string>
     <string name="unica_dl_enabled_title">تحميل الوسائط</string>
     <string name="unica_dl_enabled_summary">تفعيل تحميل الوسائط من المواقع المدعومة</string>
+    <string name="unica_dl_universal_title">الوضع الشامل (جميع المواقع)</string>
+    <string name="unica_dl_universal_summary">محاولة التنزيل تلقائياً من أي رابط وسائط يتم نسخه دون تقييد</string>
     <string name="unica_dl_clipboard_title">مراقبة الحافظة</string>
     <string name="unica_dl_clipboard_summary">اكتشاف روابط الوسائط تلقائياً عند نسخها</string>
     <string name="unica_dl_open_title">عرض التنزيلات</string>
-    <string name="pref_universal_extractor">الوضع الشامل (جميع المواقع)</string>
-    <string name="pref_universal_extractor_sum">محاولة التنزيل تلقائياً من أي رابط وسائط يتم نسخه دون تقييد</string>
+    <string name="unica_dl_general_title">عام</string>
+    <string name="unica_dl_updates_title">التحديثات والمكتبات</string>
+    <string name="unica_dl_info_title">المعلومات والدعم</string>
+    <string name="unica_dl_default_type_title">نوع التنزيل الافتراضي</string>
+    <string name="unica_dl_default_quality_title">جودة الفيديو الافتراضية</string>
+    <string name="unica_dl_download_dir_title">مجلد التنزيلات</string>
+    <string name="unica_dl_auto_update_title">التحديث التلقائي</string>
+    <string name="unica_dl_auto_update_summary">التحقق اليومي من تحديثات محرك التنزيل yt-dlp</string>
+    <string name="unica_dl_ytdlp_version_title">إصدار yt-dlp</string>
+    <string name="unica_dl_last_update_check_title">آخر فحص للتحديث</string>
+    <string name="unica_dl_check_now_title">التحقق من التحديثات الآن</string>
+    <string name="unica_dl_organize_playlists_title">تنظيم قوائم التشغيل</string>
+    <string name="unica_dl_organize_playlists_summary">إنشاء مجلد مخصص لكل قائمة تشغيل</string>
+    <string name="unica_dl_supported_sites_title">المواقع المدعومة</string>
+    <string name="unica_dl_supported_sites_summary">عرض قائمة المواقع والمنصات المدعومة للتحميل</string>
 </resources>
