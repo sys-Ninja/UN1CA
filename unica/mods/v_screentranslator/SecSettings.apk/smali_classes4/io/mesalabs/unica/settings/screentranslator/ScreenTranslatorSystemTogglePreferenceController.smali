@@ -15,14 +15,14 @@
 .end method
 
 .method public isChecked()Z
-    .locals 4
+    .locals 3
     iget-object v0, p0, Lcom/android/settingslib/core/AbstractPreferenceController;->mContext:Landroid/content/Context;
     invoke-virtual {v0}, Landroid/content/Context;->getContentResolver()Landroid/content/ContentResolver;
     move-result-object v0
     invoke-virtual {p0}, Lcom/android/settings/core/BasePreferenceController;->getPreferenceKey()Ljava/lang/String;
     move-result-object v1
     const/4 v2, 0x0
-    invoke-static {v0, v1, v2}, Landroid/provider/Settings$System;->getInt(Landroid/content/ContentResolver;Ljava/lang/String;I)I
+    invoke-static {v0, v1, v2}, Landroid/provider/Settings;->getInt(Landroid/content/ContentResolver;Ljava/lang/String;I)I
     move-result v0
     const/4 v1, 0x1
     if-ne v0, v1, :cond_0
@@ -32,38 +32,40 @@
 .end method
 
 .method public setChecked(Z)Z
-    .locals 6
+    .locals 4
     iget-object v0, p0, Lcom/android/settingslib/core/AbstractPreferenceController;->mContext:Landroid/content/Context;
     invoke-virtual {v0}, Landroid/content/Context;->getContentResolver()Landroid/content/ContentResolver;
     move-result-object v1
     invoke-virtual {p0}, Lcom/android/settings/core/BasePreferenceController;->getPreferenceKey()Ljava/lang/String;
     move-result-object v2
     if-eqz p1, :cond_0
-    const/4 p1, 0x1
+    const/4 v3, 0x1
     goto :goto_0
     :cond_0
-    const/4 p1, 0x0
+    const/4 v3, 0x0
     :goto_0
-    invoke-static {v1, v2, p1}, Landroid/provider/Settings$System;->putInt(Landroid/content/ContentResolver;Ljava/lang/String;I)Z
-
-    # If master service toggle and turning ON: Launch the app so user grants MediaProjection
-    const-string v3, "unica_st_service_enabled"
-    invoke-virtual {v3, v2}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
-    move-result v3
-    if-eqz v3, :skip_launch
-    if-eqz p1, :skip_launch
-
-    # Launch ScreenTranslatorSettingsActivity
-    new-instance v3, Landroid/content/Intent;
-    const-string v4, "io.mesalabs.unica.action.SCREEN_TRANSLATOR_SETTINGS"
-    invoke-direct {v3, v4}, Landroid/content/Intent;-><init>(Ljava/lang/String;)V
-    const-string v4, "io.mesalabs.unica.screentranslator"
-    invoke-virtual {v3, v4}, Landroid/content/Intent;->setPackage(Ljava/lang/String;)Landroid/content/Intent;
-    const v4, 0x10000000
-    invoke-virtual {v3, v4}, Landroid/content/Intent;->addFlags(I)Landroid/content/Intent;
-    invoke-virtual {v0, v3}, Landroid/content/Context;->startActivity(Landroid/content/Intent;)V
-
-    :skip_launch
+    invoke-static {v1, v2, v3}, Landroid/provider/Settings;->putInt(Landroid/content/ContentResolver;Ljava/lang/String;I)Z
+    # Send broadcast to ScreenTranslator app on master toggle
+    const-string v0, "unica_st_service_enabled"
+    invoke-virtual {v0, v2}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+    move-result v0
+    if-eqz v0, :skip_st_svc
+    iget-object v0, p0, Lcom/android/settingslib/core/AbstractPreferenceController;->mContext:Landroid/content/Context;
+    new-instance v2, Landroid/content/Intent;
+    const-string v3, "io.mesalabs.unica.screentranslator.TOGGLE_SERVICE"
+    invoke-direct {v2, v3}, Landroid/content/Intent;-><init>(Ljava/lang/String;)V
+    const-string v3, "enabled"
+    if-eqz p1, :cond_st_off
+    const/4 v4, 0x1
+    goto :st_put
+    :cond_st_off
+    const/4 v4, 0x0
+    :st_put
+    invoke-virtual {v2, v3, v4}, Landroid/content/Intent;->putExtra(Ljava/lang/String;Z)Landroid/content/Intent;
+    const-string v3, "io.mesalabs.unica.screentranslator"
+    invoke-virtual {v2, v3}, Landroid/content/Intent;->setPackage(Ljava/lang/String;)Landroid/content/Intent;
+    invoke-virtual {v0, v2}, Landroid/content/Context;->sendBroadcast(Landroid/content/Intent;)V
+    :skip_st_svc
     const/4 v0, 0x1
     return v0
 .end method
@@ -133,7 +135,7 @@
     return v0
 .end method
 
-.method public bridge synthetic needUserInteraction(Ljava/lang/Object;)Lcom/samsung/android/settings/cube/Controllable$ControllableType;
+.method public bridge synthetic needUserInteraction(Ljava/lang/Object;)Lcom/samsung/android/settings/cube/Controllable;
     .locals 1
     const/4 v0, 0x0
     return-object v0

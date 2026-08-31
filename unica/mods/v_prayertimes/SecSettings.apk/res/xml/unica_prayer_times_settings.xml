@@ -22,17 +22,6 @@
     <com.samsung.android.settings.widget.SecInsetCategoryPreference />
 
     <PreferenceCategory android:title="@string/unica_pt_general_title">
-        <Preference
-            android:key="unica_prayer_times_location"
-            android:title="@string/unica_pt_location_title"
-            android:summary="@string/unica_pt_location_summary"
-            android:persistent="false">
-            <intent
-                android:action="io.mesalabs.unica.action.PRAYER_TIMES_SETTINGS"
-                android:targetPackage="io.mesalabs.unica.prayertimes"
-                android:targetClass="io.mesalabs.unica.prayertimes.PrayerTimesSettingsActivity" />
-        </Preference>
-
         <SecDropDownPreference
             android:key="unica_prayer_times_method"
             android:title="@string/unica_pt_method_title"
@@ -63,17 +52,6 @@
             android:entries="@array/unica_pt_early_minutes_entries"
             android:entryValues="@array/unica_pt_early_minutes_values"
             settings:controller="io.mesalabs.unica.settings.prayertimes.PrayerTimesSystemListPreferenceController" />
-
-        <Preference
-            android:key="unica_prayer_times_sounds"
-            android:title="@string/unica_pt_sounds_title"
-            android:summary="@string/unica_pt_sounds_summary"
-            android:persistent="false">
-            <intent
-                android:action="io.mesalabs.unica.action.PRAYER_TIMES_SETTINGS"
-                android:targetPackage="io.mesalabs.unica.prayertimes"
-                android:targetClass="io.mesalabs.unica.prayertimes.PrayerTimesSettingsActivity" />
-        </Preference>
     </PreferenceCategory>
 
 </PreferenceScreen>

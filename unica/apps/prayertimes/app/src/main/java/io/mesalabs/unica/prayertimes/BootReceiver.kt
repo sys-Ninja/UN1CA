@@ -16,9 +16,14 @@ class BootReceiver : BroadcastReceiver() {
             Intent.ACTION_TIME_CHANGED,
             Intent.ACTION_TIMEZONE_CHANGED,
             Intent.ACTION_DATE_CHANGED,
-            "android.intent.action.TIME_SET" -> {
-                // Time/Date/Timezone manually or automatically changed -> Reschedule immediately
-                PrayerManager.scheduleNextPrayer(context)
+            "android.intent.action.TIME_SET",
+            "io.mesalabs.unica.prayertimes.TOGGLE_SERVICE" -> {
+                val prefs = Prefs.get(context)
+                if (prefs.isEnabled) {
+                    PrayerManager.scheduleNextPrayer(context)
+                } else {
+                    PrayerManager.cancelAlarms(context)
+                }
             }
         }
     }

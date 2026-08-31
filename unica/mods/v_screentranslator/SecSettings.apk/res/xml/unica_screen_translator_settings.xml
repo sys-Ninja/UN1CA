@@ -44,19 +44,4 @@
             settings:controller="io.mesalabs.unica.settings.screentranslator.ScreenTranslatorSystemTogglePreferenceController" />
     </PreferenceCategory>
 
-    <com.samsung.android.settings.widget.SecInsetCategoryPreference />
-
-    <PreferenceCategory android:title="@string/unica_st_launch_category">
-        <Preference
-            android:key="unica_st_launch"
-            android:title="@string/unica_st_launch_title"
-            android:summary="@string/unica_st_launch_summary"
-            android:persistent="false">
-            <intent
-                android:action="io.mesalabs.unica.action.SCREEN_TRANSLATOR_SETTINGS"
-                android:targetPackage="io.mesalabs.unica.screentranslator"
-                android:targetClass="io.mesalabs.unica.screentranslator.ScreenTranslatorSettingsActivity" />
-        </Preference>
-    </PreferenceCategory>
-
 </PreferenceScreen>
