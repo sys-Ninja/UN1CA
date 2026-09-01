@@ -125,7 +125,7 @@
 .method public bridge synthetic needUserInteraction(Ljava/lang/Object;)Lcom/samsung/android/settings/cube/Controllable$ControllableType;
     .locals 1
     const/4 v0, 0x0
-    return-object v0
+    return v0
 .end method
 
 .method public bridge synthetic runDefaultAction()Z
@@ -137,7 +137,7 @@
 .method public bridge synthetic setValue(Lcom/samsung/android/settings/cube/ControlValue;)Lcom/samsung/android/settings/cube/ControlResult;
     .locals 1
     const/4 v0, 0x0
-    return-object v0
+    return v0
 .end method
 
 .method public bridge synthetic useDynamicSliceSummary()Z
