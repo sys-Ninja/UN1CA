@@ -22,7 +22,7 @@
     invoke-virtual {p0}, Lcom/android/settings/core/BasePreferenceController;->getPreferenceKey()Ljava/lang/String;
     move-result-object v1
     const/4 v2, 0x0
-    invoke-static {v0, v1, v2}, Landroid/provider/Settings;->getInt(Landroid/content/ContentResolver;Ljava/lang/String;I)I
+    invoke-static {v0, v1, v2}, Landroid/provider/Settings$System;->getInt(Landroid/content/ContentResolver;Ljava/lang/String;I)I
     move-result v0
     const/4 v1, 0x1
     if-ne v0, v1, :cond_0
@@ -44,7 +44,7 @@
     :cond_0
     const/4 v3, 0x0
     :goto_0
-    invoke-static {v1, v2, v3}, Landroid/provider/Settings;->putInt(Landroid/content/ContentResolver;Ljava/lang/String;I)Z
+    invoke-static {v1, v2, v3}, Landroid/provider/Settings$System;->putInt(Landroid/content/ContentResolver;Ljava/lang/String;I)Z
     # Send broadcast to ScreenTranslator app on master toggle
     const-string v0, "unica_st_service_enabled"
     invoke-virtual {v0, v2}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
@@ -138,7 +138,7 @@
 .method public bridge synthetic needUserInteraction(Ljava/lang/Object;)Lcom/samsung/android/settings/cube/Controllable;
     .locals 1
     const/4 v0, 0x0
-    return-object v0
+    return v0
 .end method
 
 .method public bridge synthetic runDefaultAction()Z
@@ -150,7 +150,7 @@
 .method public bridge synthetic setValue(Lcom/samsung/android/settings/cube/ControlValue;)Lcom/samsung/android/settings/cube/ControlResult;
     .locals 1
     const/4 v0, 0x0
-    return-object v0
+    return v0
 .end method
 
 .method public bridge synthetic useDynamicSliceSummary()Z
