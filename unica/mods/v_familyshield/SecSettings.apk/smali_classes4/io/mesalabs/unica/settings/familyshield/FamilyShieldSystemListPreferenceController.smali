@@ -1,4 +1,4 @@
-﻿.class public Lio/mesalabs/unica/settings/familyshield/FamilyShieldSystemListPreferenceController;
+.class public Lio/mesalabs/unica/settings/familyshield/FamilyShieldSystemListPreferenceController;
 .super Lcom/android/settings/core/BasePreferenceController;
 .implements Landroidx/preference/Preference$OnPreferenceChangeListener;
 .source "FamilyShieldSystemListPreferenceController.java"
