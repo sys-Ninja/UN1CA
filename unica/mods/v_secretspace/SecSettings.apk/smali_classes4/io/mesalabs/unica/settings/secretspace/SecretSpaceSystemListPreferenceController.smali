@@ -1,4 +1,4 @@
-﻿.class public Lio/mesalabs/unica/settings/secretspace/SecretSpaceSystemListPreferenceController;
+.class public Lio/mesalabs/unica/settings/secretspace/SecretSpaceSystemListPreferenceController;
 .super Lcom/android/settings/core/BasePreferenceController;
 .implements Landroidx/preference/Preference$OnPreferenceChangeListener;
 .source "SecretSpaceSystemListPreferenceController.java"
