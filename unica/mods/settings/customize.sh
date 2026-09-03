@@ -25,38 +25,7 @@ fi
 AUDIO_RECORD="$(find "$APKTOOL_DIR/system/framework/framework.jar" -name "AudioRecord.smali" | head -1)"
 if [ -n "$AUDIO_RECORD" ] && [ -f "$AUDIO_RECORD" ]; then
     LOG "- Patching AudioRecord in $AUDIO_RECORD"
-    python3 - << 'HOOK_EOF' "$AUDIO_RECORD"
-import sys, re
-
-path = sys.argv[1]
-with open(path, "r") as f:
-    acode = f.read()
-
-# Byte array read
-pat_byte = r'(invoke-[a-z/]+\s*\{[^}]+\},\s*Landroid/media/AudioRecord;->native_read_in_byte_array\([^\)]+\)I\s*
-\s*move-result\s+([vp0-9]+))'
-acode = re.sub(pat_byte, r'
-
-    invoke-static {p0, p1, p2, }, Lio/mesalabs/unica/audio/VoiceChangerAudioRecordHook;->onAudioRecordRead(Landroid/media/AudioRecord;[BII)V', acode)
-
-# Short array read
-pat_short = r'(invoke-[a-z/]+\s*\{[^}]+\},\s*Landroid/media/AudioRecord;->native_read_in_short_array\([^\)]+\)I\s*
-\s*move-result\s+([vp0-9]+))'
-acode = re.sub(pat_short, r'
-
-    invoke-static {p0, p1, p2, }, Lio/mesalabs/unica/audio/VoiceChangerAudioRecordHook;->onAudioRecordRead(Landroid/media/AudioRecord;[SII)V', acode)
-
-# Direct buffer read
-pat_buf = r'(invoke-[a-z/]+\s*\{[^}]+\},\s*Landroid/media/AudioRecord;->native_read_in_direct_buffer\([^\)]+\)I\s*
-\s*move-result\s+([vp0-9]+))'
-acode = re.sub(pat_buf, r'
-
-    invoke-static {p0, p1, }, Lio/mesalabs/unica/audio/VoiceChangerAudioRecordHook;->onAudioRecordRead(Landroid/media/AudioRecord;Ljava/nio/ByteBuffer;I)V', acode)
-
-with open(path, "w") as f:
-    f.write(acode)
-print("AudioRecord patched successfully!")
-HOOK_EOF
+    python3 "$MODPATH/patch_audiorecord.py" "$AUDIO_RECORD"
 fi
 
 DECODE_APK "system" "system/priv-app/SecSettings/SecSettings.apk"
