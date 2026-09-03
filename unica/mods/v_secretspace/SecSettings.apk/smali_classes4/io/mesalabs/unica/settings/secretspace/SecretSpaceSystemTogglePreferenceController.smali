@@ -97,7 +97,7 @@
 .method public bridge synthetic needUserInteraction(Ljava/lang/Object;)Lcom/samsung/android/settings/cube/Controllable$ControllableType;
     .locals 1
     const/4 v0, 0x0
-    return v0
+    return-object v0
 .end method
 .method public bridge synthetic runDefaultAction()Z
     .locals 1
