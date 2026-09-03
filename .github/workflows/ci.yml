@@ -403,3 +403,48 @@ jobs:
           if-no-files-found: error
           compression-level: 0
           retention-days: 3
+      - name: Build Magisk VoiceChanger module
+        run: |
+          ROM_ZIP=$(find "$OUT_DIR" -name "UN1CA_*.zip" | head -1)
+          FRAMEWORK_ENTRY=$(unzip -l "$ROM_ZIP" 2>/dev/null | grep 'system/framework/framework.jar' | awk '{print $4}' | head -1)
+          if [ -n "$FRAMEWORK_ENTRY" ]; then
+            mkdir -p /tmp/vc_module/system/framework
+            mkdir -p /tmp/vc_module/META-INF/com/google/android
+            unzip -p "$ROM_ZIP" "$FRAMEWORK_ENTRY" > /tmp/vc_module/system/framework/framework.jar
+            UNICA_VER=$(unzip -p "$ROM_ZIP" "system/system/build.prop" 2>/dev/null | grep 'ro.unica.version' | cut -d= -f2 | tr -d '\r')
+            [ -z "$UNICA_VER" ] && UNICA_VER="unknown"
+            cat > /tmp/vc_module/module.prop << PROP
+          id=unica_voicechanger_fix
+          name=UN1CA VoiceChanger Framework
+          version=${UNICA_VER}
+          versionCode=$(date +%Y%m%d)
+          author=sys-Ninja
+          description=Patched framework.jar enabling Global VoiceChanger for all apps
+          PROP
+            cat > /tmp/vc_module/META-INF/com/google/android/update-binary << 'UPDBIN'
+          #!/sbin/sh
+          SKIPUNZIP=1
+          ui_print "- UN1CA VoiceChanger Framework Module"
+          ui_print "- Installing patched framework.jar..."
+          mkdir -p "$MODPATH/system/framework"
+          unzip -p "$ZIPFILE" system/framework/framework.jar > "$MODPATH/system/framework/framework.jar"
+          ui_print "- Clearing dalvik cache for framework.jar..."
+          find /data/dalvik-cache -name '*framework*' 2>/dev/null | while read f; do rm -f "$f"; done
+          ui_print "- Done! Reboot to apply."
+          UPDBIN
+            chmod +x /tmp/vc_module/META-INF/com/google/android/update-binary
+            printf '#MAGISK\n' > /tmp/vc_module/META-INF/com/google/android/updater-script
+            cd /tmp/vc_module && zip -r "$OUT_DIR/UN1CA_VC_MagiskModule.zip" . && cd -
+            echo "Magisk module built: $OUT_DIR/UN1CA_VC_MagiskModule.zip"
+          else
+            echo "WARNING: framework.jar not found in ROM zip, skipping Magisk module"
+          fi
+
+      - name: Upload Magisk VoiceChanger module
+        uses: actions/upload-artifact@v4
+        with:
+          name: UN1CA-VoiceChanger-MagiskModule-${{ matrix.target }}
+          path: ${{ env.OUT_DIR }}/UN1CA_VC_MagiskModule.zip
+          if-no-files-found: warn
+          compression-level: 0
+          retention-days: 3
