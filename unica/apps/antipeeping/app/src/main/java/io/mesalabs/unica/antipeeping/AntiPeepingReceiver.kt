@@ -23,10 +23,10 @@ class AntiPeepingReceiver : BroadcastReceiver() {
                     context.startService(serviceIntent)
                 }
             } else {
-                val stopIntent = Intent(context, AntiPeepingService::class.java).apply {
-                    this.action = AntiPeepingService.ACTION_STOP
-                }
-                context.startService(stopIntent)
+                // stopService() works from background receivers (no restriction on Android 14+)
+                // avoids BackgroundServiceStartNotAllowedException from startService()
+                val stopIntent = Intent(context, AntiPeepingService::class.java)
+                context.stopService(stopIntent)
             }
         }
     }
