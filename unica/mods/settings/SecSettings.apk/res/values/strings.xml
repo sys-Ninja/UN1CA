@@ -165,4 +165,6 @@
     <string name="unica_vc_preset_anonymous">Anonymous</string>
     <string name="unica_vc_preset_walkie_talkie">Walkie-Talkie</string>
     <string name="unica_vc_preset_cyborg">Cyborg</string>
+    <string name="unica_vc_global_title">Apply to all apps</string>
+    <string name="unica_vc_global_summary">Change voice in WhatsApp, Messenger, voice recordings and third-party apps</string>
 </resources>

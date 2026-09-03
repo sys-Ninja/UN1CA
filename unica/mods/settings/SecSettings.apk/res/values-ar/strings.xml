@@ -163,4 +163,6 @@
     <string name="unica_vc_preset_anonymous">صوت مموّه</string>
     <string name="unica_vc_preset_walkie_talkie">جهاز لاسلكي</string>
     <string name="unica_vc_preset_cyborg">سايبورغ</string>
+    <string name="unica_vc_global_title">تطبيق على كافة التطبيقات</string>
+    <string name="unica_vc_global_summary">تغيير الصوت في واتساب، ماسنجر، التسجيلات الصوتية وكافة التطبيقات</string>
 </resources>
