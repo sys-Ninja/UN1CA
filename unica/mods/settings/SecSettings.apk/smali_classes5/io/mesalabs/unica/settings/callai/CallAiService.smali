@@ -763,7 +763,7 @@
 .end method
 
 .method private pumpCallerAudio(Lio/mesalabs/unica/settings/callai/LiveClient;)V
-    .registers 9
+    .registers 11
 
     .line 167
     const/16 v0, 0x140
