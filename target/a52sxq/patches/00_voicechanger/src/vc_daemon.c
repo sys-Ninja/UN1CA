@@ -176,20 +176,39 @@ static struct {
  * 70 s call) until the injection ring overflowed — a hiccup every 6.7 s. */
 struct preset {
     const char *name;
-    float pitch;   /* frequency multiplier; 2^(semitones/12) */
+    float pitch;          /* frequency multiplier; 2^(semitones/12) */
+    float hpf_freq;       /* High-pass filter cutoff Hz (0 to disable) */
+    float notch_freq;     /* Throat boxiness notch freq Hz (0 to disable) */
+    float notch_gain;     /* Notch gain in dB (negative) */
+    float notch_q;        /* Notch Q */
+    float formant_freq;   /* Formant resonance boost freq Hz (0 to disable) */
+    float formant_gain;   /* Formant boost in dB (positive) */
+    float formant_q;      /* Formant boost Q */
+    float air_freq;       /* High-shelf freq Hz (0 to disable) */
+    float air_gain;       /* High-shelf gain in dB */
 };
 
 static const struct preset kPresets[] = {
-    { "normal",     1.00f },
-    { "female",     1.26f },  /* +4 st */
-    { "male",       0.79f },  /* -4 st */
-    { "child",      1.68f },  /* +9 st */
-    { "old_man",    0.87f },  /* -2.5 st */
-    { "old_woman",  1.12f },  /* +2 st */
-    { "chipmunk",   2.00f },  /* +12 st */
-    { "giant",      0.63f },  /* -8 st */
-    { "helium",     1.50f },  /* +7 st */
-    { "custom",     1.00f },  /* driven by persist.sys.unica.vc.semitones */
+    { "normal",     1.00f,   0.0f,    0.0f,  0.0f, 1.0f,    0.0f, 0.0f, 1.0f,    0.0f,  0.0f },
+    /* Female: natural feminine pitch (+6.3 st), cuts male chest resonance,
+     * slims throat boxiness, boosts female F2/F3 presence, smooths high-end air */
+    { "female",     1.44f, 195.0f,  480.0f, -4.0f, 1.2f, 2300.0f, 3.5f, 1.4f, 3200.0f, -2.0f },
+    /* Male: deep masculine pitch (-4.3 st), rich chest resonance, softer highs */
+    { "male",       0.78f,  75.0f, 2500.0f, -3.0f, 1.2f,  140.0f, 4.0f, 1.0f,    0.0f,  0.0f },
+    /* Child: youthful high pitch (+8.6 st), light body, crisp presence */
+    { "child",      1.65f, 240.0f,    0.0f,  0.0f, 1.0f, 2600.0f, 4.0f, 1.3f, 3300.0f, -1.0f },
+    /* Old Man: lower pitch (-2.8 st), throat resonance, muted air */
+    { "old_man",    0.85f,  90.0f,    0.0f,  0.0f, 1.0f,  400.0f, 3.0f, 1.0f, 2800.0f, -3.5f },
+    /* Old Woman: mature tone (+3.5 st), mid presence */
+    { "old_woman",  1.22f, 170.0f,    0.0f,  0.0f, 1.0f, 1800.0f, 2.5f, 1.2f, 3000.0f, -2.0f },
+    /* Chipmunk: cartoon high pitch (+11.6 st) */
+    { "chipmunk",   1.95f, 300.0f,    0.0f,  0.0f, 1.0f, 2800.0f, 3.0f, 1.2f,    0.0f,  0.0f },
+    /* Giant: deep sub-bass resonance (-8.8 st) */
+    { "giant",      0.60f,  50.0f,    0.0f,  0.0f, 1.0f,  100.0f, 6.0f, 0.8f, 2600.0f, -4.0f },
+    /* Helium: +7.6 st squeaky pitch */
+    { "helium",     1.55f, 220.0f,    0.0f,  0.0f, 1.0f,    0.0f, 0.0f, 1.0f,    0.0f,  0.0f },
+    /* Custom: driven dynamically by persist.sys.unica.vc.semitones */
+    { "custom",     1.00f,   0.0f,    0.0f,  0.0f, 1.0f,    0.0f, 0.0f, 1.0f,    0.0f,  0.0f },
 };
 #define NUM_PRESETS   ((int)(sizeof(kPresets) / sizeof(kPresets[0])))
 #define CUSTOM_PRESET (NUM_PRESETS - 1)
@@ -345,6 +364,92 @@ static inline float biquad_run(struct biquad *f, float x)
     return y;
 }
 
+static void biquad_passthrough(struct biquad *f)
+{
+    f->b0 = 1.0f;
+    f->b1 = f->b2 = f->a1 = f->a2 = f->z1 = f->z2 = 0.0f;
+}
+
+static void biquad_highpass(struct biquad *f, float fs, float fc, float q)
+{
+    if (fc <= 20.0f || fc >= fs * 0.48f) {
+        biquad_passthrough(f);
+        return;
+    }
+    float w     = 2.0f * (float)M_PI * fc / fs;
+    float cw    = cosf(w);
+    float alpha = sinf(w) / (2.0f * q);
+    float a0    = 1.0f + alpha;
+
+    f->b0 = ((1.0f + cw) * 0.5f) / a0;
+    f->b1 = (-(1.0f + cw)) / a0;
+    f->b2 = f->b0;
+    f->a1 = (-2.0f * cw) / a0;
+    f->a2 = (1.0f - alpha) / a0;
+    f->z1 = f->z2 = 0.0f;
+}
+
+static void biquad_peaking(struct biquad *f, float fs, float fc, float q, float gain_db)
+{
+    if (fc <= 20.0f || fc >= fs * 0.48f || fabsf(gain_db) < 0.1f) {
+        biquad_passthrough(f);
+        return;
+    }
+    float w     = 2.0f * (float)M_PI * fc / fs;
+    float cw    = cosf(w);
+    float sw    = sinf(w);
+    float a     = powf(10.0f, gain_db / 40.0f);
+    float alpha = sw / (2.0f * q);
+    float a0    = 1.0f + alpha / a;
+
+    f->b0 = (1.0f + alpha * a) / a0;
+    f->b1 = (-2.0f * cw) / a0;
+    f->b2 = (1.0f - alpha * a) / a0;
+    f->a1 = (-2.0f * cw) / a0;
+    f->a2 = (1.0f - alpha / a) / a0;
+    f->z1 = f->z2 = 0.0f;
+}
+
+static void biquad_highshelf(struct biquad *f, float fs, float fc, float gain_db)
+{
+    if (fc <= 20.0f || fc >= fs * 0.48f || fabsf(gain_db) < 0.1f) {
+        biquad_passthrough(f);
+        return;
+    }
+    float w     = 2.0f * (float)M_PI * fc / fs;
+    float cw    = cosf(w);
+    float sw    = sinf(w);
+    float a     = powf(10.0f, gain_db / 40.0f);
+    float alpha = (sw / 2.0f) * sqrtf((a + 1.0f / a) * (1.0f / 1.0f - 1.0f) + 2.0f);
+    float sa2   = 2.0f * sqrtf(a) * alpha;
+
+    float a0    = (a + 1.0f) - (a - 1.0f) * cw + sa2;
+    f->b0       = (a * ((a + 1.0f) + (a - 1.0f) * cw + sa2)) / a0;
+    f->b1       = (-2.0f * a * ((a - 1.0f) + (a + 1.0f) * cw)) / a0;
+    f->b2       = (a * ((a + 1.0f) + (a - 1.0f) * cw - sa2)) / a0;
+    f->a1       = (2.0f * ((a - 1.0f) - (a + 1.0f) * cw)) / a0;
+    f->a2       = ((a + 1.0f) - (a - 1.0f) * cw - sa2) / a0;
+    f->z1 = f->z2 = 0.0f;
+}
+
+/* Warm soft-knee saturator: keeps audio silky and prevents harsh clipping */
+static inline short soft_limit(float sample)
+{
+    const float threshold = 24000.0f;
+    const float max_val   = 32767.0f;
+    float a = fabsf(sample);
+
+    if (a <= threshold) {
+        return (short)sample;
+    }
+
+    float sign = sample < 0.0f ? -1.0f : 1.0f;
+    float norm = (a - threshold) / (max_val - threshold);
+    if (norm > 1.0f) norm = 1.0f;
+    float compressed = threshold + (max_val - threshold) * (norm - (norm * norm * norm) / 3.0f);
+    return (short)(sign * compressed);
+}
+
 /* ── Session ──────────────────────────────────────────────────────────────── */
 
 /* The Settings UI stores the preset by name; older builds stored the index.
@@ -367,7 +472,9 @@ static int preset_index(void)
     return 0;
 }
 
-static void apply_preset(sonicStream stream, int *cur_preset, float *cur_semi)
+static void apply_preset(sonicStream stream, int *cur_preset, float *cur_semi,
+                         struct biquad *hpf, struct biquad *notch,
+                         struct biquad *formant, struct biquad *air)
 {
     int preset = preset_index();
 
@@ -379,14 +486,47 @@ static void apply_preset(sonicStream stream, int *cur_preset, float *cur_semi)
         return;
 
     float pitch = kPresets[preset].pitch;
-    if (preset == CUSTOM_PRESET)
+    float hpf_f = kPresets[preset].hpf_freq;
+    float notch_f = kPresets[preset].notch_freq;
+    float notch_g = kPresets[preset].notch_gain;
+    float notch_q = kPresets[preset].notch_q;
+    float fmt_f = kPresets[preset].formant_freq;
+    float fmt_g = kPresets[preset].formant_gain;
+    float fmt_q = kPresets[preset].formant_q;
+    float air_f = kPresets[preset].air_freq;
+    float air_g = kPresets[preset].air_gain;
+
+    if (preset == CUSTOM_PRESET) {
         pitch = powf(2.0f, semi / 12.0f);
+        if (semi > 1.0f) {
+            hpf_f = fminf(100.0f + semi * 15.0f, 300.0f);
+            fmt_f = fminf(1500.0f + semi * 100.0f, 3200.0f);
+            fmt_g = fminf(semi * 0.5f, 4.0f);
+            fmt_q = 1.3f;
+            air_f = 3200.0f;
+            air_g = -1.5f;
+        } else if (semi < -1.0f) {
+            hpf_f = 70.0f;
+            fmt_f = 140.0f;
+            fmt_g = fminf(-semi * 0.6f, 5.0f);
+            fmt_q = 1.0f;
+            notch_f = 2500.0f;
+            notch_g = -2.5f;
+            notch_q = 1.2f;
+        }
+    }
 
     sonicSetPitch(stream, pitch);
+    biquad_highpass(hpf, (float)OUT_RATE, hpf_f, 0.7071f);
+    biquad_peaking(notch, (float)OUT_RATE, notch_f, notch_q, notch_g);
+    biquad_peaking(formant, (float)OUT_RATE, fmt_f, fmt_q, fmt_g);
+    biquad_highshelf(air, (float)OUT_RATE, air_f, air_g);
+
     *cur_preset = preset;
     *cur_semi   = semi;
 
-    LOGI("PRESET %s pitch=%.3f", kPresets[preset].name, pitch);
+    LOGI("PRESET %s pitch=%.3f hpf=%.0f fmt=%.0f(+%.1fdB)",
+         kPresets[preset].name, pitch, hpf_f, fmt_f, fmt_g);
 }
 
 static void route_teardown(void)
@@ -462,6 +602,11 @@ static void run_session(void)
     long chunks = 0;
     int peak_in = 0, resets = 0, clipped = 0, dropped = 0;
     struct biquad aa[AA_SECTIONS];
+    struct biquad hpf, notch, formant, air;
+    biquad_passthrough(&hpf);
+    biquad_passthrough(&notch);
+    biquad_passthrough(&formant);
+    biquad_passthrough(&air);
 
     /* 6th-order Butterworth = three cascaded biquads with these Q values.
      * Measured: -1.6 dB at 3 kHz, -35 dB at 6 kHz, -56 dB at 9 kHz. */
@@ -529,7 +674,8 @@ static void run_session(void)
     sonicSetSpeed(stream, 1.0f);
     sonicSetRate(stream, 1.0f);
     sonicSetVolume(stream, 1.0f);
-    apply_preset(stream, &cur_preset, &cur_semi);
+    sonicSetQuality(stream, 1);   /* Enable 12-point sinc FIR interpolation */
+    apply_preset(stream, &cur_preset, &cur_semi, &hpf, &notch, &formant, &air);
 
     /* Only now is it safe to silence the mic. */
     ctl_set_int("TX_DEC0 Volume", TX_DEC_MUTED);
@@ -607,7 +753,12 @@ static void run_session(void)
         int got = (avail > 0) ? sonicReadShortFromStream(stream, sonic_out, avail) : 0;
 
         for (int i = 0; i < got; i++) {
-            inj_buf[inj_fill++] = sonic_out[i];
+            float s = (float)sonic_out[i];
+            s = biquad_run(&hpf, s);
+            s = biquad_run(&notch, s);
+            s = biquad_run(&formant, s);
+            s = biquad_run(&air, s);
+            inj_buf[inj_fill++] = soft_limit(s);
             if (inj_fill == INJ_FRAMES) {
                 if (alsa.pcm_write(inj, inj_buf, inj_bytes) != 0) {
                     LOGE("pcm_write: %s", alsa.pcm_get_error(inj));
@@ -626,7 +777,7 @@ static void run_session(void)
             resets += route_verify();
 
         if (chunks % CHUNKS_PER_SEC == 0) {
-            apply_preset(stream, &cur_preset, &cur_semi);
+            apply_preset(stream, &cur_preset, &cur_semi, &hpf, &notch, &formant, &air);
             use_agc = prop_bool(PROP_AGC, 1);
 
             LOGI("STAT %lds peak=%d gain=%.1f fixups=%d clip=%d drop=%d",
