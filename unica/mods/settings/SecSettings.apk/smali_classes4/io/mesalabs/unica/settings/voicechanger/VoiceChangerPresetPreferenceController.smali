@@ -37,7 +37,7 @@
 
     iput-object p1, p0, Lio/mesalabs/unica/settings/voicechanger/VoiceChangerPresetPreferenceController;->mPreference:Landroidx/preference/SecDropDownPreference;
 
-    const/16 v0, 0x9
+    const/16 v0, 0xe
 
     new-array v1, v0, [Ljava/lang/CharSequence;
 
@@ -203,6 +203,96 @@
 
     aput-object v2, v1, v3
 
+    iget-object v2, p0, Lcom/android/settingslib/core/AbstractPreferenceController;->mContext:Landroid/content/Context;
+
+    const-string v3, "string"
+
+    const-string v4, "unica_vc_preset_soft_girl"
+
+    invoke-static {v3, v4}, Lio/mesalabs/unica/utils/Utils;->getResourceId(Ljava/lang/String;Ljava/lang/String;)I
+
+    move-result v3
+
+    invoke-virtual {v2, v3}, Landroid/content/Context;->getString(I)Ljava/lang/String;
+
+    move-result-object v2
+
+    const/16 v3, 0x9
+
+    aput-object v2, v1, v3
+
+    iget-object v2, p0, Lcom/android/settingslib/core/AbstractPreferenceController;->mContext:Landroid/content/Context;
+
+    const-string v3, "string"
+
+    const-string v4, "unica_vc_preset_radio"
+
+    invoke-static {v3, v4}, Lio/mesalabs/unica/utils/Utils;->getResourceId(Ljava/lang/String;Ljava/lang/String;)I
+
+    move-result v3
+
+    invoke-virtual {v2, v3}, Landroid/content/Context;->getString(I)Ljava/lang/String;
+
+    move-result-object v2
+
+    const/16 v3, 0xa
+
+    aput-object v2, v1, v3
+
+    iget-object v2, p0, Lcom/android/settingslib/core/AbstractPreferenceController;->mContext:Landroid/content/Context;
+
+    const-string v3, "string"
+
+    const-string v4, "unica_vc_preset_anonymous"
+
+    invoke-static {v3, v4}, Lio/mesalabs/unica/utils/Utils;->getResourceId(Ljava/lang/String;Ljava/lang/String;)I
+
+    move-result v3
+
+    invoke-virtual {v2, v3}, Landroid/content/Context;->getString(I)Ljava/lang/String;
+
+    move-result-object v2
+
+    const/16 v3, 0xb
+
+    aput-object v2, v1, v3
+
+    iget-object v2, p0, Lcom/android/settingslib/core/AbstractPreferenceController;->mContext:Landroid/content/Context;
+
+    const-string v3, "string"
+
+    const-string v4, "unica_vc_preset_walkie_talkie"
+
+    invoke-static {v3, v4}, Lio/mesalabs/unica/utils/Utils;->getResourceId(Ljava/lang/String;Ljava/lang/String;)I
+
+    move-result v3
+
+    invoke-virtual {v2, v3}, Landroid/content/Context;->getString(I)Ljava/lang/String;
+
+    move-result-object v2
+
+    const/16 v3, 0xc
+
+    aput-object v2, v1, v3
+
+    iget-object v2, p0, Lcom/android/settingslib/core/AbstractPreferenceController;->mContext:Landroid/content/Context;
+
+    const-string v3, "string"
+
+    const-string v4, "unica_vc_preset_cyborg"
+
+    invoke-static {v3, v4}, Lio/mesalabs/unica/utils/Utils;->getResourceId(Ljava/lang/String;Ljava/lang/String;)I
+
+    move-result v3
+
+    invoke-virtual {v2, v3}, Landroid/content/Context;->getString(I)Ljava/lang/String;
+
+    move-result-object v2
+
+    const/16 v3, 0xd
+
+    aput-object v2, v1, v3
+
 
     invoke-virtual {p1, v1}, Landroidx/preference/DropDownPreference;->setEntries([Ljava/lang/CharSequence;)V
 
@@ -261,6 +351,36 @@
     const-string v2, "helium"
 
     const/16 v3, 0x8
+
+    aput-object v2, v1, v3
+
+    const-string v2, "soft_girl"
+
+    const/16 v3, 0x9
+
+    aput-object v2, v1, v3
+
+    const-string v2, "radio"
+
+    const/16 v3, 0xa
+
+    aput-object v2, v1, v3
+
+    const-string v2, "anonymous"
+
+    const/16 v3, 0xb
+
+    aput-object v2, v1, v3
+
+    const-string v2, "walkie_talkie"
+
+    const/16 v3, 0xc
+
+    aput-object v2, v1, v3
+
+    const-string v2, "cyborg"
+
+    const/16 v3, 0xd
 
     aput-object v2, v1, v3
 

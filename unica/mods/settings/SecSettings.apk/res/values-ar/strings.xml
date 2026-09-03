@@ -158,4 +158,9 @@
     <string name="unica_vc_preset_old_woman">امرأة مسنة</string>
     <string name="unica_vc_preset_title">الصوت</string>
     <string name="unica_vc_settings_title">مُغيّر الصوت في المكالمات</string>
+    <string name="unica_vc_preset_soft_girl">فتاة ناعمة</string>
+    <string name="unica_vc_preset_radio">مذيع راديو</string>
+    <string name="unica_vc_preset_anonymous">صوت مموّه</string>
+    <string name="unica_vc_preset_walkie_talkie">جهاز لاسلكي</string>
+    <string name="unica_vc_preset_cyborg">سايبورغ</string>
 </resources>

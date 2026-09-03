@@ -160,4 +160,9 @@
     <string name="unica_vc_preset_old_woman">Old woman</string>
     <string name="unica_vc_preset_title">Voice</string>
     <string name="unica_vc_settings_title">Call voice changer</string>
+    <string name="unica_vc_preset_soft_girl">Soft Girl</string>
+    <string name="unica_vc_preset_radio">Radio Announcer</string>
+    <string name="unica_vc_preset_anonymous">Anonymous</string>
+    <string name="unica_vc_preset_walkie_talkie">Walkie-Talkie</string>
+    <string name="unica_vc_preset_cyborg">Cyborg</string>
 </resources>

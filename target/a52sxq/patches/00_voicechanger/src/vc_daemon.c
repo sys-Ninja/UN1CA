@@ -207,6 +207,21 @@ static const struct preset kPresets[] = {
     { "giant",      0.60f,  50.0f,    0.0f,  0.0f, 1.0f,  100.0f, 6.0f, 0.8f, 2600.0f, -4.0f },
     /* Helium: +7.6 st squeaky pitch */
     { "helium",     1.55f, 220.0f,    0.0f,  0.0f, 1.0f,    0.0f, 0.0f, 1.0f,    0.0f,  0.0f },
+    /* Soft Girl: youthful feminine (+7.2 st), bright F2/F3 resonance @ 2450 Hz,
+     * hard HPF @ 210 Hz strips male chest, silky air shelf @ 3300 Hz */
+    { "soft_girl",  1.52f, 210.0f,  520.0f, -3.5f, 1.3f, 2450.0f, 4.0f, 1.5f, 3300.0f, -1.5f },
+    /* Radio Announcer: warm broadcast voice (-2 st), deep bass +4.5 dB @ 130 Hz,
+     * studio clarity @ 2800 Hz, cuts muddy 300-400 Hz range */
+    { "radio",      0.89f,  80.0f,  350.0f, -3.0f, 0.9f, 2800.0f, 2.0f, 1.0f, 2200.0f,  2.0f },
+    /* Anonymous: identity-masking deep voice (-5.7 st), suppresses distinctive
+     * vocal characteristics to prevent speaker recognition */
+    { "anonymous",  0.72f,  60.0f,  800.0f, -5.0f, 0.8f,  250.0f, 3.5f, 0.9f, 2000.0f, -4.0f },
+    /* Walkie-Talkie: bandpass voice radio simulation, no pitch shift,
+     * narrow 450-2500 Hz band exactly matching radio voice codecs */
+    { "walkie_talkie", 1.00f, 450.0f, 2600.0f, -8.0f, 0.6f, 1100.0f, 4.0f, 0.7f, 2400.0f,  5.0f },
+    /* Cyborg: robotic sci-fi voice (-3.9 st), dual metallic comb resonance
+     * @ 900 Hz and 1800 Hz simulating mechanical vocal tract */
+    { "cyborg",     0.80f,  80.0f, 1800.0f,  5.0f, 0.5f,  900.0f, 5.0f, 0.5f, 2500.0f,  3.0f },
     /* Custom: driven dynamically by persist.sys.unica.vc.semitones */
     { "custom",     1.00f,   0.0f,    0.0f,  0.0f, 1.0f,    0.0f, 0.0f, 1.0f,    0.0f,  0.0f },
 };
