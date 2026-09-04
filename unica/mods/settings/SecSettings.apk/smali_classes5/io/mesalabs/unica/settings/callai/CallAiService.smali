@@ -819,24 +819,13 @@
 
     move-result v6
 
+    # Mute uplink only while the agent is playing back (avoid barge-in echo).
+    # When the agent is silent, forward ALL audio so Gemini gets a clean end-of-turn signal.
     invoke-virtual {p1}, Lio/mesalabs/unica/settings/callai/LiveClient;->isPlaying()Z
 
     move-result v7
 
-    if-eqz v7, :cond_idle_gate
-
-    const/16 v7, 0x898
-
-    if-ge v6, v7, :cond_send_audio
-
-    goto :goto_reset_buf
-
-    :cond_idle_gate
-    const/16 v7, 0x258
-
-    if-ge v6, v7, :cond_send_audio
-
-    goto :goto_reset_buf
+    if-nez v7, :goto_reset_buf
 
     :cond_send_audio
     .line 181

@@ -201,6 +201,16 @@ object PrayerManager {
 
         if (nextPrayer != null) {
             val (prayer, timeMillis) = nextPrayer
+            try {
+                val sdf = java.text.SimpleDateFormat("hh:mm a", java.util.Locale.getDefault())
+                val timeStr = sdf.format(Date(timeMillis))
+                val prayerLabel = prayer.name.lowercase().replaceFirstChar { it.uppercase() }
+                android.provider.Settings.System.putString(
+                    ctx.contentResolver,
+                    "unica_prayer_times_city",
+                    "$prayerLabel: $timeStr"
+                )
+            } catch (_: Exception) {}
             if (prayer != Prayer.SUNRISE) {
                 Log.i(TAG, "Scheduling alarm for ${prayer.name} at ${Date(timeMillis)}")
                 setExactAlarm(ctx, prayer.name, timeMillis)

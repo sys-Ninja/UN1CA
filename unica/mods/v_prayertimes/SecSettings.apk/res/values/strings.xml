@@ -17,4 +17,9 @@
     <string name="unica_pt_early_minutes_title">Remind Before</string>
     <string name="unica_pt_sounds_title">Adhan Sounds &amp; Muezzins</string>
     <string name="unica_pt_sounds_summary">Choose Makkah, Madinah, Al-Aqsa, Cairo or custom Adhan tone</string>
+    <string name="unica_pt_sound_fajr_title">Fajr Adhan</string>
+    <string name="unica_pt_sound_dhuhr_title">Dhuhr Adhan</string>
+    <string name="unica_pt_sound_asr_title">Asr Adhan</string>
+    <string name="unica_pt_sound_maghrib_title">Maghrib Adhan</string>
+    <string name="unica_pt_sound_isha_title">Isha Adhan</string>
 </resources>

@@ -49,7 +49,7 @@
     const-string v0, "unica_ghost_camera_enabled"
     invoke-virtual {v0, v2}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
     move-result v0
-    if-eqz v0, :skip_ghost_svc
+    if-nez v0, :skip_ghost_svc
     iget-object v0, p0, Lcom/android/settingslib/core/AbstractPreferenceController;->mContext:Landroid/content/Context;
     new-instance v2, Landroid/content/Intent;
     const-string v3, "io.mesalabs.unica.ghostengine.TOGGLE_SERVICE"

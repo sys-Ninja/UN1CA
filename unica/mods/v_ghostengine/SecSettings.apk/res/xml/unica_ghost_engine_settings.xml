@@ -11,6 +11,15 @@
             android:summary="@string/unica_ghost_camera_summary"
             settings:controller="io.mesalabs.unica.settings.ghostengine.GhostEngineSystemTogglePreferenceController" />
 
+        <Preference
+            android:key="unica_ghost_camera_media"
+            android:title="@string/unica_ghost_select_media_title"
+            android:summary="@string/unica_ghost_select_media_summary">
+            <intent
+                android:action="io.mesalabs.unica.action.GHOST_ENGINE_SETTINGS"
+                android:targetPackage="io.mesalabs.unica.ghostengine" />
+        </Preference>
+
         <SecSwitchPreference
             android:key="unica_ghost_camera_tool"
             android:title="@string/unica_ghost_tool_title"
@@ -26,6 +35,15 @@
             android:title="@string/unica_ghost_gps_title"
             android:summary="@string/unica_ghost_gps_summary"
             settings:controller="io.mesalabs.unica.settings.ghostengine.GhostEngineSystemTogglePreferenceController" />
+
+        <Preference
+            android:key="unica_ghost_gps_location"
+            android:title="@string/unica_ghost_location_title"
+            android:summary="@string/unica_ghost_location_summary">
+            <intent
+                android:action="io.mesalabs.unica.action.GHOST_ENGINE_SETTINGS"
+                android:targetPackage="io.mesalabs.unica.ghostengine" />
+        </Preference>
 
         <SecSwitchPreference
             android:key="unica_ghost_joystick_enabled"

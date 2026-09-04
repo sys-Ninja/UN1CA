@@ -12,5 +12,6 @@
         <permission name="android.permission.POST_NOTIFICATIONS" />
         <permission name="android.permission.WRITE_SETTINGS" />
         <permission name="android.permission.WRITE_SECURE_SETTINGS" />
+        <permission name="android.permission.START_FOREGROUND_SERVICES_FROM_BACKGROUND" />
     </privapp-permissions>
 </permissions>

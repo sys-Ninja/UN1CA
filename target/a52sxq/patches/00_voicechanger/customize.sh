@@ -24,4 +24,20 @@ cat >> "$WORK_DIR/vendor/etc/selinux/vendor_sepolicy.cil" << 'CIL'
 (typepermissive vc_daemon)
 CIL
 
+LOG "- Exporting persist.sys.unica.vc.* properties to untrusted_app domain"
+# Mark persist.sys.unica.vc.* as exported_system_prop so 3rd-party apps (WhatsApp,
+# Telegram, voice recorder …) can read them directly via mmap without Binder IPC.
+# Without this Samsung SELinux denies read access for the untrusted_app domain.
+for PROP_CTX in \
+        "$WORK_DIR/vendor/etc/selinux/vendor_property_contexts" \
+        "$WORK_DIR/system/etc/selinux/plat_property_contexts"; do
+    if [ -f "$PROP_CTX" ]; then
+        # Remove any stale entry first, then append the correct one
+        sed -i '/^persist\.sys\.unica\.vc\./d' "$PROP_CTX"
+        printf 'persist.sys.unica.vc.    u:object_r:exported_system_prop:s0\n' >> "$PROP_CTX"
+        LOG "  -> patched $PROP_CTX"
+    fi
+done
+unset PROP_CTX
+
 LOG_STEP_OUT
