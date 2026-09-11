@@ -22,17 +22,12 @@ import io.mesalabs.unica.ghostengine.location.StealthLocationManager
 import kotlinx.coroutines.*
 import kotlin.coroutines.resume
 
-/**
- * Dialog-themed Activity for searching a spoofed GPS location.
- * Uses Android Geocoder (Google backend, zero API key needed).
- */
 class GhostLocationSearchProxy : Activity() {
 
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
     private var searchJob: Job? = null
     private lateinit var adapter: ResultsAdapter
     private lateinit var progress: ProgressBar
-    private lateinit var noResults: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,10 +36,10 @@ class GhostLocationSearchProxy : Activity() {
 
     private fun showSearchDialog() {
         val view = layoutInflater.inflate(R.layout.dialog_location_search, null)
-        val searchInput = view.findViewById<EditText>(R.id.location_search_input)
-        progress  = view.findViewById(R.id.location_progress)
-        noResults = view.findViewById(R.id.location_no_results)
-        val recycler = view.findViewById<RecyclerView>(R.id.location_results)
+        // Use the REAL IDs from dialog_location_search.xml
+        val searchInput = view.findViewById<EditText>(R.id.edit_search_city)
+        progress  = view.findViewById(R.id.progress_searching)
+        val recycler  = view.findViewById<RecyclerView>(R.id.recycler_predictions)
 
         adapter = ResultsAdapter { onAddressSelected(it) }
         recycler.layoutManager = LinearLayoutManager(this)
@@ -84,11 +79,9 @@ class GhostLocationSearchProxy : Activity() {
         searchJob = scope.launch {
             delay(300)
             progress.visibility = View.VISIBLE
-            noResults.visibility = View.GONE
             val results = withContext(Dispatchers.IO) { geocodeQuery(query) }
             progress.visibility = View.GONE
-            if (results.isEmpty()) { noResults.visibility = View.VISIBLE; adapter.submitList(emptyList()) }
-            else adapter.submitList(results)
+            adapter.submitList(results)
         }
     }
 

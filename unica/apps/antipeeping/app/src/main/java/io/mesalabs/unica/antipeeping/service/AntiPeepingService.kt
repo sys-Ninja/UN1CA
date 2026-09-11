@@ -5,7 +5,7 @@ import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
-import androidx.lifecycle.LifecycleService
+import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.os.IBinder
@@ -50,11 +50,13 @@ class AntiPeepingService : Service(), LifecycleOwner {
 
     override fun onCreate() {
         super.onCreate()
+        lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_CREATE)
         lifecycleRegistry.currentState = Lifecycle.State.CREATED
         overlayController = PrivacyOverlayController(this)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_START)
         if (intent?.action == ACTION_STOP) {
             stopSelf()
             return START_NOT_STICKY
@@ -158,6 +160,7 @@ class AntiPeepingService : Service(), LifecycleOwner {
     }
 
     override fun onDestroy() {
+        lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
         super.onDestroy()
         lifecycleRegistry.currentState = Lifecycle.State.DESTROYED
         overlayController?.hideThreat()
