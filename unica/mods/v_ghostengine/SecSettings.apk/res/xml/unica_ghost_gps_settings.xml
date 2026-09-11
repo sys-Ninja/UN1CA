@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:settings="http://schemas.android.com/apk/res-auto"
+    android:title="@string/unica_ghost_gps_title">
+
+    <com.samsung.android.settings.widget.SecInsetCategoryPreference />
+
+    <SecSwitchPreference
+        android:key="unica_ghost_gps_enabled"
+        android:title="@string/unica_ghost_gps_title"
+        android:summary="@string/unica_ghost_gps_summary"
+        settings:controller="io.mesalabs.unica.settings.ghostengine.GhostGpsTogglePreferenceController" />
+
+    <com.samsung.android.settings.widget.SecInsetCategoryPreference />
+
+    <Preference
+        android:key="unica_ghost_gps_location"
+        android:title="@string/unica_ghost_location_title"
+        android:summary="@string/unica_ghost_location_summary"
+        settings:controller="io.mesalabs.unica.settings.ghostengine.GhostLocationController">
+        <intent
+            android:action="io.mesalabs.unica.ghostengine.SEARCH_LOCATION"
+            android:targetPackage="io.mesalabs.unica.ghostengine" />
+    </Preference>
+
+    <com.samsung.android.settings.widget.SecInsetCategoryPreference />
+
+    <SecSwitchPreference
+        android:key="unica_ghost_joystick_enabled"
+        android:title="@string/unica_ghost_joystick_title"
+        android:summary="@string/unica_ghost_joystick_summary"
+        settings:controller="io.mesalabs.unica.settings.ghostengine.GhostGpsTogglePreferenceController" />
+
+</PreferenceScreen>

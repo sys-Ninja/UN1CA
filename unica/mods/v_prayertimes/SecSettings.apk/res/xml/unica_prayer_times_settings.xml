@@ -4,7 +4,6 @@
 
     <com.samsung.android.settings.widget.SecInsetCategoryPreference />
 
-    <!-- Countdown card: shows next prayer name + time, NO intent to open app Activity -->
     <Preference
         android:key="unica_prayer_times_countdown"
         android:title="@string/unica_pt_next_prayer_title"
@@ -22,15 +21,12 @@
     <com.samsung.android.settings.widget.SecInsetCategoryPreference />
 
     <PreferenceCategory android:title="@string/unica_pt_general_title">
-        <SecDropDownPreference
-            android:key="unica_prayer_times_method"
+        <SecDropDownPreference android:key="unica_prayer_times_method"
             android:title="@string/unica_pt_method_title"
             android:entries="@array/unica_pt_method_entries"
             android:entryValues="@array/unica_pt_method_values"
             settings:controller="io.mesalabs.unica.settings.prayertimes.PrayerTimesSystemListPreferenceController" />
-
-        <SecDropDownPreference
-            android:key="unica_prayer_times_madhab"
+        <SecDropDownPreference android:key="unica_prayer_times_madhab"
             android:title="@string/unica_pt_madhab_title"
             android:entries="@array/unica_pt_madhab_entries"
             android:entryValues="@array/unica_pt_madhab_values"
@@ -40,14 +36,11 @@
     <com.samsung.android.settings.widget.SecInsetCategoryPreference />
 
     <PreferenceCategory android:title="@string/unica_pt_notifications_title">
-        <SecSwitchPreference
-            android:key="unica_prayer_times_early_warning"
+        <SecSwitchPreference android:key="unica_prayer_times_early_warning"
             android:title="@string/unica_pt_early_warning_title"
             android:summary="@string/unica_pt_early_warning_summary"
             settings:controller="io.mesalabs.unica.settings.prayertimes.PrayerTimesSystemTogglePreferenceController" />
-
-        <SecDropDownPreference
-            android:key="unica_prayer_times_early_minutes"
+        <SecDropDownPreference android:key="unica_prayer_times_early_minutes"
             android:title="@string/unica_pt_early_minutes_title"
             android:entries="@array/unica_pt_early_minutes_entries"
             android:entryValues="@array/unica_pt_early_minutes_values"
@@ -57,40 +50,72 @@
     <com.samsung.android.settings.widget.SecInsetCategoryPreference />
 
     <PreferenceCategory android:title="@string/unica_pt_sounds_title">
-        <SecDropDownPreference
-            android:key="unica_prayer_times_sound_fajr"
-            android:title="@string/unica_pt_sound_fajr_title"
-            android:entries="@array/unica_pt_adhan_entries"
-            android:entryValues="@array/unica_pt_adhan_values"
-            settings:controller="io.mesalabs.unica.settings.prayertimes.PrayerTimesSystemListPreferenceController" />
 
-        <SecDropDownPreference
-            android:key="unica_prayer_times_sound_dhuhr"
+        <SecDropDownPreference android:key="unica_prayer_times_sound_fajr"
+            android:title="@string/unica_pt_sound_fajr_title"
+            android:entries="@array/unica_pt_adhan_fajr_entries"
+            android:entryValues="@array/unica_pt_adhan_fajr_values"
+            android:defaultValue="makkah"
+            settings:controller="io.mesalabs.unica.settings.prayertimes.PrayerTimesSystemListPreferenceController" />
+        <Preference android:key="unica_prayer_times_custom_file_fajr"
+            android:title="@string/unica_pt_custom_file_title"
+            android:summary="@string/unica_pt_custom_file_summary">
+            <intent android:action="io.mesalabs.unica.prayertimes.PICK_ADHAN_SOUND"
+                android:targetPackage="io.mesalabs.unica.prayertimes" />
+        </Preference>
+
+        <SecDropDownPreference android:key="unica_prayer_times_sound_dhuhr"
             android:title="@string/unica_pt_sound_dhuhr_title"
             android:entries="@array/unica_pt_adhan_entries"
             android:entryValues="@array/unica_pt_adhan_values"
+            android:defaultValue="makkah"
             settings:controller="io.mesalabs.unica.settings.prayertimes.PrayerTimesSystemListPreferenceController" />
+        <Preference android:key="unica_prayer_times_custom_file_dhuhr"
+            android:title="@string/unica_pt_custom_file_title"
+            android:summary="@string/unica_pt_custom_file_summary">
+            <intent android:action="io.mesalabs.unica.prayertimes.PICK_ADHAN_SOUND"
+                android:targetPackage="io.mesalabs.unica.prayertimes" />
+        </Preference>
 
-        <SecDropDownPreference
-            android:key="unica_prayer_times_sound_asr"
+        <SecDropDownPreference android:key="unica_prayer_times_sound_asr"
             android:title="@string/unica_pt_sound_asr_title"
             android:entries="@array/unica_pt_adhan_entries"
             android:entryValues="@array/unica_pt_adhan_values"
+            android:defaultValue="makkah"
             settings:controller="io.mesalabs.unica.settings.prayertimes.PrayerTimesSystemListPreferenceController" />
+        <Preference android:key="unica_prayer_times_custom_file_asr"
+            android:title="@string/unica_pt_custom_file_title"
+            android:summary="@string/unica_pt_custom_file_summary">
+            <intent android:action="io.mesalabs.unica.prayertimes.PICK_ADHAN_SOUND"
+                android:targetPackage="io.mesalabs.unica.prayertimes" />
+        </Preference>
 
-        <SecDropDownPreference
-            android:key="unica_prayer_times_sound_maghrib"
+        <SecDropDownPreference android:key="unica_prayer_times_sound_maghrib"
             android:title="@string/unica_pt_sound_maghrib_title"
             android:entries="@array/unica_pt_adhan_entries"
             android:entryValues="@array/unica_pt_adhan_values"
+            android:defaultValue="makkah"
             settings:controller="io.mesalabs.unica.settings.prayertimes.PrayerTimesSystemListPreferenceController" />
+        <Preference android:key="unica_prayer_times_custom_file_maghrib"
+            android:title="@string/unica_pt_custom_file_title"
+            android:summary="@string/unica_pt_custom_file_summary">
+            <intent android:action="io.mesalabs.unica.prayertimes.PICK_ADHAN_SOUND"
+                android:targetPackage="io.mesalabs.unica.prayertimes" />
+        </Preference>
 
-        <SecDropDownPreference
-            android:key="unica_prayer_times_sound_isha"
+        <SecDropDownPreference android:key="unica_prayer_times_sound_isha"
             android:title="@string/unica_pt_sound_isha_title"
             android:entries="@array/unica_pt_adhan_entries"
             android:entryValues="@array/unica_pt_adhan_values"
+            android:defaultValue="makkah"
             settings:controller="io.mesalabs.unica.settings.prayertimes.PrayerTimesSystemListPreferenceController" />
+        <Preference android:key="unica_prayer_times_custom_file_isha"
+            android:title="@string/unica_pt_custom_file_title"
+            android:summary="@string/unica_pt_custom_file_summary">
+            <intent android:action="io.mesalabs.unica.prayertimes.PICK_ADHAN_SOUND"
+                android:targetPackage="io.mesalabs.unica.prayertimes" />
+        </Preference>
+
     </PreferenceCategory>
 
 </PreferenceScreen>

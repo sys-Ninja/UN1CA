@@ -1,63 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:settings="http://schemas.android.com/apk/res-auto">
+    xmlns:settings="http://schemas.android.com/apk/res-auto"
+    android:title="@string/unica_ghost_engine_title">
 
     <com.samsung.android.settings.widget.SecInsetCategoryPreference />
 
-    <!-- ── Ghost Camera ───────────────────────────────────────────────── -->
-    <PreferenceCategory android:title="@string/unica_ghost_camera_category">
-
-        <SecSwitchPreference
-            android:key="unica_ghost_camera_enabled"
-            android:title="@string/unica_ghost_camera_title"
-            android:summary="@string/unica_ghost_camera_summary"
-            settings:controller="io.mesalabs.unica.settings.ghostengine.GhostEngineSystemTogglePreferenceController" />
-
-        <!-- Native file picker via ACTION_OPEN_DOCUMENT -->
-        <Preference
-            android:key="unica_ghost_camera_media"
-            android:title="@string/unica_ghost_select_media_title"
-            android:summary="@string/unica_ghost_select_media_summary">
-            <intent
-                android:action="android.intent.action.OPEN_DOCUMENT"
-                android:mimeType="image/*|video/*" />
-        </Preference>
-
-        <SecSwitchPreference
-            android:key="unica_ghost_camera_tool"
-            android:title="@string/unica_ghost_tool_title"
-            android:summary="@string/unica_ghost_tool_summary"
-            settings:controller="io.mesalabs.unica.settings.ghostengine.GhostEngineSystemTogglePreferenceController" />
-
-    </PreferenceCategory>
+    <Preference
+        android:key="unica_ghost_camera_screen"
+        android:title="@string/unica_ghost_camera_title"
+        android:summary="@string/unica_ghost_camera_summary"
+        settings:controller="io.mesalabs.unica.settings.ghostengine.GhostCameraSettingsEntryController" />
 
     <com.samsung.android.settings.widget.SecInsetCategoryPreference />
 
-    <!-- ── Stealth GPS ────────────────────────────────────────────────── -->
-    <PreferenceCategory android:title="@string/unica_ghost_gps_category">
-
-        <SecSwitchPreference
-            android:key="unica_ghost_gps_enabled"
-            android:title="@string/unica_ghost_gps_title"
-            android:summary="@string/unica_ghost_gps_summary"
-            settings:controller="io.mesalabs.unica.settings.ghostengine.GhostEngineSystemTogglePreferenceController" />
-
-        <!-- Opens GhostEngineSettingsActivity for Google Places location search -->
-        <Preference
-            android:key="unica_ghost_gps_location"
-            android:title="@string/unica_ghost_location_title"
-            android:summary="@string/unica_ghost_location_summary">
-            <intent
-                android:action="io.mesalabs.unica.action.GHOST_ENGINE_SETTINGS"
-                android:targetPackage="io.mesalabs.unica.ghostengine" />
-        </Preference>
-
-        <SecSwitchPreference
-            android:key="unica_ghost_joystick_enabled"
-            android:title="@string/unica_ghost_joystick_title"
-            android:summary="@string/unica_ghost_joystick_summary"
-            settings:controller="io.mesalabs.unica.settings.ghostengine.GhostEngineSystemTogglePreferenceController" />
-
-    </PreferenceCategory>
+    <Preference
+        android:key="unica_ghost_gps_screen"
+        android:title="@string/unica_ghost_gps_title"
+        android:summary="@string/unica_ghost_gps_summary"
+        settings:controller="io.mesalabs.unica.settings.ghostengine.GhostGpsSettingsEntryController" />
 
 </PreferenceScreen>

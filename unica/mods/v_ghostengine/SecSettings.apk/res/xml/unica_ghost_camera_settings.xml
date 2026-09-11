@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:settings="http://schemas.android.com/apk/res-auto"
+    android:title="@string/unica_ghost_camera_title">
+
+    <com.samsung.android.settings.widget.SecInsetCategoryPreference />
+
+    <SecSwitchPreference
+        android:key="unica_ghost_camera_enabled"
+        android:title="@string/unica_ghost_camera_title"
+        android:summary="@string/unica_ghost_camera_summary"
+        settings:controller="io.mesalabs.unica.settings.ghostengine.GhostCameraTogglePreferenceController" />
+
+    <com.samsung.android.settings.widget.SecInsetCategoryPreference />
+
+    <Preference
+        android:key="unica_ghost_camera_media"
+        android:title="@string/unica_ghost_select_media_title"
+        android:summary="@string/unica_ghost_select_media_summary"
+        settings:controller="io.mesalabs.unica.settings.ghostengine.GhostCameraMediaController">
+        <intent
+            android:action="io.mesalabs.unica.ghostengine.PICK_MEDIA"
+            android:targetPackage="io.mesalabs.unica.ghostengine" />
+    </Preference>
+
+    <com.samsung.android.settings.widget.SecInsetCategoryPreference />
+
+    <SecSwitchPreference
+        android:key="unica_ghost_camera_tool"
+        android:title="@string/unica_ghost_tool_title"
+        android:summary="@string/unica_ghost_tool_summary"
+        settings:controller="io.mesalabs.unica.settings.ghostengine.GhostCameraTogglePreferenceController" />
+
+</PreferenceScreen>

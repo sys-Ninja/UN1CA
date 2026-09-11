@@ -135,18 +135,27 @@ class Prefs private constructor(ctx: Context) {
     }
 
     fun getAdhanSoundKey(prayer: String): String {
+        val sysKey = Settings.System.getString(resolver, "unica_prayer_times_sound_${prayer.lowercase()}")
+        if (!sysKey.isNullOrEmpty()) {
+            prefs.edit().putString("adhan_sound_key_${prayer.lowercase()}", sysKey).apply()
+            return sysKey
+        }
         return prefs.getString("adhan_sound_key_${prayer.lowercase()}", "makkah") ?: "makkah"
     }
 
     fun setAdhanSoundKey(prayer: String, key: String) {
+        Settings.System.putString(resolver, "unica_prayer_times_sound_${prayer.lowercase()}", key)
         prefs.edit().putString("adhan_sound_key_${prayer.lowercase()}", key).apply()
     }
 
     fun getCustomAdhanUri(prayer: String): String? {
+        val sysUri = Settings.System.getString(resolver, "unica_prayer_times_custom_sound_${prayer.lowercase()}")
+        if (!sysUri.isNullOrEmpty()) return sysUri
         return prefs.getString("custom_adhan_uri_${prayer.lowercase()}", null)
     }
 
     fun setCustomAdhanUri(prayer: String, uri: String?) {
+        if (uri != null) Settings.System.putString(resolver, "unica_prayer_times_custom_sound_${prayer.lowercase()}", uri)
         prefs.edit().putString("custom_adhan_uri_${prayer.lowercase()}", uri).apply()
     }
 

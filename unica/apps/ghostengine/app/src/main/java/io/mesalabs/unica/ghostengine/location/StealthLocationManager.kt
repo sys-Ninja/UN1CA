@@ -84,7 +84,26 @@ object StealthLocationManager {
         }
     }
 
-    fun stopSpoofing(context: Context) {
+    fun updateSpoofedLocation(context: Context, lat: Double, lng: Double) {
+        val prefs = GhostEnginePrefs.get(context)
+        prefs.spoofedLatitude = lat
+        prefs.spoofedLongitude = lng
+        if (spoofJob?.isActive == true) {
+            scope.launch {
+                try {
+                    val lm = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+                    val loc = Location(LocationManager.GPS_PROVIDER).apply {
+                        latitude = lat; longitude = lng; altitude = prefs.spoofedAltitude
+                        accuracy = 3.0f; time = System.currentTimeMillis()
+                        elapsedRealtimeNanos = SystemClock.elapsedRealtimeNanos()
+                    }
+                    lm.setTestProviderLocation(LocationManager.GPS_PROVIDER, loc)
+                } catch (_: Exception) {}
+            }
+        }
+    }
+
+        fun stopSpoofing(context: Context) {
         spoofJob?.cancel()
         spoofJob = null
         try {
