@@ -28,7 +28,7 @@
     iget-object v1, p0, Lcom/android/settingslib/core/AbstractPreferenceController;->mContext:Landroid/content/Context;
     invoke-virtual {v1}, Landroid/content/Context;->getContentResolver()Landroid/content/ContentResolver;
     move-result-object v1
-    const-string v2, "unica_prayer_times_city"
+    const-string v2, "unica_prayer_times_next_display"
     invoke-static {v1, v2}, Landroid/provider/Settings$System;->getString(Landroid/content/ContentResolver;Ljava/lang/String;)Ljava/lang/String;
     move-result-object v1
     if-eqz v1, :cond_0

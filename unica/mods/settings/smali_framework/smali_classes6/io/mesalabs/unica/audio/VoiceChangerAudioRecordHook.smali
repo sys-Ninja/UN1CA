@@ -56,38 +56,19 @@
 .end method
 
 .method private static isGlobalActive()Z
-    .locals 2
+    .locals 1
 
-    .line 236
-    const-string v0, "persist.sys.unica.vc.enabled"
-
-    const/4 v1, 0x0
-
-    invoke-static {v0, v1}, Landroid/os/SystemProperties;->getBoolean(Ljava/lang/String;Z)Z
-
-    move-result v0
-
-    if-eqz v0, :cond_0
-
-    .line 237
+    # Global VC mode is independent of call VC mode (persist.sys.unica.vc.enabled)
+    # Only check the global flag so both modes can work simultaneously or independently
     const-string v0, "persist.sys.unica.vc.global"
 
-    invoke-static {v0, v1}, Landroid/os/SystemProperties;->getBoolean(Ljava/lang/String;Z)Z
+    const/4 p0, 0x0
 
-    move-result v0
+    invoke-static {v0, p0}, Landroid/os/SystemProperties;->getBoolean(Ljava/lang/String;Z)Z
 
-    if-eqz v0, :cond_0
+    move-result p0
 
-    const/4 v1, 0x1
-
-    goto :goto_0
-
-    :cond_0
-    nop
-
-    .line 236
-    :goto_0
-    return v1
+    return p0
 .end method
 
 .method public static onAudioRecordRead(Landroid/media/AudioRecord;Ljava/nio/ByteBuffer;I)V

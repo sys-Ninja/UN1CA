@@ -4,15 +4,12 @@
 
     <com.samsung.android.settings.widget.SecInsetCategoryPreference />
 
+    <!-- Countdown card: shows next prayer name + time, NO intent to open app Activity -->
     <Preference
         android:key="unica_prayer_times_countdown"
         android:title="@string/unica_pt_next_prayer_title"
-        android:summary="@string/unica_pt_next_prayer_summary"
-        settings:controller="io.mesalabs.unica.settings.prayertimes.PrayerTimesCountdownPreferenceController">
-        <intent
-            android:action="io.mesalabs.unica.action.PRAYER_TIMES_SETTINGS"
-            android:targetPackage="io.mesalabs.unica.prayertimes" />
-    </Preference>
+        android:summary="@string/unica_pt_syncing_summary"
+        settings:controller="io.mesalabs.unica.settings.prayertimes.PrayerTimesCountdownPreferenceController" />
 
     <com.samsung.android.settings.widget.SecInsetCategoryPreference />
 

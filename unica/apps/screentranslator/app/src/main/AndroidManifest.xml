@@ -14,6 +14,7 @@
         android:label="@string/app_name"
         android:theme="@style/Theme.ScreenTranslator">
 
+        <!-- Settings Activity: opened from SecSettings to handle MediaProjection consent -->
         <activity
             android:name=".ScreenTranslatorSettingsActivity"
             android:exported="true"
@@ -44,12 +45,12 @@
             </intent-filter>
         </service>
 
+        <!-- Receiver: only handles stop toggle, NOT BOOT_COMPLETED (mediaProjection FGS is boot-banned) -->
         <receiver
             android:name=".ScreenTranslatorReceiver"
             android:exported="true">
             <intent-filter>
                 <action android:name="io.mesalabs.unica.screentranslator.TOGGLE_SERVICE" />
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
 

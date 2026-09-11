@@ -9,7 +9,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
-import io.mesalabs.unica.ghostengine.GhostEngineSettingsActivity
 import io.mesalabs.unica.ghostengine.R
 import io.mesalabs.unica.ghostengine.data.GhostEnginePrefs
 import io.mesalabs.unica.ghostengine.location.FloatingJoystickController
@@ -43,10 +42,24 @@ class GhostCameraService : Service() {
             GhostCameraManager.prepareMedia(this)
             if (prefs.showCameraTool) {
                 floatingTool = FloatingCameraToolController(this) {
-                    val launchIntent = Intent(this, GhostEngineSettingsActivity::class.java).apply {
+                    // Navigate to SecSettings Ghost Engine screen instead of opening
+                    // GhostEngineSettingsActivity directly. This keeps UX in SecSettings.
+                    val deepLink = Intent(Intent.ACTION_MAIN).apply {
+                        setClassName(
+                            "com.android.settings",
+                            "com.android.settings.Settings\$UnicaGhostEngineSettingsActivity"
+                        )
                         flags = Intent.FLAG_ACTIVITY_NEW_TASK
                     }
-                    startActivity(launchIntent)
+                    try {
+                        startActivity(deepLink)
+                    } catch (_: Exception) {
+                        // Fallback: open the GhostEngine app settings directly
+                        val fallback = packageManager.getLaunchIntentForPackage(packageName)?.apply {
+                            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                        }
+                        fallback?.let { startActivity(it) }
+                    }
                 }
                 floatingTool?.show()
             }
@@ -79,9 +92,9 @@ class GhostCameraService : Service() {
         )
 
         return NotificationCompat.Builder(this, channelId)
-            .setSmallIcon(android.R.drawable.ic_menu_camera)
-            .setContentTitle(getString(R.string.app_name))
-            .setContentText(getString(R.string.service_running_sum))
+            .setContentTitle(getString(R.string.notification_title))
+            .setContentText(getString(R.string.notification_text))
+            .setSmallIcon(R.drawable.ic_launcher)
             .addAction(0, getString(R.string.stop), stopIntent)
             .setOngoing(true)
             .build()
@@ -90,13 +103,10 @@ class GhostCameraService : Service() {
     override fun onDestroy() {
         floatingTool?.hide()
         floatingTool = null
-
         joystickController?.hide()
         joystickController = null
-
         GhostCameraManager.release()
         StealthLocationManager.stopSpoofing(this)
-
         super.onDestroy()
     }
 

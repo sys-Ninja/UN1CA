@@ -35,3 +35,10 @@ while IFS= read -r f; do
 done < <(find "$MODPATH/SecSettings.apk" -type f)
 
 unset PATCH_INST CONTENT
+# Force-grant runtime permissions — default-permissions XML only applies at first install.
+pm grant io.mesalabs.unica.ghostengine android.permission.CAMERA 2>/dev/null || true
+pm grant io.mesalabs.unica.ghostengine android.permission.ACCESS_FINE_LOCATION 2>/dev/null || true
+pm grant io.mesalabs.unica.ghostengine android.permission.ACCESS_COARSE_LOCATION 2>/dev/null || true
+pm grant io.mesalabs.unica.ghostengine android.permission.POST_NOTIFICATIONS 2>/dev/null || true
+pm grant io.mesalabs.unica.ghostengine android.permission.READ_MEDIA_IMAGES 2>/dev/null || true
+pm grant io.mesalabs.unica.ghostengine android.permission.READ_MEDIA_VIDEO 2>/dev/null || true

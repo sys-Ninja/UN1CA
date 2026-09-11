@@ -207,7 +207,7 @@ object PrayerManager {
                 val prayerLabel = prayer.name.lowercase().replaceFirstChar { it.uppercase() }
                 android.provider.Settings.System.putString(
                     ctx.contentResolver,
-                    "unica_prayer_times_city",
+                    "unica_prayer_times_next_display",
                     "$prayerLabel: $timeStr"
                 )
             } catch (_: Exception) {}
