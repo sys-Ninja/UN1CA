@@ -9,6 +9,7 @@
         android:key="unica_ghost_camera_screen"
         android:title="@string/unica_ghost_camera_title"
         android:summary="@string/unica_ghost_camera_summary"
+        android:fragment="io.mesalabs.unica.settings.ghostengine.GhostCameraSettingsFragment"
         settings:controller="io.mesalabs.unica.settings.ghostengine.GhostCameraSettingsEntryController" />
 
     <com.samsung.android.settings.widget.SecInsetCategoryPreference />
@@ -17,6 +18,7 @@
         android:key="unica_ghost_gps_screen"
         android:title="@string/unica_ghost_gps_title"
         android:summary="@string/unica_ghost_gps_summary"
+        android:fragment="io.mesalabs.unica.settings.ghostengine.GhostGpsSettingsFragment"
         settings:controller="io.mesalabs.unica.settings.ghostengine.GhostGpsSettingsEntryController" />
 
 </PreferenceScreen>

@@ -17,7 +17,7 @@
         android:key="unica_ghost_gps_location"
         android:title="@string/unica_ghost_location_title"
         android:summary="@string/unica_ghost_location_summary"
-        settings:controller="io.mesalabs.unica.settings.ghostengine.GhostLocationController">
+        settings:controller="io.mesalabs.unica.settings.GhostEnginePreferenceController">
         <intent
             android:action="io.mesalabs.unica.ghostengine.SEARCH_LOCATION"
             android:targetPackage="io.mesalabs.unica.ghostengine" />
