@@ -40,6 +40,7 @@ class GhostCameraService : Service() {
 
         if (prefs.isGhostCameraEnabled) {
             GhostCameraManager.prepareMedia(this)
+            GhostCameraManager.startVirtualCamera(this)
             if (prefs.showCameraTool) {
                 floatingTool = FloatingCameraToolController(this) {
                     // Navigate back to SecSettings Ghost Engine screen
