@@ -4,6 +4,7 @@
     <string name="unica_prayer_times_settings_title">Prayer Times</string>
     <string name="unica_pt_next_prayer_title">Next Prayer</string>
     <string name="unica_pt_next_prayer_summary">Syncing with official astronomical servers…</string>
+    <string name="unica_pt_syncing_summary">Syncing with official astronomical servers…</string>
     <string name="unica_pt_enabled_title">Prayer Times</string>
     <string name="unica_pt_enabled_summary">Receive automatic Adhan alarms and daily prayer notifications</string>
     <string name="unica_pt_general_title">Location &amp; Calculation</string>
@@ -22,4 +23,6 @@
     <string name="unica_pt_sound_asr_title">Asr Adhan</string>
     <string name="unica_pt_sound_maghrib_title">Maghrib Adhan</string>
     <string name="unica_pt_sound_isha_title">Isha Adhan</string>
+    <string name="unica_pt_custom_file_title">Custom Audio File</string>
+    <string name="unica_pt_custom_file_summary">Select a custom sound from device storage</string>
 </resources>

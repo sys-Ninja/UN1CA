@@ -50,4 +50,36 @@
         <item>20</item>
         <item>30</item>
     </string-array>
+
+    <string-array name="unica_pt_adhan_entries">
+        <item>مكة المكرمة &#x2014; أم القرى</item>
+        <item>المدينة المنورة &#x2014; المسجد النبوي</item>
+        <item>المسجد الأقصى (القدس)</item>
+        <item>القاهرة (مصر)</item>
+        <item>تكبيرات فقط</item>
+        <item>نغمة هادئة</item>
+        <item>صامت</item>
+        <item>ملف صوتي مخصص&#x2026;</item>
+    </string-array>
+    <string-array name="unica_pt_adhan_values">
+        <item>makkah</item><item>madinah</item><item>aqsa</item><item>cairo</item>
+        <item>takbeer</item><item>soft_chime</item><item>silent</item><item>custom</item>
+    </string-array>
+
+    <string-array name="unica_pt_adhan_fajr_entries">
+        <item>مكة المكرمة &#x2014; أم القرى</item>
+        <item>المدينة المنورة &#x2014; المسجد النبوي</item>
+        <item>المسجد الأقصى (القدس)</item>
+        <item>القاهرة (مصر)</item>
+        <item>أذان الفجر كامل (الصلاة خير من النوم)</item>
+        <item>تكبيرات فقط</item>
+        <item>نغمة هادئة</item>
+        <item>صامت</item>
+        <item>ملف صوتي مخصص&#x2026;</item>
+    </string-array>
+    <string-array name="unica_pt_adhan_fajr_values">
+        <item>makkah</item><item>madinah</item><item>aqsa</item><item>cairo</item>
+        <item>fajr_full</item><item>takbeer</item><item>soft_chime</item><item>silent</item>
+        <item>custom</item>
+    </string-array>
 </resources>

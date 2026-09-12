@@ -4,6 +4,7 @@
     <string name="unica_prayer_times_settings_title">مواقيت الصلاة</string>
     <string name="unica_pt_next_prayer_title">الصلاة القادمة</string>
     <string name="unica_pt_next_prayer_summary">جارٍ المزامنة المباشرة مع الخادم الرسمي…</string>
+    <string name="unica_pt_syncing_summary">جارٍ المزامنة المباشرة مع الخادم الرسمي…</string>
     <string name="unica_pt_enabled_title">مواقيت الصلاة</string>
     <string name="unica_pt_enabled_summary">تلقي تنبيهات الأذان التلقائية وإشعارات الصلوات الخمس</string>
     <string name="unica_pt_general_title">الموقع وهيئة الحساب</string>
@@ -17,4 +18,11 @@
     <string name="unica_pt_early_minutes_title">التنبيه قبل الصلاة بـ</string>
     <string name="unica_pt_sounds_title">أصوات الأذان والمؤذنين</string>
     <string name="unica_pt_sounds_summary">اختر أذان الحرم المكي، المدني، الأقصى، القاهرة أو ملف مخصص</string>
+    <string name="unica_pt_sound_fajr_title">أذان الفجر</string>
+    <string name="unica_pt_sound_dhuhr_title">أذان الظهر</string>
+    <string name="unica_pt_sound_asr_title">أذان العصر</string>
+    <string name="unica_pt_sound_maghrib_title">أذان المغرب</string>
+    <string name="unica_pt_sound_isha_title">أذان العشاء</string>
+    <string name="unica_pt_custom_file_title">ملف صوتي مخصص</string>
+    <string name="unica_pt_custom_file_summary">اختيار نغمة أو صوت أذان من ذاكرة الهاتف</string>
 </resources>
