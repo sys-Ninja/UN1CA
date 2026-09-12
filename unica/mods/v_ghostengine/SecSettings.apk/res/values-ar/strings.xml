@@ -15,4 +15,6 @@
     <string name="unica_ghost_location_summary">افتح البحث على الخريطة لاختيار الإحداثيات المزيفة</string>
     <string name="unica_ghost_joystick_title">عصا التحكم العائمة (Joystick)</string>
     <string name="unica_ghost_joystick_summary">تحريك الموقع المزيف في الوقت الفعلي بعصا التحكم المرئية</string>
+    <string name="search_location_title">البحث عن موقع</string>
+    <string name="cancel">إلغاء</string>
 </resources>
