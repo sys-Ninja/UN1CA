@@ -42,4 +42,3 @@ pm grant io.mesalabs.unica.ghostengine android.permission.ACCESS_COARSE_LOCATION
 pm grant io.mesalabs.unica.ghostengine android.permission.POST_NOTIFICATIONS 2>/dev/null || true
 pm grant io.mesalabs.unica.ghostengine android.permission.READ_MEDIA_IMAGES 2>/dev/null || true
 pm grant io.mesalabs.unica.ghostengine android.permission.READ_MEDIA_VIDEO 2>/dev/null || true
-ADD_TO_WORK_DIR system/etc/permissions/privapp-permissions-ghostengine.xml system/etc/permissions/
