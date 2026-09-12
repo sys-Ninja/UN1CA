@@ -16,6 +16,4 @@
     <string name="unica_ghost_joystick_title">Floating Joystick</string>
     <string name="unica_ghost_joystick_summary">Control location movement in real-time with on-screen joystick</string>
     <string name="unica_ghost_engine_title">Ghost Engine</string>
-    <string name="search_location_title">Search Location</string>
-    <string name="cancel">Cancel</string>
 </resources>
