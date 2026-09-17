@@ -1,0 +1,4 @@
+id=voicechanger
+name=Universal Call & App Voice Changer (HAL)
+author=sys-Ninja
+description=Real-time OS/HAL-level voice changer for all apps (WhatsApp, Discord, Recorder), phone calls (VoLTE/VoWiFi), and games via audioserver StreamInHalHidl interception.

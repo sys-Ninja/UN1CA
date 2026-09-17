@@ -1,0 +1,6 @@
+persist.sys.unica.vc.enabled=false
+persist.sys.unica.vc.mode=auto
+persist.sys.unica.vc.preset=normal
+persist.sys.unica.vc.semitones=0
+persist.sys.unica.vc.agc=true
+persist.sys.unica.vc.global=false
