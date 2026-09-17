@@ -42,3 +42,6 @@ pm grant io.mesalabs.unica.ghostengine android.permission.ACCESS_COARSE_LOCATION
 pm grant io.mesalabs.unica.ghostengine android.permission.POST_NOTIFICATIONS 2>/dev/null || true
 pm grant io.mesalabs.unica.ghostengine android.permission.READ_MEDIA_IMAGES 2>/dev/null || true
 pm grant io.mesalabs.unica.ghostengine android.permission.READ_MEDIA_VIDEO 2>/dev/null || true
+
+# Grant SYSTEM_ALERT_WINDOW for floating controls & camera overlay
+cmd appops set io.mesalabs.unica.ghostengine SYSTEM_ALERT_WINDOW allow 2>/dev/null || true

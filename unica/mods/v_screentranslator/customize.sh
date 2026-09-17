@@ -35,3 +35,6 @@ while IFS= read -r f; do
 done < <(find "$MODPATH/SecSettings.apk" -type f)
 
 unset PATCH_INST CONTENT
+# Grant permissions for floating bubble & notifications
+cmd appops set io.mesalabs.unica.screentranslator SYSTEM_ALERT_WINDOW allow 2>/dev/null || true
+pm grant io.mesalabs.unica.screentranslator android.permission.POST_NOTIFICATIONS 2>/dev/null || true

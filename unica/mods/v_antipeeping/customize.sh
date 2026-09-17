@@ -40,3 +40,6 @@ unset PATCH_INST CONTENT
 # Since the APK may have been installed before this XML was added, we grant explicitly here.
 pm grant io.mesalabs.unica.antipeeping android.permission.CAMERA 2>/dev/null || true
 pm grant io.mesalabs.unica.antipeeping android.permission.POST_NOTIFICATIONS 2>/dev/null || true
+
+# Grant SYSTEM_ALERT_WINDOW for floating privacy shield overlay
+cmd appops set io.mesalabs.unica.antipeeping SYSTEM_ALERT_WINDOW allow 2>/dev/null || true
