@@ -555,6 +555,9 @@ static void route_teardown(void)
     ctl_set_enum("TX SMIC MUX2", "ZERO");
     ctl_set_int("TX_DEC2 Volume", TX_DEC2_DEFAULT);
     ctl_set_int("Incall_Music Audio Mixer MultiMedia1", 0);
+    ctl_set_int("Incall_Music_2 Audio Mixer MultiMedia1", 0);
+    ctl_set_int("Incall_Music Audio Mixer MultiMedia9", 0);
+    ctl_set_int("Incall_Music_2 Audio Mixer MultiMedia9", 0);
 }
 
 /* Re-assert every control the private channel depends on.
@@ -570,11 +573,17 @@ static int route_verify(void)
 {
     int fixed = 0;
 
+    /* Assert Incall_Music on both SIM1 (MMode1) and SIM2 (MMode2) */
     if (ctl_get_int("Incall_Music Audio Mixer MultiMedia1", 1) != 1) {
         ctl_set_int("Incall_Music Audio Mixer MultiMedia1", 1);
-        ctl_set_int("Playback 0 Volume", 8192);
         fixed++;
     }
+    if (ctl_get_int("Incall_Music_2 Audio Mixer MultiMedia1", 1) != 1) {
+        ctl_set_int("Incall_Music_2 Audio Mixer MultiMedia1", 1);
+        fixed++;
+    }
+    ctl_set_int("Playback 0 Volume", 8192);
+
     if (ctl_get_int("TX_AIF2_CAP Mixer DEC2", 1) != 1) {
         ctl_set_enum("TX SMIC MUX2", "SWR_MIC0");
         ctl_set_int("TX_AIF2_CAP Mixer DEC2", 1);
@@ -632,9 +641,14 @@ static void run_session(void)
     LOGI("SESSION start");
 
     /* Injection first: if it cannot open we must not mute the mic, or the
-     * other party would hear nothing at all. */
+     * other party would hear nothing at all.
+     * Enable both SIM1 (Incall_Music) and SIM2 (Incall_Music_2) uplinks. */
     ctl_set_int("Incall_Music Audio Mixer MultiMedia1", 1);
+    ctl_set_int("Incall_Music_2 Audio Mixer MultiMedia1", 1);
+    ctl_set_int("Incall_Music Audio Mixer MultiMedia9", 1);
+    ctl_set_int("Incall_Music_2 Audio Mixer MultiMedia9", 1);
     ctl_set_int("Playback 0 Volume", 8192);   /* unity, range 0..8192 */
+    ctl_set_int("Playback 23 Volume", 8192);
 
     memset(&inj_cfg, 0, sizeof(inj_cfg));
     inj_cfg.channels     = 1;
@@ -702,8 +716,15 @@ static void run_session(void)
         int chunk_peak = 0;
 
         if (alsa.pcm_read(cap, cap_buf, cap_bytes) != 0) {
-            LOGE("pcm_read: %s", alsa.pcm_get_error(cap));
-            break;
+            LOGW("pcm_read xrun: %s, recovering...", alsa.pcm_get_error(cap));
+            alsa.pcm_close(cap);
+            usleep(10000);
+            cap = alsa.pcm_open(CARD, DEV_CAPTURE, PCM_IN, &cap_cfg);
+            if (!cap || !alsa.pcm_is_ready(cap)) {
+                LOGE("capture recover failed: %s", cap ? alsa.pcm_get_error(cap) : "null");
+                break;
+            }
+            continue;
         }
 
         /* 48 kHz → 8 kHz: run every input sample through the anti-alias
@@ -776,8 +797,14 @@ static void run_session(void)
             inj_buf[inj_fill++] = soft_limit(s);
             if (inj_fill == INJ_FRAMES) {
                 if (alsa.pcm_write(inj, inj_buf, inj_bytes) != 0) {
-                    LOGE("pcm_write: %s", alsa.pcm_get_error(inj));
-                    goto out;
+                    LOGW("pcm_write xrun: %s, recovering...", alsa.pcm_get_error(inj));
+                    alsa.pcm_close(inj);
+                    usleep(10000);
+                    inj = alsa.pcm_open(CARD, DEV_INJECT, PCM_OUT, &inj_cfg);
+                    if (!inj || !alsa.pcm_is_ready(inj)) {
+                        LOGE("inject recover failed: %s", inj ? alsa.pcm_get_error(inj) : "null");
+                        goto out;
+                    }
                 }
                 inj_fill = 0;
             }

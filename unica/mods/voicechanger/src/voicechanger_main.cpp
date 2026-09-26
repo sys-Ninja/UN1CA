@@ -12,7 +12,7 @@
 #include <errno.h>
 #include <pthread.h>
 
-#include "/tmp/sonic.h"
+#include "sonic.h"
 
 #define TAG "VoiceChangerHAL"
 #define ALOGI(...) __android_log_print(ANDROID_LOG_INFO, TAG, __VA_ARGS__)
@@ -190,42 +190,65 @@ static void update_preset(const char* preset, float semitones, int sampleRate, i
         sonicSetSpeed(s_sonic, 1.0f);
     }
 
+    struct PresetDef {
+        const char *name;
+        float pitch;
+        float hpf_freq;
+        float notch_freq;
+        float notch_gain;
+        float notch_q;
+        float formant_freq;
+        float formant_gain;
+        float formant_q;
+        float air_freq;
+        float air_gain;
+    };
+
+    static const PresetDef kPresets[] = {
+        { "normal",        1.00f,   0.0f,    0.0f,  0.0f, 1.0f,    0.0f, 0.0f, 1.0f,    0.0f,  0.0f },
+        { "female",        1.44f, 195.0f,  480.0f, -4.0f, 1.2f, 2300.0f, 3.5f, 1.4f, 3200.0f, -2.0f },
+        { "girl",          1.44f, 195.0f,  480.0f, -1.5f, 1.4f, 2300.0f, 4.0f, 1.2f, 3200.0f, -3.0f },
+        { "male",          0.78f,  75.0f, 2500.0f, -3.0f, 1.2f,  140.0f, 4.0f, 1.0f,    0.0f,  0.0f },
+        { "child",         1.65f, 240.0f,    0.0f,  0.0f, 1.0f, 2600.0f, 4.0f, 1.3f, 3300.0f, -1.0f },
+        { "old_man",       0.85f,  90.0f,    0.0f,  0.0f, 1.0f,  400.0f, 3.0f, 1.0f, 2800.0f, -3.5f },
+        { "old_woman",     1.22f, 170.0f,    0.0f,  0.0f, 1.0f, 1800.0f, 2.5f, 1.2f, 3000.0f, -2.0f },
+        { "chipmunk",      1.95f, 300.0f,    0.0f,  0.0f, 1.0f, 2800.0f, 3.0f, 1.2f,    0.0f,  0.0f },
+        { "giant",         0.60f,  50.0f,    0.0f,  0.0f, 1.0f,  100.0f, 6.0f, 0.8f, 2600.0f, -4.0f },
+        { "helium",        1.55f, 220.0f,    0.0f,  0.0f, 1.0f,    0.0f, 0.0f, 1.0f,    0.0f,  0.0f },
+        { "soft_girl",     1.52f, 210.0f,  520.0f, -3.5f, 1.3f, 2450.0f, 4.0f, 1.5f, 3300.0f, -1.5f },
+        { "radio",         0.89f,  80.0f,  350.0f, -3.0f, 0.9f, 2800.0f, 2.0f, 1.0f, 2200.0f,  2.0f },
+        { "anonymous",     0.72f,  60.0f,  800.0f, -5.0f, 0.8f,  250.0f, 3.5f, 0.9f, 2000.0f, -4.0f },
+        { "walkie_talkie", 1.00f, 450.0f, 2600.0f, -8.0f, 0.6f, 1100.0f, 4.0f, 0.7f, 2400.0f,  5.0f },
+        { "cyborg",        0.80f,  80.0f, 1800.0f,  5.0f, 0.5f,  900.0f, 5.0f, 0.5f, 2500.0f,  3.0f },
+        { "custom",        1.00f,   0.0f,    0.0f,  0.0f, 1.0f,    0.0f, 0.0f, 1.0f,    0.0f,  0.0f }
+    };
+    static const int kNumPresets = sizeof(kPresets) / sizeof(kPresets[0]);
+
     float pitch = 1.0f;
     float hpfFreq = 0.0f;
     float notchFreq = 0.0f, notchQ = 1.0f, notchGain = 0.0f;
     float formantFreq = 0.0f, formantQ = 1.0f, formantGain = 0.0f;
     float airFreq = 0.0f, airGain = 0.0f;
 
-    if (strcmp(preset, "soft_girl") == 0) {
-        pitch = 1.52f;
-        hpfFreq = 210.0f;
-        notchFreq = 520.0f; notchQ = 1.5f; notchGain = -1.5f;
-        formantFreq = 2450.0f; formantQ = 1.3f; formantGain = 4.0f;
-        airFreq = 3300.0f; airGain = -3.5f;
-    } else if (strcmp(preset, "girl") == 0) {
-        pitch = 1.44f;
-        hpfFreq = 195.0f;
-        notchFreq = 480.0f; notchQ = 1.4f; notchGain = -1.5f;
-        formantFreq = 2300.0f; formantQ = 1.2f; formantGain = 4.0f;
-        airFreq = 3200.0f; airGain = -3.0f;
-    } else if (strcmp(preset, "chipmunk") == 0) {
-        pitch = 1.95f;
-        hpfFreq = 300.0f;
-        formantFreq = 2800.0f; formantQ = 1.2f; formantGain = 3.0f;
-    } else if (strcmp(preset, "giant") == 0) {
-        pitch = 0.60f;
-        hpfFreq = 50.0f;
-        notchFreq = 100.0f; notchQ = 1.0f; notchGain = -4.0f;
-        formantFreq = 2600.0f; formantQ = 0.8f; formantGain = 6.0f;
-    } else if (strcmp(preset, "helium") == 0) {
-        pitch = 1.55f;
-        hpfFreq = 220.0f;
-    } else if (strcmp(preset, "cyborg") == 0) {
-        pitch = 0.80f;
-        hpfFreq = 80.0f;
-        notchFreq = 1800.0f; notchQ = 0.5f; notchGain = 5.0f;
-        formantFreq = 900.0f; formantQ = 0.5f; formantGain = 5.0f;
-        airFreq = 2500.0f; airGain = 5.0f;
+    const PresetDef* found = nullptr;
+    for (int i = 0; i < kNumPresets; i++) {
+        if (strcmp(preset, kPresets[i].name) == 0) {
+            found = &kPresets[i];
+            break;
+        }
+    }
+
+    if (found && strcmp(preset, "custom") != 0) {
+        pitch = found->pitch;
+        hpfFreq = found->hpf_freq;
+        notchFreq = found->notch_freq;
+        notchQ = found->notch_q;
+        notchGain = found->notch_gain;
+        formantFreq = found->formant_freq;
+        formantQ = found->formant_q;
+        formantGain = found->formant_gain;
+        airFreq = found->air_freq;
+        airGain = found->air_gain;
     } else if (strcmp(preset, "custom") == 0 || fabsf(semitones) > 0.01f) {
         pitch = (float)pow(2.0, (double)semitones / 12.0);
         if (semitones > 0.0f) {
