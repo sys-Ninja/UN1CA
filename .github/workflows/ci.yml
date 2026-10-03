@@ -462,6 +462,9 @@ jobs:
         target: [a52sxq]
 
     steps:
+      - name: Checkout repo (for gh CLI)
+        uses: actions/checkout@v7
+
       - name: Download ROM zip
         uses: actions/download-artifact@v4
         with:
@@ -475,33 +478,33 @@ jobs:
           path: ./release
         continue-on-error: true
 
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: sixteen-${{ github.run_number }}
-          name: "UN1CA A52s (sixteen) - Build #${{ github.run_number }}"
-          body: |
-            ## UN1CA Custom ROM - Galaxy A52s (SM-A528B)
-            **Branch:** sixteen | **Build:** #${{ github.run_number }}
-            **Commit:** ${{ github.sha }}
+      - name: Create GitHub Release via gh CLI
+        run: |
+          TAG="sixteen-${{ github.run_number }}"
+          TITLE="UN1CA A52s (sixteen) - Build #${{ github.run_number }}"
+          NOTES="## UN1CA Custom ROM - Galaxy A52s (SM-A528B)
+          **Branch:** sixteen | **Build:** #${{ github.run_number }}
+          **Commit:** ${{ github.sha }}
 
-            ### ميزات هذا الإصدار:
-            - 🎙️ مغير الصوت (Voice Changer) - دعم الشريحتين + 14 نبرة صوت
-            - 📱 منع التلصص (Anti-Peeping)
-            - 👻 محرك الأداء (Ghost Engine)
-            - 📥 تحميل الميديا (Media Downloader)
-            - 🕌 مواقيت الصلاة (Prayer Times)
-            - 🌐 ترجمة الشاشة (Screen Translator)
-            - 📍 موقع مزيف (Fake Location)
-            - 🎥 كاميرا افتراضية (Virtual Camera)
+          ### ميزات هذا الإصدار:
+          - 🎙️ مغير الصوت (Voice Changer) - دعم الشريحتين + 14 نبرة صوت
+          - 📱 منع التلصص (Anti-Peeping)
+          - 👻 محرك الأداء (Ghost Engine)
+          - 📥 تحميل الميديا (Media Downloader)
+          - 🕌 مواقيت الصلاة (Prayer Times)
+          - 🌐 ترجمة الشاشة (Screen Translator)
+          - 📍 موقع مزيف (Fake Location)
+          - 🎥 كاميرا افتراضية (Virtual Camera)
 
-            ### كيفية التثبيت:
-            1. فلش الـ ZIP عبر TWRP أو Odin
-            2. أعد التشغيل وتمتع بالروم
+          ### كيفية التثبيت:
+          1. فلش الـ ZIP عبر TWRP أو Odin
+          2. أعد التشغيل وتمتع بالروم
 
-            > ⚠️ هذا بناء تطويري (Development Build) - قم بعمل نسخة احتياطية قبل الفلاش
-          files: ./release/*
-          draft: false
-          prerelease: true
+          > ⚠️ هذا بناء تطويري - قم بعمل نسخة احتياطية قبل الفلاش"
+
+          echo "Files to upload:"
+          ls -lh ./release/
+
+          gh release create "$TAG"             --title "$TITLE"             --notes "$NOTES"             --prerelease             ./release/*
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
