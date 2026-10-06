@@ -505,6 +505,26 @@ jobs:
           echo "Files to upload:"
           ls -lh ./release/
 
-          gh release create "$TAG"             --title "$TITLE"             --notes "$NOTES"             --prerelease             ./release/*
+          mkdir -p ./release_upload
+          for f in ./release/*; do
+            if [ -f "$f" ]; then
+              fsize=$(stat -c%s "$f")
+              if [ "$fsize" -gt 1992294400 ]; then
+                echo "Splitting large file $(basename "$f") ($fsize bytes) into 1900MB parts..."
+                split -b 1900M -d -a 2 "$f" "./release_upload/$(basename "$f").part"
+              else
+                cp "$f" ./release_upload/
+              fi
+            fi
+          done
+
+          echo "Final assets for release upload:"
+          ls -lh ./release_upload/
+
+          gh release create "$TAG" \
+            --title "$TITLE" \
+            --notes "$NOTES" \
+            --prerelease \
+            ./release_upload/*
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
