@@ -21,4 +21,14 @@ for PROP_CTX in \
 done
 unset PROP_CTX
 
+
+LOG "- Removing any voicechanger entries from audio_effects_common.conf to prevent audioserver bootloop"
+for CONF in         "$WORK_DIR/system/system/etc/audio_effects_common.conf"         "$WORK_DIR/vendor/etc/audio_effects_common.conf"; do
+    if [ -f "$CONF" ]; then
+        sed -i '/voicechanger/,/}/d' "$CONF"
+        LOG "  -> cleaned $CONF"
+    fi
+done
+unset CONF
+
 LOG_STEP_OUT
