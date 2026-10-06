@@ -47,7 +47,7 @@ echo "Output: $MODULE_DIR/system/lib64/libvoicechanger.so"
 
 mkdir -p "$MODULE_DIR/system/lib64"
 "$CXX" -O3 -fPIC -shared \
-    -static-libstdc++ \
+    -static-libstdc++ -Wl,-Bstatic -lc++ -Wl,-Bdynamic \
     -Wl,-soname,libvoicechanger.so \
     "$MODULE_DIR/src/voicechanger_main.cpp" \
     "$MODULE_DIR/src/sonic.c" \
