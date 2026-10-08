@@ -138,13 +138,13 @@
 
     move-result-object p0
 
-    const-string v0, "\nIf the caller wants to end the call, says goodbye, or the conversation is finished, say a polite brief goodbye and append [HANGUP] at the end of your reply."
+    const-string v0, "\nWhen you want to end the call: call the hang_up function immediately. Before calling it, say a farewell in the same language/dialect as the conversation. If Arabic/Egyptian: say 'مع السلامة يا فندم' or 'سلام' or 'في رعاية الله' or 'السلام عليكم ورحمة الله' — choose what fits the context. If English: say 'Goodbye!' or 'Take care!'. NEVER say the words 'hang up' or '[HANGUP]' out loud to the caller — these are internal commands only."
 
     invoke-virtual {p0, v0}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     move-result-object p0
 
-    const-string v0, "\nIf the caller is trolling, laughing, joking around, or wasting time without a serious purpose, do not entertain them. Politely say goodbye and append [HANGUP] at the end of your reply."
+    const-string v0, "\nIf the caller is trolling, wasting time, or the conversation purpose is done, politely say farewell in the conversation language, then call the hang_up function."
 
     invoke-virtual {p0, v0}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
