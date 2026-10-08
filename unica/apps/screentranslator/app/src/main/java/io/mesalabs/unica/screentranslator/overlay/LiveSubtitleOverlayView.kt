@@ -1,5 +1,6 @@
 package io.mesalabs.unica.screentranslator.overlay
 
+import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
@@ -7,80 +8,109 @@ import android.graphics.Paint
 import android.graphics.Rect
 import android.graphics.Typeface
 import android.view.View
-import io.mesalabs.unica.screentranslator.data.TranslatorPrefs
-import java.util.concurrent.CopyOnWriteArrayList
 
-data class SubtitleRenderItem(
-    val translatedText: String,
-    val boundingBox: Rect,
-    val originalWidth: Int,
-    val originalHeight: Int
+data class TranslationBlock(
+    val rect: Rect,
+    val text: String,
+    val bgColor: Int,
+    val textColor: Int
 )
 
 class LiveSubtitleOverlayView(context: Context) : View(context) {
 
-    private val items = CopyOnWriteArrayList<SubtitleRenderItem>()
-    private val prefs = TranslatorPrefs.get(context)
+    private var blocks: List<TranslationBlock> = emptyList()
+    private var visible = true
+    private var currentAlpha = 255
 
-    // Two-pass Paint for seamless cinema-style outlined subtitles (No ugly boxes!)
-    private val strokePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        style = Paint.Style.STROKE
-        strokeJoin = Paint.Join.ROUND
-        strokeCap = Paint.Cap.ROUND
-        typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
-    }
-
-    private val fillPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+    private val bgPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.FILL
+    }
+
+    private val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
     }
 
-    fun updateSubtitles(newItems: List<SubtitleRenderItem>) {
-        items.clear()
-        items.addAll(newItems)
-        postInvalidate()
+    init {
+        setBackgroundColor(Color.TRANSPARENT)
+    }
+
+    fun setBlocks(newBlocks: List<TranslationBlock>) {
+        if (!visible) return
+        blocks = newBlocks
+        invalidate()
     }
 
     fun clearSubtitles() {
-        if (items.isNotEmpty()) {
-            items.clear()
-            postInvalidate()
+        blocks = emptyList()
+        invalidate()
+    }
+
+    fun hideTemporarily(ms: Long = 1500) {
+        if (!visible) return
+        visible = false
+        
+        val fadeOut = ValueAnimator.ofInt(255, 0).apply {
+            duration = 150
+            addUpdateListener { animator ->
+                currentAlpha = animator.animatedValue as Int
+                invalidate()
+            }
         }
+        fadeOut.start()
+
+        postDelayed({
+            visible = true
+            val fadeIn = ValueAnimator.ofInt(0, 255).apply {
+                duration = 150
+                addUpdateListener { animator ->
+                    currentAlpha = animator.animatedValue as Int
+                    invalidate()
+                }
+            }
+            fadeIn.start()
+        }, ms)
     }
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        if (items.isEmpty()) return
+        if (blocks.isEmpty() || currentAlpha == 0) return
 
-        val textColor = prefs.textColor
-        val strokeColor = prefs.strokeColor
-        val strokeW = prefs.strokeWidth
+        for (block in blocks) {
+            val box = block.rect
+            if (block.text.isBlank()) continue
 
-        strokePaint.color = strokeColor
-        strokePaint.strokeWidth = strokeW
-        fillPaint.color = textColor
+            // Draw Background to occlude original text
+            bgPaint.color = block.bgColor
+            bgPaint.alpha = currentAlpha
+            
+            // Inflate rect slightly to cover edges
+            val inflatedRect = Rect(box.left - 4, box.top - 4, box.right + 4, box.bottom + 4)
+            canvas.drawRect(inflatedRect, bgPaint)
 
-        for (item in items) {
-            val box = item.boundingBox
-            val text = item.translatedText
-            if (text.isBlank()) continue
-
-            // Auto-fit font size based on bounding box height
+            // Calculate text properties
             val targetHeight = box.height().toFloat()
-            val fontSize = (targetHeight * 0.82f).coerceIn(24f, 68f)
+            val fontSize = (targetHeight * 0.85f).coerceIn(20f, 72f)
+            
+            textPaint.color = block.textColor
+            textPaint.alpha = currentAlpha
+            textPaint.textSize = fontSize
 
-            strokePaint.textSize = fontSize
-            fillPaint.textSize = fontSize
+            // RTL support
+            val containsArabic = block.text.any { it in '؀'..'ۿ' }
+            if (containsArabic) {
+                textPaint.textAlign = Paint.Align.RIGHT
+            } else {
+                textPaint.textAlign = Paint.Align.LEFT
+            }
 
-            val textWidth = fillPaint.measureText(text)
-            val startX = (box.left + (box.width() - textWidth) / 2f).coerceAtLeast(box.left.toFloat())
-            val baselineY = box.bottom - (box.height() * 0.2f)
+            val baselineY = box.bottom - (box.height() * 0.15f)
+            val startX = if (containsArabic) {
+                box.right.toFloat() - 4f
+            } else {
+                box.left.toFloat() + 4f
+            }
 
-            // Pass 1: Draw dark outline (gives high contrast against any game background)
-            canvas.drawText(text, startX, baselineY, strokePaint)
-
-            // Pass 2: Draw crisp text fill
-            canvas.drawText(text, startX, baselineY, fillPaint)
+            canvas.drawText(block.text, startX, baselineY, textPaint)
         }
     }
 }
