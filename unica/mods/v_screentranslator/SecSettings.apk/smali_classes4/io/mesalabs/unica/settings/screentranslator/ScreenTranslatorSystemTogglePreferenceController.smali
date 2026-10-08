@@ -32,39 +32,63 @@
 .end method
 
 .method public setChecked(Z)Z
-    .locals 4
+    .locals 5
+
+    # Save the on/off value to System settings
     iget-object v0, p0, Lcom/android/settingslib/core/AbstractPreferenceController;->mContext:Landroid/content/Context;
     invoke-virtual {v0}, Landroid/content/Context;->getContentResolver()Landroid/content/ContentResolver;
     move-result-object v1
     invoke-virtual {p0}, Lcom/android/settings/core/BasePreferenceController;->getPreferenceKey()Ljava/lang/String;
     move-result-object v2
-    if-eqz p1, :cond_0
+    if-eqz p1, :cond_val_off
     const/4 v3, 0x1
-    goto :goto_0
-    :cond_0
+    goto :goto_val
+    :cond_val_off
     const/4 v3, 0x0
-    :goto_0
+    :goto_val
     invoke-static {v1, v2, v3}, Landroid/provider/Settings$System;->putInt(Landroid/content/ContentResolver;Ljava/lang/String;I)Z
-    # Send broadcast to ScreenTranslator app on master toggle
-    const-string v0, "unica_st_service_enabled"
-    invoke-virtual {v0, v2}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
-    move-result v0
-    if-eqz v0, :skip_st_svc
+
+    # Only react to the screen-translator preference key
+    const-string v3, "unica_st_service_enabled"
+    invoke-virtual {v3, v2}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+    move-result v3
+    if-eqz v3, :skip_st_svc
+
     iget-object v0, p0, Lcom/android/settingslib/core/AbstractPreferenceController;->mContext:Landroid/content/Context;
+    if-eqz p1, :cond_st_off
+
+    # ---- ENABLE: Launch ScreenTranslatorSettingsActivity to request MediaProjection ----
+    new-instance v2, Landroid/content/Intent;
+    const-string v3, "io.mesalabs.unica.action.SCREEN_TRANSLATOR_SETTINGS"
+    invoke-direct {v2, v3}, Landroid/content/Intent;-><init>(Ljava/lang/String;)V
+
+    # FLAG_ACTIVITY_NEW_TASK = 0x10000000
+    const v3, 0x10000000
+    invoke-virtual {v2, v3}, Landroid/content/Intent;->addFlags(I)Landroid/content/Intent;
+
+    # Extra: request_projection = true
+    const-string v3, "request_projection"
+    const/4 v4, 0x1
+    invoke-virtual {v2, v3, v4}, Landroid/content/Intent;->putExtra(Ljava/lang/String;Z)Landroid/content/Intent;
+
+    invoke-virtual {v0, v2}, Landroid/content/Context;->startActivity(Landroid/content/Intent;)V
+    goto :skip_st_svc
+
+    :cond_st_off
+    # ---- DISABLE: Send broadcast with stop=true so ScreenTranslatorReceiver stops the service ----
     new-instance v2, Landroid/content/Intent;
     const-string v3, "io.mesalabs.unica.screentranslator.TOGGLE_SERVICE"
     invoke-direct {v2, v3}, Landroid/content/Intent;-><init>(Ljava/lang/String;)V
-    const-string v3, "enabled"
-    if-eqz p1, :cond_st_off
+
+    const-string v3, "stop"
     const/4 v4, 0x1
-    goto :st_put
-    :cond_st_off
-    const/4 v4, 0x0
-    :st_put
     invoke-virtual {v2, v3, v4}, Landroid/content/Intent;->putExtra(Ljava/lang/String;Z)Landroid/content/Intent;
+
     const-string v3, "io.mesalabs.unica.screentranslator"
     invoke-virtual {v2, v3}, Landroid/content/Intent;->setPackage(Ljava/lang/String;)Landroid/content/Intent;
+
     invoke-virtual {v0, v2}, Landroid/content/Context;->sendBroadcast(Landroid/content/Intent;)V
+
     :skip_st_svc
     const/4 v0, 0x1
     return v0
