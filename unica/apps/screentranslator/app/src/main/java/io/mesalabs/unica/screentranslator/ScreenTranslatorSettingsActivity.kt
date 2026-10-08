@@ -19,6 +19,9 @@ import io.mesalabs.unica.screentranslator.service.ScreenTranslatorService
 
 class ScreenTranslatorSettingsActivity : AppCompatActivity() {
 
+    // True when launched from SecSettings toggle (projection-only flow, no settings fragment)
+    private var projectionOnlyMode = false
+
     private val mediaProjectionLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -36,14 +39,24 @@ class ScreenTranslatorSettingsActivity : AppCompatActivity() {
         } else {
             Toast.makeText(this, R.string.permission_denied, Toast.LENGTH_SHORT).show()
         }
+        // When launched from the toggle, finish immediately after requesting projection
+        if (projectionOnlyMode) finish()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        supportFragmentManager
-            .beginTransaction()
-            .replace(android.R.id.content, ScreenTranslatorFragment { checkAndStartService() })
-            .commit()
+        projectionOnlyMode = intent.getBooleanExtra("request_projection", false)
+
+        if (projectionOnlyMode) {
+            // Launched from SecSettings master toggle: directly request screen capture permission
+            checkAndStartService()
+        } else {
+            // Launched normally: show settings fragment
+            supportFragmentManager
+                .beginTransaction()
+                .replace(android.R.id.content, ScreenTranslatorFragment { checkAndStartService() })
+                .commit()
+        }
     }
 
     private fun checkAndStartService() {
@@ -54,6 +67,7 @@ class ScreenTranslatorSettingsActivity : AppCompatActivity() {
             )
             startActivity(intent)
             Toast.makeText(this, R.string.grant_overlay_permission, Toast.LENGTH_LONG).show()
+            if (projectionOnlyMode) finish()
             return
         }
 
