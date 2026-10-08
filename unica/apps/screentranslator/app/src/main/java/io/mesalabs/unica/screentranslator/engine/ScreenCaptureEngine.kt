@@ -2,6 +2,7 @@ package io.mesalabs.unica.screentranslator.engine
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.Color
 import android.graphics.PixelFormat
 import android.graphics.Rect
 import android.hardware.display.DisplayManager
@@ -13,7 +14,7 @@ import android.util.Log
 import android.view.WindowManager
 import io.mesalabs.unica.screentranslator.data.TranslatorPrefs
 import io.mesalabs.unica.screentranslator.overlay.LiveSubtitleOverlayView
-import io.mesalabs.unica.screentranslator.overlay.SubtitleRenderItem
+import io.mesalabs.unica.screentranslator.overlay.TranslationBlock
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -70,9 +71,54 @@ class ScreenCaptureEngine(
         startProcessingLoop()
     }
 
+    private fun sampleBackgroundColor(bitmap: Bitmap, rect: Rect): Pair<Int, Int> {
+        var r = 0L
+        var g = 0L
+        var b = 0L
+        var count = 0
+
+        val expand = 2
+        val left = (rect.left - expand).coerceAtLeast(0)
+        val right = (rect.right + expand).coerceAtMost(bitmap.width - 1)
+        val top = (rect.top - expand).coerceAtLeast(0)
+        val bottom = (rect.bottom + expand).coerceAtMost(bitmap.height - 1)
+
+        val pixels = intArrayOf(
+            bitmap.getPixel(left, top),
+            bitmap.getPixel(right, top),
+            bitmap.getPixel(left, bottom),
+            bitmap.getPixel(right, bottom),
+            bitmap.getPixel(rect.centerX(), top),
+            bitmap.getPixel(rect.centerX(), bottom),
+            bitmap.getPixel(left, rect.centerY()),
+            bitmap.getPixel(right, rect.centerY())
+        )
+
+        for (pixel in pixels) {
+            r += Color.red(pixel)
+            g += Color.green(pixel)
+            b += Color.blue(pixel)
+            count++
+        }
+
+        val avgR = (r / count).toInt()
+        val avgG = (g / count).toInt()
+        val avgB = (b / count).toInt()
+        
+        val bgColor = Color.rgb(avgR, avgG, avgB)
+        
+        // Luminance calculation
+        val luminance = (0.299 * avgR + 0.587 * avgG + 0.114 * avgB) / 255.0
+        val textColor = if (luminance < 0.5) Color.WHITE else Color.BLACK
+
+        return Pair(bgColor, textColor)
+    }
+
     private fun startProcessingLoop() {
         captureJob?.cancel()
         val prefs = TranslatorPrefs.get(context)
+        val sourceLang = prefs.sourceLanguage
+        val targetLang = prefs.targetLanguage
 
         captureJob = scope.launch {
             while (isActive) {
@@ -93,32 +139,54 @@ class ScreenCaptureEngine(
                         bitmap.copyPixelsFromBuffer(buffer)
                         image.close()
 
-                        // Fast frame hash check to avoid redundant OCR on static frames
                         val currentHash = computeFastSampleHash(bitmap)
+                        
+                        // Dialog & Scene change detection
+                        val diff = if (lastFrameHash != 0L) {
+                            java.lang.Long.bitCount(currentHash xor lastFrameHash).toFloat() / 64f
+                        } else 0f
+                        
+                        if (diff > 0.4f) {
+                            // Large scene change
+                            overlayView.hideTemporarily(1500)
+                        }
+
                         if (currentHash != lastFrameHash) {
                             lastFrameHash = currentHash
 
-                            // 1. Run On-Device OCR
                             val textBlocks = OnDeviceOcrEngine.processFrame(bitmap)
                             if (textBlocks.isNotEmpty()) {
-                                val subtitleItems = mutableListOf<SubtitleRenderItem>()
+                                val translationBlocks = mutableListOf<TranslationBlock>()
+                                var totalBlockArea = 0
 
                                 for (block in textBlocks) {
                                     for (line in block.lines) {
-                                        val translated = OnDeviceTranslationEngine.translateText(line.originalText)
+                                        val translated = OnDeviceTranslationEngine.translate(line.originalText, sourceLang, targetLang)
                                         if (translated.isNotBlank()) {
-                                            subtitleItems.add(
-                                                SubtitleRenderItem(
-                                                    translatedText = translated,
-                                                    boundingBox = line.boundingBox,
-                                                    originalWidth = screenWidth,
-                                                    originalHeight = screenHeight
+                                            val (bgColor, textColor) = sampleBackgroundColor(bitmap, line.boundingBox)
+                                            
+                                            translationBlocks.add(
+                                                TranslationBlock(
+                                                    rect = line.boundingBox,
+                                                    text = translated,
+                                                    bgColor = bgColor,
+                                                    textColor = textColor
                                                 )
                                             )
+                                            totalBlockArea += (line.boundingBox.width() * line.boundingBox.height())
                                         }
                                     }
                                 }
-                                overlayView.updateSubtitles(subtitleItems)
+
+                                val screenArea = screenWidth * screenHeight
+                                val blockAreaRatio = totalBlockArea.toFloat() / screenArea.toFloat()
+                                
+                                if (blockAreaRatio > 0.65f) {
+                                    // Too much text, likely a full screen menu or dialog changing
+                                    overlayView.hideTemporarily(2000)
+                                } else {
+                                    overlayView.setBlocks(translationBlocks)
+                                }
                             } else {
                                 overlayView.clearSubtitles()
                             }
@@ -136,11 +204,18 @@ class ScreenCaptureEngine(
 
     private fun computeFastSampleHash(bitmap: Bitmap): Long {
         var hash = 0L
-        val stepX = (bitmap.width / 16).coerceAtLeast(1)
-        val stepY = (bitmap.height / 16).coerceAtLeast(1)
+        val stepX = (bitmap.width / 8).coerceAtLeast(1)
+        val stepY = (bitmap.height / 8).coerceAtLeast(1)
+        var bitPos = 0
         for (x in 0 until bitmap.width step stepX) {
             for (y in 0 until bitmap.height step stepY) {
-                hash = 31 * hash + bitmap.getPixel(x, y)
+                if (bitPos >= 64) break
+                val pixel = bitmap.getPixel(x, y)
+                val luminance = (Color.red(pixel) + Color.green(pixel) + Color.blue(pixel)) / 3
+                if (luminance > 128) {
+                    hash = hash or (1L shl bitPos)
+                }
+                bitPos++
             }
         }
         return hash
