@@ -17,13 +17,26 @@ import io.mesalabs.unica.ghostengine.data.GhostEnginePrefs
 
 class FloatingCameraToolController(
     private val context: Context,
-    private val onPickMedia: () -> Unit
+    private val onPickMedia: (slot: Int) -> Unit
 ) {
     private val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
     private var toolView: View? = null
     private val prefs = GhostEnginePrefs.get(context)
     private var isGhostActive = true
-    private var currentSlot = 1
+    var currentSlot = 1
+        private set
+
+    // Slot metadata
+    private val slotLabels = mapOf(
+        1 to "👤 Selfie",
+        2 to "🪪 ID Front",
+        3 to "🪪 ID Back"
+    )
+    private val slotColors = mapOf(
+        1 to "#00C853",   // green = front camera
+        2 to "#2979FF",  // blue = back camera
+        3 to "#2979FF"   // blue = back camera
+    )
 
     @SuppressLint("InflateParams", "ClickableViewAccessibility")
     fun show() {
@@ -32,111 +45,78 @@ class FloatingCameraToolController(
         toolView = LayoutInflater.from(context).inflate(R.layout.floating_camera_tool, null)
 
         val btnToggle = toolView!!.findViewById<ImageButton>(R.id.btn_ghost_toggle)
-        val btnSlot1 = toolView!!.findViewById<TextView>(R.id.btn_slot_1)
-        val btnSlot2 = toolView!!.findViewById<TextView>(R.id.btn_slot_2)
-        val btnSlot3 = toolView!!.findViewById<TextView>(R.id.btn_slot_3)
-        val btnNext = toolView!!.findViewById<ImageButton>(R.id.btn_next_media)
-        val btnPick = toolView!!.findViewById<ImageButton>(R.id.btn_pick_media)
+        val btnSlot1  = toolView!!.findViewById<TextView>(R.id.btn_slot_1)
+        val btnSlot2  = toolView!!.findViewById<TextView>(R.id.btn_slot_2)
+        val btnSlot3  = toolView!!.findViewById<TextView>(R.id.btn_slot_3)
+        val btnNext   = toolView!!.findViewById<ImageButton>(R.id.btn_next_media)
+        val btnPick   = toolView!!.findViewById<ImageButton>(R.id.btn_pick_media)
+        val lblStatus = toolView!!.findViewById<TextView>(R.id.lbl_slot_status)
 
-        fun updateSlotHighlights() {
-            btnSlot1.setTextColor(if (currentSlot == 1) Color.parseColor("#0381FE") else Color.WHITE)
-            btnSlot2.setTextColor(if (currentSlot == 2) Color.parseColor("#0381FE") else Color.WHITE)
-            btnSlot3.setTextColor(if (currentSlot == 3) Color.parseColor("#0381FE") else Color.WHITE)
+        fun updateHighlights() {
+            listOf(1 to btnSlot1, 2 to btnSlot2, 3 to btnSlot3).forEach { (slot, btn) ->
+                val active = slot == currentSlot
+                btn.setTextColor(Color.parseColor(if (active) slotColors[slot]!! else "#AAAAAA"))
+                btn.alpha = if (active) 1.0f else 0.6f
+            }
+            lblStatus?.text = slotLabels[currentSlot] ?: "Slot $currentSlot"
+            // Show which camera is active
+            val camLabel = if (currentSlot == 1) "📷 Front Cam" else "📷 Back Cam"
+            lblStatus?.append("  $camLabel")
         }
 
         fun switchToSlot(slot: Int) {
             currentSlot = slot
-            updateSlotHighlights()
-            val uri = when (slot) {
-                1 -> prefs.mediaSlot1 ?: prefs.mediaUri
-                2 -> prefs.mediaSlot2 ?: prefs.mediaUri
-                3 -> prefs.mediaSlot3 ?: prefs.mediaUri
-                else -> prefs.mediaUri
-            }
-            if (uri != null) {
-                prefs.mediaUri = uri
-                GhostCameraManager.prepareMedia(context)
-                val label = when (slot) {
-                    1 -> "Slot 1: Face / Selfie"
-                    2 -> "Slot 2: ID Front (بطاقة وش)"
-                    3 -> "Slot 3: ID Back (بطاقة ظهر)"
-                    else -> "Slot $slot"
-                }
-                Toast.makeText(context, label, Toast.LENGTH_SHORT).show()
-            }
+            updateHighlights()
+            GhostCameraManager.switchSlot(context, slot)
+            val label = slotLabels[slot] ?: "Slot $slot"
+            Toast.makeText(context, label, Toast.LENGTH_SHORT).show()
         }
 
-        updateSlotHighlights()
+        updateHighlights()
 
         btnToggle.setOnClickListener {
             isGhostActive = !isGhostActive
-            btnToggle.alpha = if (isGhostActive) 1.0f else 0.45f
-            if (isGhostActive) {
-                GhostCameraManager.resumeFeed()
-            } else {
-                GhostCameraManager.pauseFeed()
-            }
+            btnToggle.alpha = if (isGhostActive) 1.0f else 0.4f
+            if (isGhostActive) GhostCameraManager.resumeAll() else GhostCameraManager.pauseAll()
         }
 
         btnSlot1.setOnClickListener { switchToSlot(1) }
         btnSlot2.setOnClickListener { switchToSlot(2) }
         btnSlot3.setOnClickListener { switchToSlot(3) }
-
-        btnNext.setOnClickListener {
-            val nextSlot = if (currentSlot >= 3) 1 else currentSlot + 1
-            switchToSlot(nextSlot)
-        }
-
-        btnPick.setOnClickListener { onPickMedia() }
+        btnNext.setOnClickListener  { switchToSlot(if (currentSlot >= 3) 1 else currentSlot + 1) }
+        btnPick.setOnClickListener  { onPickMedia(currentSlot) }
 
         val params = WindowManager.LayoutParams(
             WindowManager.LayoutParams.WRAP_CONTENT,
             WindowManager.LayoutParams.WRAP_CONTENT,
             WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
-            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
+            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
+                WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
             PixelFormat.TRANSLUCENT
         ).apply {
             gravity = Gravity.TOP or Gravity.END
-            x = 24
-            y = 300
+            x = 16; y = 280
         }
 
-        var initialX = 0
-        var initialY = 0
-        var initialTouchX = 0f
-        var initialTouchY = 0f
-
+        var ix = 0; var iy = 0; var tx = 0f; var ty = 0f
         toolView!!.setOnTouchListener { _, event ->
             when (event.action) {
-                MotionEvent.ACTION_DOWN -> {
-                    initialX = params.x
-                    initialY = params.y
-                    initialTouchX = event.rawX
-                    initialTouchY = event.rawY
-                    true
-                }
+                MotionEvent.ACTION_DOWN -> { ix = params.x; iy = params.y; tx = event.rawX; ty = event.rawY; true }
                 MotionEvent.ACTION_MOVE -> {
-                    val dx = (initialTouchX - event.rawX).toInt()
-                    val dy = (event.rawY - initialTouchY).toInt()
-                    params.x = initialX + dx
-                    params.y = initialY + dy
-                    windowManager.updateViewLayout(toolView, params)
-                    true
+                    params.x = ix + (tx - event.rawX).toInt()
+                    params.y = iy + (event.rawY - ty).toInt()
+                    windowManager.updateViewLayout(toolView, params); true
                 }
                 else -> false
             }
         }
 
-        try {
-            windowManager.addView(toolView, params)
-        } catch (_: Exception) {}
+        try { windowManager.addView(toolView, params) } catch (_: Exception) {}
     }
 
     fun hide() {
-        if (toolView != null) {
-            try {
-                windowManager.removeView(toolView)
-            } catch (_: Exception) {}
+        toolView?.let {
+            try { windowManager.removeView(it) } catch (_: Exception) {}
             toolView = null
         }
     }
