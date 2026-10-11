@@ -39,18 +39,34 @@ class ScreenTranslatorService : Service() {
             return START_NOT_STICKY
         }
 
-        startForeground(2001, createNotification())
+        if (captureEngine != null) return START_STICKY
 
         val resultCode = intent?.getIntExtra(EXTRA_RESULT_CODE, 0) ?: 0
+        @Suppress("DEPRECATION")
         val resultData = intent?.getParcelableExtra<Intent>(EXTRA_RESULT_DATA)
 
-        if (resultCode != 0 && resultData != null && captureEngine == null) {
+        if (resultCode == 0 || resultData == null) {
+            stopSelf()
+            return START_NOT_STICKY
+        }
+
+        try {
             val mpManager = getSystemService(Context.MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
             mediaProjection = mpManager.getMediaProjection(resultCode, resultData)
+
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+                startForeground(2001, createNotification(),
+                    android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION)
+            } else {
+                startForeground(2001, createNotification())
+            }
 
             initEngines()
             setupOverlay()
             startCapture()
+        } catch (e: Exception) {
+            stopSelf()
+            return START_NOT_STICKY
         }
 
         return START_STICKY
