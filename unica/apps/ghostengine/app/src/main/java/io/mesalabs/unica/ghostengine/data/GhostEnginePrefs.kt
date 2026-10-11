@@ -48,7 +48,7 @@ class GhostEnginePrefs private constructor(private val context: Context) {
         get() = Settings.System.getInt(resolver, "unica_ghost_camera_tool", 1) == 1
         set(value) { Settings.System.putInt(resolver, "unica_ghost_camera_tool", if (value) 1 else 0) }
 
-    // Stealth GPS Settings
+    // Stealth GPS Settings (Default: false to decouple GPS from Camera)
     var isStealthGpsEnabled: Boolean
         get() = Settings.System.getInt(resolver, "unica_ghost_gps_enabled", 0) == 1
         set(value) { Settings.System.putInt(resolver, "unica_ghost_gps_enabled", if (value) 1 else 0) }
