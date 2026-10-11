@@ -39,10 +39,10 @@ class GhostCameraService : Service() {
         val prefs = GhostEnginePrefs.get(this)
 
         if (prefs.isGhostCameraEnabled) {
-            GhostCameraManager.prepareMedia(this)
+            GhostCameraManager.prepareMedia(this)  // يحمّل الـ 3 slots تلقائياً
             GhostCameraManager.startVirtualCamera(this)
             if (prefs.showCameraTool) {
-                floatingTool = FloatingCameraToolController(this) {
+                floatingTool = FloatingCameraToolController(this) { _ ->
                     // Navigate back to SecSettings Ghost Engine screen
                     val secSettingsIntent = packageManager
                         .getLaunchIntentForPackage("com.android.settings")
