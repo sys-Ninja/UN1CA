@@ -12,7 +12,7 @@
         android:id="@+id/btn_ghost_toggle"
         android:layout_width="34dp"
         android:layout_height="34dp"
-        android:background="?attr/selectableItemBackgroundBorderless"
+        android:background="@android:color/transparent"
         android:src="@android:drawable/ic_menu_camera"
         android:tint="#FFFFFF"
         android:contentDescription="Toggle Ghost" />
@@ -27,7 +27,7 @@
         android:textSize="13sp"
         android:textStyle="bold"
         android:textColor="#FFFFFF"
-        android:background="?attr/selectableItemBackgroundBorderless" />
+        android:background="@android:color/transparent" />
 
     <TextView
         android:id="@+id/btn_slot_2"
@@ -39,7 +39,7 @@
         android:textSize="13sp"
         android:textStyle="bold"
         android:textColor="#FFFFFF"
-        android:background="?attr/selectableItemBackgroundBorderless" />
+        android:background="@android:color/transparent" />
 
     <TextView
         android:id="@+id/btn_slot_3"
@@ -51,14 +51,14 @@
         android:textSize="13sp"
         android:textStyle="bold"
         android:textColor="#FFFFFF"
-        android:background="?attr/selectableItemBackgroundBorderless" />
+        android:background="@android:color/transparent" />
 
     <ImageButton
         android:id="@+id/btn_next_media"
         android:layout_width="34dp"
         android:layout_height="34dp"
         android:layout_marginStart="6dp"
-        android:background="?attr/selectableItemBackgroundBorderless"
+        android:background="@android:color/transparent"
         android:src="@android:drawable/ic_media_next"
         android:tint="#FFFFFF"
         android:contentDescription="Next Slot" />
@@ -68,9 +68,20 @@
         android:layout_width="34dp"
         android:layout_height="34dp"
         android:layout_marginStart="4dp"
-        android:background="?attr/selectableItemBackgroundBorderless"
+        android:background="@android:color/transparent"
         android:src="@android:drawable/ic_menu_gallery"
         android:tint="#FFFFFF"
         android:contentDescription="Pick Media" />
+
+    <TextView
+        android:id="@+id/lbl_slot_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="6dp"
+        android:layout_marginEnd="4dp"
+        android:textSize="11sp"
+        android:textColor="#CCFFFFFF"
+        android:maxLines="1"
+        android:ellipsize="end" />
 
 </LinearLayout>
