@@ -77,13 +77,18 @@ done
 for f in "$APKTOOL_DIR/system/priv-app/wallpaper-res/wallpaper-res.apk/res/drawable-nodpi/wallpaper_"*.webp; do
     COMPRESS_WEBP "$f"
 done
+if [ -d "$MODPATH/assets" ]; then
+    LOG "- Adding custom wallpapers"
+    for wallpaper_file in "$MODPATH/assets/"*.webp; do
+        [ -f "$wallpaper_file" ] || continue
+        COMPRESS_WEBP "$wallpaper_file"
+        cp -f "$wallpaper_file" \
+            "$APKTOOL_DIR/system/priv-app/wallpaper-res/wallpaper-res.apk/res/drawable-nodpi/"
+    done
+fi
 for f in "$APKTOOL_DIR/system/priv-app/wallpaper-res/wallpaper-res.apk/res/raw/video_"*.mp4; do
     ENCODE_MP4 "$f"
 done
-if [ -d "/assets" ]; then
-    LOG "- Adding custom wallpapers"
-    cp -f "/assets/"*.webp         "/system/priv-app/wallpaper-res/wallpaper-res.apk/res/drawable-nodpi/"
-fi
 LOG "- Downloading latest Samsung Wallpaper app"
 DOWNLOAD_FILE "$(GET_GALAXY_STORE_DOWNLOAD_URL "000008552712")" \
     "$WORK_DIR/system/system/priv-app/SpriteWallpaper/SpriteWallpaper.apk"
