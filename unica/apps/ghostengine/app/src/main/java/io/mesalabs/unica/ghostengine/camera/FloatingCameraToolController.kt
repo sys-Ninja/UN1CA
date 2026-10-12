@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
 import android.graphics.PixelFormat
-import android.view.ContextThemeWrapper
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.MotionEvent
@@ -43,10 +42,9 @@ class FloatingCameraToolController(
     fun show() {
         if (toolView != null) return
 
-        // Wrap context with Theme.GhostEngine to avoid InflateException
-        // when resolving ?attr/ attributes in a WindowManager overlay context
-        val themedContext = ContextThemeWrapper(context, R.style.Theme_GhostEngine)
-        toolView = LayoutInflater.from(themedContext).inflate(R.layout.floating_camera_tool, null)
+        // Inflate directly with context - no ContextThemeWrapper needed
+        // XML uses only hardcoded colors and @android: resources (no ?attr/)
+        toolView = LayoutInflater.from(context).inflate(R.layout.floating_camera_tool, null)
 
         val btnToggle = toolView!!.findViewById<ImageButton>(R.id.btn_ghost_toggle)
         val btnSlot1  = toolView!!.findViewById<TextView>(R.id.btn_slot_1)
