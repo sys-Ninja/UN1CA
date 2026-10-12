@@ -57,6 +57,15 @@ class ScreenCaptureEngine(
             2
         )
 
+        // Android 14+ (API 34+): Must register callback BEFORE createVirtualDisplay
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            mediaProjection.registerCallback(object : android.media.projection.MediaProjection.Callback() {
+                override fun onStop() {
+                    android.util.Log.d("ScreenCaptureEngine", "MediaProjection stopped externally")
+                }
+            }, android.os.Handler(android.os.Looper.getMainLooper()))
+        }
+
         virtualDisplay = mediaProjection.createVirtualDisplay(
             "ScreenTranslatorCapture",
             screenWidth,
