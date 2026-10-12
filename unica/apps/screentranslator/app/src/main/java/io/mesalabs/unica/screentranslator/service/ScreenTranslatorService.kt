@@ -51,14 +51,24 @@ class ScreenTranslatorService : Service() {
         }
 
         try {
-            val mpManager = getSystemService(Context.MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
-            mediaProjection = mpManager.getMediaProjection(resultCode, resultData)
-
+            // Android 14+: startForeground MUST come before getMediaProjection
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
                 startForeground(2001, createNotification(),
                     android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION)
             } else {
                 startForeground(2001, createNotification())
+            }
+
+            val mpManager = getSystemService(Context.MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
+            mediaProjection = mpManager.getMediaProjection(resultCode, resultData)
+
+            // Android 14+: MUST register callback before createVirtualDisplay
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                mediaProjection?.registerCallback(object : android.media.projection.MediaProjection.Callback() {
+                    override fun onStop() {
+                        stopSelf()
+                    }
+                }, android.os.Handler(android.os.Looper.getMainLooper()))
             }
 
             initEngines()
