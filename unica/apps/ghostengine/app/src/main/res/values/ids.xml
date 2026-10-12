@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <item type="id" name="lbl_slot_status" />
+    <!-- lbl_slot_status id is declared directly in floating_camera_tool.xml -->
 </resources>
