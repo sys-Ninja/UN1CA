@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
 import android.graphics.PixelFormat
+import android.view.ContextThemeWrapper
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.MotionEvent
@@ -28,9 +29,9 @@ class FloatingCameraToolController(
 
     // Slot metadata
     private val slotLabels = mapOf(
-        1 to "👤 Selfie",
-        2 to "🪪 ID Front",
-        3 to "🪪 ID Back"
+        1 to "\uD83D\uDC64 Selfie",
+        2 to "\uD83E\uDEAA ID Front",
+        3 to "\uD83E\uDEAA ID Back"
     )
     private val slotColors = mapOf(
         1 to "#00C853",   // green = front camera
@@ -42,7 +43,10 @@ class FloatingCameraToolController(
     fun show() {
         if (toolView != null) return
 
-        toolView = LayoutInflater.from(context).inflate(R.layout.floating_camera_tool, null)
+        // Wrap context with Theme.GhostEngine to avoid InflateException
+        // when resolving ?attr/ attributes in a WindowManager overlay context
+        val themedContext = ContextThemeWrapper(context, R.style.Theme_GhostEngine)
+        toolView = LayoutInflater.from(themedContext).inflate(R.layout.floating_camera_tool, null)
 
         val btnToggle = toolView!!.findViewById<ImageButton>(R.id.btn_ghost_toggle)
         val btnSlot1  = toolView!!.findViewById<TextView>(R.id.btn_slot_1)
@@ -60,7 +64,7 @@ class FloatingCameraToolController(
             }
             lblStatus?.text = slotLabels[currentSlot] ?: "Slot $currentSlot"
             // Show which camera is active
-            val camLabel = if (currentSlot == 1) "📷 Front Cam" else "📷 Back Cam"
+            val camLabel = if (currentSlot == 1) "\uD83D\uDCF7 Front Cam" else "\uD83D\uDCF7 Back Cam"
             lblStatus?.append("  $camLabel")
         }
 
