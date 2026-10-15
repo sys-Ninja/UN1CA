@@ -167,4 +167,8 @@
     <string name="unica_vc_preset_cyborg">Cyborg</string>
     <string name="unica_vc_global_title">Apply to all apps</string>
     <string name="unica_vc_global_summary">Change voice in WhatsApp, Messenger, voice recordings and third-party apps</string>
+    <string name="unica_vc_inject_title">Inject recording to microphone</string>
+    <string name="unica_vc_inject_summary">Stream shared audio file into microphone for WhatsApp and other apps, then turn off automatically</string>
+    <string name="unica_vc_inject_share_title">Inject to Mic 💉</string>
+    <string name="unica_vc_inject_ready_toast">💉 Audio ready for injection! Record in WhatsApp now</string>
 </resources>
