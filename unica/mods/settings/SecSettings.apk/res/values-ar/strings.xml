@@ -165,4 +165,8 @@
     <string name="unica_vc_preset_cyborg">سايبورغ</string>
     <string name="unica_vc_global_title">تطبيق على كافة التطبيقات</string>
     <string name="unica_vc_global_summary">تغيير الصوت في واتساب، ماسنجر، التسجيلات الصوتية وكافة التطبيقات</string>
+    <string name="unica_vc_inject_title">حقن تسجيل الصوت في المايك</string>
+    <string name="unica_vc_inject_summary">بث التسجيل المشارك مباشرة في مايك واتساب والتطبيقات، ثم الإيقاف التلقائي</string>
+    <string name="unica_vc_inject_share_title">حقن في الريكورد 💉</string>
+    <string name="unica_vc_inject_ready_toast">💉 تم تجهيز الصوت للحقن! سجل ريكورد الآن</string>
 </resources>
