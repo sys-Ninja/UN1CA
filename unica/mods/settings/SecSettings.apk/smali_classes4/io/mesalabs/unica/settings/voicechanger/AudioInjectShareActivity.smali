@@ -24,7 +24,7 @@
 
     move-result-object p1
 
-    if-eqz p1, :cond_4
+    if-eqz p1, :cond_5
 
     const-string v0, "android.intent.extra.STREAM"
 
@@ -41,49 +41,57 @@
     move-result-object v0
 
     :cond_0
-    if-eqz v0, :cond_4
+    if-eqz v0, :cond_5
 
-    invoke-virtual {p0}, Landroid/app/Activity;->getContentResolver()Landroid/content/ContentResolver;
-
-    move-result-object p1
-
-    invoke-virtual {p1, v0}, Landroid/content/ContentResolver;->openInputStream(Landroid/net/Uri;)Ljava/io/InputStream;
-
-    move-result-object p1
-
-    if-eqz p1, :cond_4
-
-    new-instance v0, Ljava/io/File;
+    new-instance p1, Ljava/io/File;
 
     const-string v1, "/sdcard/Recordings"
 
-    invoke-direct {v0, v1}, Ljava/io/File;-><init>(Ljava/lang/String;)V
+    invoke-direct {p1, v1}, Ljava/io/File;-><init>(Ljava/lang/String;)V
 
-    invoke-virtual {v0}, Ljava/io/File;->exists()Z
+    invoke-virtual {p1}, Ljava/io/File;->exists()Z
 
     move-result v1
 
     if-nez v1, :cond_1
 
-    invoke-virtual {v0}, Ljava/io/File;->mkdirs()Z
+    invoke-virtual {p1}, Ljava/io/File;->mkdirs()Z
 
     :cond_1
-    new-instance v0, Ljava/io/File;
+    new-instance p1, Ljava/io/File;
 
     const-string v1, "/sdcard/Recordings/unica_inject.wav"
 
-    invoke-direct {v0, v1}, Ljava/io/File;-><init>(Ljava/lang/String;)V
+    invoke-direct {p1, v1}, Ljava/io/File;-><init>(Ljava/lang/String;)V
+
+    # 1. Try decoding with MediaCodec
+    invoke-static {p0, v0, p1}, Lio/mesalabs/unica/settings/voicechanger/AudioDecoder;->decodeToWav(Landroid/content/Context;Landroid/net/Uri;Ljava/io/File;)Z
+
+    move-result v1
+
+    if-nez v1, :cond_4
+
+    # 2. Fallback: direct stream copy
+    invoke-virtual {p0}, Landroid/app/Activity;->getContentResolver()Landroid/content/ContentResolver;
+
+    move-result-object v1
+
+    invoke-virtual {v1, v0}, Landroid/content/ContentResolver;->openInputStream(Landroid/net/Uri;)Ljava/io/InputStream;
+
+    move-result-object v0
+
+    if-eqz v0, :cond_4
 
     new-instance v1, Ljava/io/FileOutputStream;
 
-    invoke-direct {v1, v0}, Ljava/io/FileOutputStream;-><init>(Ljava/io/File;)V
+    invoke-direct {v1, p1}, Ljava/io/FileOutputStream;-><init>(Ljava/io/File;)V
 
-    const/16 v0, 0x2000
+    const/16 p1, 0x2000
 
-    new-array v0, v0, [B
+    new-array p1, p1, [B
 
     :goto_0
-    invoke-virtual {p1, v0}, Ljava/io/InputStream;->read([B)I
+    invoke-virtual {v0, p1}, Ljava/io/InputStream;->read([B)I
 
     move-result v2
 
@@ -93,7 +101,7 @@
 
     const/4 v3, 0x0
 
-    invoke-virtual {v1, v0, v3, v2}, Ljava/io/FileOutputStream;->write([BII)V
+    invoke-virtual {v1, p1, v3, v2}, Ljava/io/FileOutputStream;->write([BII)V
 
     goto :goto_0
 
@@ -102,8 +110,9 @@
 
     invoke-virtual {v1}, Ljava/io/FileOutputStream;->close()V
 
-    invoke-virtual {p1}, Ljava/io/InputStream;->close()V
+    invoke-virtual {v0}, Ljava/io/InputStream;->close()V
 
+    :cond_4
     # Set property to enable injection
     const-string p1, "persist.sys.unica.vc.inject"
 
@@ -135,7 +144,7 @@
 
     invoke-static {v0, v1, p1}, Landroid/util/Log;->e(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)I
 
-    :cond_4
+    :cond_5
     :goto_1
     invoke-virtual {p0}, Landroid/app/Activity;->finish()V
 
