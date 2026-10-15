@@ -6,6 +6,7 @@ on:
   push:
     branches:
       - 'sixteen'
+      - 'sixteen-mic-inject'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
