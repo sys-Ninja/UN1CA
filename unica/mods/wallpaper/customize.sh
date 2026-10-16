@@ -99,4 +99,33 @@ APPLY_PATCH "system" "system/priv-app/SpriteWallpaper/SpriteWallpaper.apk" \
 APPLY_PATCH "system" "system/priv-app/wallpaper-res/wallpaper-res.apk" \
     "$MODPATH/wallpaper-res.apk/0001-Adjust-metadata-for-60fps-video-files.patch"
 
+
+LOG "- Updating resources_info.json with custom wallpapers"
+python3 -c "
+import json, os
+json_path = '$APKTOOL_DIR/system/priv-app/wallpaper-res/wallpaper-res.apk/res/raw/resources_info.json'
+if os.path.isfile(json_path):
+    with open(json_path, 'r', encoding='utf-8') as f:
+        data = json.load(f)
+    phone_list = data.setdefault('phone', [])
+    existing = {x.get('filename') for x in phone_list}
+    cur_idx = len(phone_list)
+    for num in range(11, 21):
+        fname = f'wallpaper_{num}.png'
+        if fname not in existing:
+            phone_list.append({
+                'isDefault': False,
+                'index': cur_idx,
+                'which': 3,
+                'screen': 0,
+                'type': 0,
+                'filename': fname,
+                'frame_no': -1,
+                'cmf_info': ['']
+            })
+            cur_idx += 1
+    with open(json_path, 'w', encoding='utf-8') as f:
+        json.dump(data, f, indent=2)
+"
+
 unset -f ENCODE_MP4 COMPRESS_WEBP
