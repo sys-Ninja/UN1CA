@@ -350,7 +350,7 @@ object GhostCameraManager {
             val vdmClass = Class.forName("android.companion.virtual.VirtualDeviceManager")
             val vdm = context.getSystemService(vdmClass) ?: return
 
-            val pbClass = Class.forName("android.companion.virtual.VirtualDeviceParams$Builder")
+            val pbClass = Class.forName("android.companion.virtual.VirtualDeviceParams" + "$" + "Builder")
             val pb = pbClass.getDeclaredConstructor().newInstance()
             pbClass.getMethod("setName", String::class.java).invoke(pb, "GhostEngine")
             val params = pbClass.getMethod("build").invoke(pb)
@@ -362,7 +362,7 @@ object GhostCameraManager {
                     .invoke(vdm, -1, params)
             } ?: return
 
-            val vcbClass = Class.forName("android.companion.virtual.camera.VirtualCameraConfig$Builder")
+            val vcbClass = Class.forName("android.companion.virtual.camera.VirtualCameraConfig" + "$" + "Builder")
             val vcb = vcbClass.getDeclaredConstructor(String::class.java).newInstance(name)
             try { vcbClass.getMethod("setLensFacing", Int::class.javaPrimitiveType).invoke(vcb, lensFacing) } catch (_: Exception) {}
             try {
@@ -381,7 +381,7 @@ object GhostCameraManager {
             Log.i(TAG, "Virtual camera registered: $name (lensFacing=$lensFacing)")
 
             val cbClass = try {
-                Class.forName("android.companion.virtual.camera.VirtualCamera$Callback")
+                Class.forName("android.companion.virtual.camera.VirtualCamera" + "$" + "Callback")
             } catch (_: Exception) {
                 Class.forName("android.companion.virtual.camera.VirtualCameraCallback")
             }
