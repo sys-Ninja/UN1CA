@@ -7,6 +7,8 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Rect
 import android.graphics.Typeface
+import android.os.Handler
+import android.os.Looper
 import android.view.View
 
 data class TranslationBlock(
@@ -18,6 +20,7 @@ data class TranslationBlock(
 
 class LiveSubtitleOverlayView(context: Context) : View(context) {
 
+    private val mainHandler = Handler(Looper.getMainLooper())
     private var blocks: List<TranslationBlock> = emptyList()
     private var visible = true
     private var currentAlpha = 255
@@ -35,17 +38,42 @@ class LiveSubtitleOverlayView(context: Context) : View(context) {
     }
 
     fun setBlocks(newBlocks: List<TranslationBlock>) {
-        if (!visible) return
-        blocks = newBlocks
-        invalidate()
+        if (Looper.myLooper() == Looper.getMainLooper()) {
+            if (!visible) return
+            blocks = newBlocks
+            invalidate()
+        } else {
+            mainHandler.post {
+                if (!visible) return@post
+                blocks = newBlocks
+                invalidate()
+            }
+        }
     }
 
     fun clearSubtitles() {
-        blocks = emptyList()
-        invalidate()
+        if (Looper.myLooper() == Looper.getMainLooper()) {
+            blocks = emptyList()
+            invalidate()
+        } else {
+            mainHandler.post {
+                blocks = emptyList()
+                invalidate()
+            }
+        }
     }
 
     fun hideTemporarily(ms: Long = 1500) {
+        if (Looper.myLooper() == Looper.getMainLooper()) {
+            performHideTemporarily(ms)
+        } else {
+            mainHandler.post {
+                performHideTemporarily(ms)
+            }
+        }
+    }
+
+    private fun performHideTemporarily(ms: Long) {
         if (!visible) return
         visible = false
         
@@ -58,7 +86,7 @@ class LiveSubtitleOverlayView(context: Context) : View(context) {
         }
         fadeOut.start()
 
-        postDelayed({
+        mainHandler.postDelayed({
             visible = true
             val fadeIn = ValueAnimator.ofInt(0, 255).apply {
                 duration = 150
