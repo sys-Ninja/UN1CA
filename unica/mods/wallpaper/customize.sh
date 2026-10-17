@@ -1,5 +1,5 @@
 if $DEBUG; then
-    LOG "[0;33m! Debug build detected. Skipping[0m"
+    LOG "\033[0;33m! Debug build detected. Skipping\033[0m"
     return 0
 fi
 
@@ -16,7 +16,8 @@ COMPRESS_WEBP()
     FILE_NAME="$(basename "$FILE")"
 
     if $TARGET_COMMON_SUPPORT_DYN_RESOLUTION_CONTROL; then
-        if [ "$TARGET_PRODUCT_SHIPPING_API_LEVEL" -gt "30" ] &&                 [ "$TARGET_PRODUCT_SHIPPING_API_LEVEL" -lt "34" ]; then
+        if [ "$TARGET_PRODUCT_SHIPPING_API_LEVEL" -gt "30" ] && \
+                [ "$TARGET_PRODUCT_SHIPPING_API_LEVEL" -lt "34" ]; then
             RES="3088"
         else
             RES="3120"
@@ -28,11 +29,11 @@ COMPRESS_WEBP()
     CMD="cwebp"
     CMD+=" -q 100"
     CMD+=" -resize $RES $RES"
-    CMD+=" "$FILE_PATH/$FILE_NAME""
-    CMD+=" -o "$FILE_PATH/temp.webp""
+    CMD+=" \"$FILE_PATH/$FILE_NAME\""
+    CMD+=" -o \"$FILE_PATH/temp.webp\""
 
     EVAL "$CMD" || return 1
-    EVAL "mv -f "$FILE_PATH/temp.webp" "$FILE_PATH/$FILE_NAME"" || return 1
+    EVAL "mv -f \"$FILE_PATH/temp.webp\" \"$FILE_PATH/$FILE_NAME\"" || return 1
 }
 
 ENCODE_MP4()
@@ -53,21 +54,22 @@ ENCODE_MP4()
     LOG "- Encoding $FILE_NAME"
 
     CMD="ffmpeg"
-    CMD+=" -i "$FILE_PATH/$FILE_NAME""
+    CMD+=" -i \"$FILE_PATH/$FILE_NAME\""
     CMD+=" -c:v libx264 -c:a copy"
     CMD+=" -pix_fmt yuv420p -crf 18 -g 1"
     CMD+=" -preset veryslow -tune zerolatency"
     CMD+=" -movflags use_metadata_tags -map_metadata 0"
-    CMD+=" -vf "fps=60,scale=$RES,setsar=1:1""
+    CMD+=" -vf \"fps=60,scale=$RES,setsar=1:1\""
     CMD+=" -video_track_timescale 360000 -movie_timescale 90000"
-    CMD+=" "$FILE_PATH/temp.mp4""
+    CMD+=" \"$FILE_PATH/temp.mp4\""
 
     EVAL "$CMD" || return 1
-    EVAL "mv -f "$FILE_PATH/temp.mp4" "$FILE_PATH/$FILE_NAME"" || return 1
+    EVAL "mv -f \"$FILE_PATH/temp.mp4\" \"$FILE_PATH/$FILE_NAME\"" || return 1
 }
 # ]
 
-ADD_TO_WORK_DIR "pa2qxxx" "system"     "system/priv-app/wallpaper-res/wallpaper-res.apk" 0 0 644 "u:object_r:system_file:s0"
+ADD_TO_WORK_DIR "pa2qxxx" "system" \
+    "system/priv-app/wallpaper-res/wallpaper-res.apk" 0 0 644 "u:object_r:system_file:s0"
 DECODE_APK "system" "system/priv-app/wallpaper-res/wallpaper-res.apk"
 for f in "$APKTOOL_DIR/system/priv-app/wallpaper-res/wallpaper-res.apk/res/drawable-nodpi/dex_wallpaper_"*.webp; do
     COMPRESS_WEBP "$f"
@@ -80,23 +82,28 @@ if [ -d "$MODPATH/assets" ]; then
     for wallpaper_file in "$MODPATH/assets/"*.webp; do
         [ -f "$wallpaper_file" ] || continue
         COMPRESS_WEBP "$wallpaper_file"
-        cp -f "$wallpaper_file"             "$APKTOOL_DIR/system/priv-app/wallpaper-res/wallpaper-res.apk/res/drawable-nodpi/"
+        cp -f "$wallpaper_file" \
+            "$APKTOOL_DIR/system/priv-app/wallpaper-res/wallpaper-res.apk/res/drawable-nodpi/"
     done
 fi
 for f in "$APKTOOL_DIR/system/priv-app/wallpaper-res/wallpaper-res.apk/res/raw/video_"*.mp4; do
     ENCODE_MP4 "$f"
 done
 LOG "- Downloading latest Samsung Wallpaper app"
-DOWNLOAD_FILE "$(GET_GALAXY_STORE_DOWNLOAD_URL "000008552712")"     "$WORK_DIR/system/system/priv-app/SpriteWallpaper/SpriteWallpaper.apk"
-APPLY_PATCH "system" "system/priv-app/SpriteWallpaper/SpriteWallpaper.apk"     "$MODPATH/SpriteWallpaper.apk/0001-Force-Paradigm-wallpapers-motion-animator.patch"
-APPLY_PATCH "system" "system/priv-app/SpriteWallpaper/SpriteWallpaper.apk"     "$MODPATH/SpriteWallpaper.apk/0002-Adjust-motion-animator-for-60fps-video-files.patch"
-APPLY_PATCH "system" "system/priv-app/wallpaper-res/wallpaper-res.apk"     "$MODPATH/wallpaper-res.apk/0001-Adjust-metadata-for-60fps-video-files.patch"
+DOWNLOAD_FILE "$(GET_GALAXY_STORE_DOWNLOAD_URL "000008552712")" \
+    "$WORK_DIR/system/system/priv-app/SpriteWallpaper/SpriteWallpaper.apk"
+APPLY_PATCH "system" "system/priv-app/SpriteWallpaper/SpriteWallpaper.apk" \
+    "$MODPATH/SpriteWallpaper.apk/0001-Force-Paradigm-wallpapers-motion-animator.patch"
+APPLY_PATCH "system" "system/priv-app/SpriteWallpaper/SpriteWallpaper.apk" \
+    "$MODPATH/SpriteWallpaper.apk/0002-Adjust-motion-animator-for-60fps-video-files.patch"
+APPLY_PATCH "system" "system/priv-app/wallpaper-res/wallpaper-res.apk" \
+    "$MODPATH/wallpaper-res.apk/0001-Adjust-metadata-for-60fps-video-files.patch"
 
 LOG "- Updating wallpaper JSONs with custom wallpapers (Featured, Graphical, Legacy)"
 python3 -c "
 import json, os
 
-raw_dir = '$APKTOOL_DIR/system/priv-app/wallpaper-res/wallpaper-res.apk/res/raw'
+raw_dir = os.path.join(os.environ.get('APKTOOL_DIR', ''), 'system/priv-app/wallpaper-res/wallpaper-res.apk/res/raw')
 
 # 1. Update resources_info.json (Legacy / DeX)
 f_main = os.path.join(raw_dir, 'resources_info.json')
