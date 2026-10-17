@@ -13,9 +13,15 @@
             app:iconSpaceReserved="false" />
 
         <Preference
-            app:key="pref_select_media"
-            app:title="@string/pref_select_media"
-            app:summary="@string/pref_select_media_sum"
+            app:key="pref_select_media_slot1"
+            app:title="@string/pref_select_media_slot1"
+            app:summary="@string/pref_select_media_slot1_sum"
+            app:iconSpaceReserved="false" />
+
+        <Preference
+            app:key="pref_select_media_slot2"
+            app:title="@string/pref_select_media_slot2"
+            app:summary="@string/pref_select_media_slot2_sum"
             app:iconSpaceReserved="false" />
 
         <SwitchPreferenceCompat
@@ -23,6 +29,19 @@
             app:title="@string/pref_show_camera_tool"
             app:summary="@string/pref_show_camera_tool_sum"
             app:defaultValue="true"
+            app:iconSpaceReserved="false" />
+
+        <SwitchPreferenceCompat
+            app:key="pref_per_app_camera"
+            app:title="@string/pref_per_app_camera"
+            app:summary="@string/pref_per_app_camera_sum"
+            app:defaultValue="false"
+            app:iconSpaceReserved="false" />
+
+        <Preference
+            app:key="pref_select_camera_target_apps"
+            app:title="@string/pref_select_camera_target_apps"
+            app:summary="@string/all_apps_selected"
             app:iconSpaceReserved="false" />
 
     </PreferenceCategory>
