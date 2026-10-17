@@ -6,10 +6,21 @@
     <string name="pref_category_camera">Ghost Camera Feed</string>
     <string name="pref_ghost_camera_enabled">Enable Ghost Camera</string>
     <string name="pref_ghost_camera_sum">Feed custom video or image into camera stream</string>
+
     <string name="pref_select_media">Select Media Source</string>
     <string name="pref_select_media_sum">Choose an MP4 video or JPG/PNG image from gallery</string>
-    <string name="pref_show_camera_tool">Floating Camera Switcher</string>
-    <string name="pref_show_camera_tool_sum">Show quick floating pill to switch feeds while in camera apps</string>
+    <string name="pref_select_media_slot1">Front Camera Media (Slot 1 / Selfie)</string>
+    <string name="pref_select_media_slot1_sum">Choose selfie photo or video for front camera</string>
+    <string name="pref_select_media_slot2">Back Camera Media (Slot 2 / ID Front)</string>
+    <string name="pref_select_media_slot2_sum">Choose document/ID photo or video for back camera</string>
+
+    <string name="pref_show_camera_tool">Floating Camera Tool</string>
+    <string name="pref_show_camera_tool_sum">Show quick floating 4x4 panel to control feed, pan, zoom and presets</string>
+
+    <string name="pref_per_app_camera">Target Specific Apps Only</string>
+    <string name="pref_per_app_camera_sum">Feed virtual camera only into selected apps (Whitelist)</string>
+    <string name="pref_select_camera_target_apps">Select Target Camera Apps</string>
+    <string name="select_camera_apps_dialog_title">Select Apps for Virtual Camera</string>
 
     <string name="pref_category_location">Stealth GPS Spoofer</string>
     <string name="pref_stealth_gps_enabled">Enable Stealth GPS</string>
@@ -17,19 +28,26 @@
     <string name="pref_search_location">Spoofed Location</string>
     <string name="pref_floating_joystick">Floating Joystick</string>
     <string name="pref_floating_joystick_sum">On-screen joystick for manual movement in games and maps</string>
-    
-    <string name="pref_per_app_gps">Target Specific Apps Only</string>
+
+    <string name="pref_per_app_gps">Target Specific Apps Only (GPS)</string>
     <string name="pref_per_app_gps_sum">Apply spoofed location only to selected apps (Whitelist)</string>
     <string name="pref_select_target_apps">Select Target Apps</string>
     <string name="select_apps_dialog_title">Select Apps to Spoof</string>
     <string name="all_apps_selected">All installed apps</string>
-    <string name="apps_selected_format">%1$d apps selected</string>
+    <string name="apps_selected_format">%1 apps selected</string>
+
+    <string name="search_apps_hint">Search apps by name or package...</string>
+    <string name="select_all">Select All</string>
+    <string name="clear_all">Clear All</string>
 
     <string name="search_location_title">Search Location</string>
     <string name="search_location_hint">Type city name or place...</string>
     <string name="service_running_sum">Ghost Engine active (Stealth protection on)</string>
     <string name="media_selected">Media source loaded successfully</string>
     <string name="grant_overlay_permission">Please grant overlay permission for floating controls</string>
+    <string name="reset_transform_toast">Transformations reset</string>
+    <string name="passthrough_camera_on">Real Camera passthrough enabled</string>
+    <string name="passthrough_camera_off">Virtual Camera feed active</string>
     <string name="cancel">Cancel</string>
     <string name="save">Save</string>
     <string name="stop">Stop</string>
