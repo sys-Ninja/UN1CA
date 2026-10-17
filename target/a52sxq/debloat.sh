@@ -1,5 +1,6 @@
 # Copyright (c) 2026 sys-Ninja
 # SPDX-License-Identifier: GPL-3.0-or-later
+# shellcheck disable=SC2034
 
 # Debloat list for Galaxy A52s 5G (a52sxq)
 # Reclaims space in super partition for offline apps and mods
