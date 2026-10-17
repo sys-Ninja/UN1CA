@@ -374,6 +374,9 @@ jobs:
       - name: Build dependencies
         run: ./scripts/build_dependencies.sh
 
+      - name: Download Ayah offline assets
+        run: python3 scripts/download_ayah_offline.py
+
       - name: Download stock firmwares
         uses: nick-fields/retry@v4
         with:
@@ -384,9 +387,6 @@ jobs:
 
       - name: Extract stock firmwares
         run: ./scripts/extract_fw.sh
-
-      - name: Download Ayah offline assets
-        run: python3 scripts/download_ayah_offline.py
 
       - name: Build ROM
         run: |
