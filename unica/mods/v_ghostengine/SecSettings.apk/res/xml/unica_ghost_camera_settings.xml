@@ -31,4 +31,16 @@
         android:summary="@string/unica_ghost_tool_summary"
         settings:controller="io.mesalabs.unica.settings.ghostengine.GhostCameraTogglePreferenceController" />
 
+    <com.samsung.android.settings.widget.SecInsetCategoryPreference />
+
+    <Preference
+        android:key="unica_ghost_camera_dashboard"
+        android:title="@string/unica_ghost_camera_dashboard_title"
+        android:summary="@string/unica_ghost_camera_dashboard_summary"
+        settings:controller="io.mesalabs.unica.settings.GhostEnginePreferenceController">
+        <intent
+            android:action="io.mesalabs.unica.action.GHOST_ENGINE_SETTINGS"
+            android:targetPackage="io.mesalabs.unica.ghostengine" />
+    </Preference>
+
 </PreferenceScreen>
