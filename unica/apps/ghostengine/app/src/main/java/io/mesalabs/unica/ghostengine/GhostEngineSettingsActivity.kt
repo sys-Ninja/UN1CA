@@ -3,7 +3,7 @@ package io.mesalabs.unica.ghostengine
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ApplicationInfo
-import android.content.pm.PackageManager
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -11,7 +11,10 @@ import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import android.widget.CheckBox
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
@@ -35,6 +38,8 @@ import kotlinx.coroutines.launch
 
 class GhostEngineSettingsActivity : AppCompatActivity() {
 
+    private var activePickerSlot = 1
+
     private val mediaPickerLauncher = registerForActivityResult(
         ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
@@ -42,7 +47,13 @@ class GhostEngineSettingsActivity : AppCompatActivity() {
             val type = contentResolver.getType(uri) ?: ""
             val isVideo = type.startsWith("video/")
             val prefs = GhostEnginePrefs.get(this)
-            prefs.mediaUri = uri.toString()
+            val uriStr = uri.toString()
+            if (activePickerSlot == 2) {
+                prefs.mediaSlot2 = uriStr
+            } else {
+                prefs.mediaSlot1 = uriStr
+                prefs.mediaUri = uriStr
+            }
             prefs.isVideoMedia = isVideo
             Toast.makeText(this, R.string.media_selected, Toast.LENGTH_SHORT).show()
         }
@@ -52,11 +63,12 @@ class GhostEngineSettingsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         supportFragmentManager
             .beginTransaction()
-            .replace(android.R.id.content, GhostEngineFragment { pickMedia() })
+            .replace(android.R.id.content, GhostEngineFragment { slot -> pickMedia(slot) })
             .commit()
     }
 
-    fun pickMedia() {
+    fun pickMedia(slot: Int) {
+        activePickerSlot = slot
         mediaPickerLauncher.launch("*/*")
     }
 
@@ -87,7 +99,7 @@ class GhostEngineSettingsActivity : AppCompatActivity() {
     }
 }
 
-class GhostEngineFragment(private val onPickMediaRequested: () -> Unit) : PreferenceFragmentCompat() {
+class GhostEngineFragment(private val onPickMediaRequested: (slot: Int) -> Unit) : PreferenceFragmentCompat() {
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         preferenceManager.preferenceDataStore = null
@@ -99,6 +111,7 @@ class GhostEngineFragment(private val onPickMediaRequested: () -> Unit) : Prefer
         val prefs = GhostEnginePrefs.get(requireContext())
         val act = requireActivity() as GhostEngineSettingsActivity
 
+        // Camera Section
         findPreference<SwitchPreferenceCompat>("pref_ghost_camera_enabled")?.apply {
             isChecked = prefs.isGhostCameraEnabled
             setOnPreferenceChangeListener { _, newValue ->
@@ -109,9 +122,16 @@ class GhostEngineFragment(private val onPickMediaRequested: () -> Unit) : Prefer
             }
         }
 
-        findPreference<Preference>("pref_select_media")?.apply {
+        findPreference<Preference>("pref_select_media_slot1")?.apply {
             setOnPreferenceClickListener {
-                onPickMediaRequested()
+                onPickMediaRequested(1)
+                true
+            }
+        }
+
+        findPreference<Preference>("pref_select_media_slot2")?.apply {
+            setOnPreferenceClickListener {
+                onPickMediaRequested(2)
                 true
             }
         }
@@ -120,10 +140,41 @@ class GhostEngineFragment(private val onPickMediaRequested: () -> Unit) : Prefer
             isChecked = prefs.showCameraTool
             setOnPreferenceChangeListener { _, newValue ->
                 prefs.showCameraTool = newValue as Boolean
+                if (prefs.isGhostCameraEnabled) act.startGhostService()
                 true
             }
         }
 
+        val perAppCameraPref = findPreference<SwitchPreferenceCompat>("pref_per_app_camera")
+        val targetCameraAppsPref = findPreference<Preference>("pref_select_camera_target_apps")
+
+        perAppCameraPref?.apply {
+            isChecked = prefs.isPerAppCamera
+            setOnPreferenceChangeListener { _, newValue ->
+                val perApp = newValue as Boolean
+                prefs.isPerAppCamera = perApp
+                targetCameraAppsPref?.isEnabled = perApp
+                updateAppSummary(targetCameraAppsPref, perApp, prefs.cameraTargetPackages.size)
+                true
+            }
+        }
+
+        targetCameraAppsPref?.apply {
+            isEnabled = prefs.isPerAppCamera
+            updateAppSummary(this, prefs.isPerAppCamera, prefs.cameraTargetPackages.size)
+            setOnPreferenceClickListener {
+                showAppSelectionDialog(
+                    titleRes = R.string.select_camera_apps_dialog_title,
+                    currentSelected = prefs.cameraTargetPackages
+                ) { newSelected ->
+                    prefs.cameraTargetPackages = newSelected
+                    updateAppSummary(targetCameraAppsPref, prefs.isPerAppCamera, newSelected.size)
+                }
+                true
+            }
+        }
+
+        // Location Section
         findPreference<SwitchPreferenceCompat>("pref_stealth_gps_enabled")?.apply {
             isChecked = prefs.isStealthGpsEnabled
             setOnPreferenceChangeListener { _, newValue ->
@@ -151,66 +202,101 @@ class GhostEngineFragment(private val onPickMediaRequested: () -> Unit) : Prefer
             }
         }
 
-        val perAppPref = findPreference<SwitchPreferenceCompat>("pref_per_app_gps")
-        val targetAppsPref = findPreference<Preference>("pref_select_target_apps")
+        val perAppGpsPref = findPreference<SwitchPreferenceCompat>("pref_per_app_gps")
+        val targetGpsAppsPref = findPreference<Preference>("pref_select_target_apps")
 
-        perAppPref?.apply {
+        perAppGpsPref?.apply {
             isChecked = prefs.isPerAppGps
             setOnPreferenceChangeListener { _, newValue ->
                 val perApp = newValue as Boolean
                 prefs.isPerAppGps = perApp
-                targetAppsPref?.isEnabled = perApp
-                updateTargetAppsSummary(targetAppsPref, prefs)
+                targetGpsAppsPref?.isEnabled = perApp
+                updateAppSummary(targetGpsAppsPref, perApp, prefs.targetPackages.size)
                 true
             }
         }
 
-        targetAppsPref?.apply {
+        targetGpsAppsPref?.apply {
             isEnabled = prefs.isPerAppGps
-            updateTargetAppsSummary(this, prefs)
+            updateAppSummary(this, prefs.isPerAppGps, prefs.targetPackages.size)
             setOnPreferenceClickListener {
-                showTargetAppsDialog(this, prefs)
+                showAppSelectionDialog(
+                    titleRes = R.string.select_apps_dialog_title,
+                    currentSelected = prefs.targetPackages
+                ) { newSelected ->
+                    prefs.targetPackages = newSelected
+                    updateAppSummary(targetGpsAppsPref, prefs.isPerAppGps, newSelected.size)
+                }
                 true
             }
         }
     }
 
-    private fun updateTargetAppsSummary(pref: Preference?, prefs: GhostEnginePrefs) {
+    private fun updateAppSummary(pref: Preference?, isPerApp: Boolean, count: Int) {
         if (pref == null) return
-        if (!prefs.isPerAppGps || prefs.targetPackages.isEmpty()) {
+        if (!isPerApp || count == 0) {
             pref.summary = getString(R.string.all_apps_selected)
         } else {
-            pref.summary = getString(R.string.apps_selected_format, prefs.targetPackages.size)
+            pref.summary = getString(R.string.apps_selected_format, count)
         }
     }
 
-    private fun showTargetAppsDialog(pref: Preference, prefs: GhostEnginePrefs) {
-        val pm = requireContext().packageManager
+    private fun showAppSelectionDialog(
+        titleRes: Int,
+        currentSelected: Set<String>,
+        onSave: (Set<String>) -> Unit
+    ) {
+        val ctx = requireContext()
+        val pm = ctx.packageManager
+        val dialogView = LayoutInflater.from(ctx).inflate(R.layout.dialog_select_apps, null)
+        val editSearch = dialogView.findViewById<EditText>(R.id.edit_search_app)
+        val btnSelectAll = dialogView.findViewById<Button>(R.id.btn_select_all)
+        val btnClearAll = dialogView.findViewById<Button>(R.id.btn_clear_all)
+        val recycler = dialogView.findViewById<RecyclerView>(R.id.recycler_target_apps)
+
         val mainIntent = Intent(Intent.ACTION_MAIN, null).apply {
             addCategory(Intent.CATEGORY_LAUNCHER)
         }
-        val apps = pm.queryIntentActivities(mainIntent, 0)
+        val appList = pm.queryIntentActivities(mainIntent, 0)
             .map { it.activityInfo.applicationInfo }
             .distinctBy { it.packageName }
-            .sortedBy { pm.getApplicationLabel(it).toString().lowercase() }
+            .map { info ->
+                AppEntry(
+                    label = pm.getApplicationLabel(info).toString(),
+                    packageName = info.packageName,
+                    icon = pm.getApplicationIcon(info),
+                    isChecked = currentSelected.contains(info.packageName)
+                )
+            }
+            .sortedBy { it.label.lowercase() }
 
-        val appNames = apps.map { pm.getApplicationLabel(it).toString() }.toTypedArray()
-        val appPackages = apps.map { it.packageName }
-        val checkedItems = BooleanArray(apps.size) { i ->
-            prefs.targetPackages.contains(appPackages[i])
+        val selectedSet = currentSelected.toMutableSet()
+        val adapter = AppListAdapter(appList) { entry, checked ->
+            if (checked) selectedSet.add(entry.packageName) else selectedSet.remove(entry.packageName)
         }
 
-        val selectedPackages = prefs.targetPackages.toMutableSet()
+        recycler.layoutManager = LinearLayoutManager(ctx)
+        recycler.adapter = adapter
 
-        AlertDialog.Builder(requireContext())
-            .setTitle(R.string.select_apps_dialog_title)
-            .setMultiChoiceItems(appNames, checkedItems) { _, which, isChecked ->
-                val pkg = appPackages[which]
-                if (isChecked) selectedPackages.add(pkg) else selectedPackages.remove(pkg)
-            }
+        btnSelectAll.setOnClickListener {
+            adapter.selectAll()
+            appList.forEach { selectedSet.add(it.packageName) }
+        }
+
+        btnClearAll.setOnClickListener {
+            adapter.clearAll()
+            selectedSet.clear()
+        }
+
+        editSearch.doAfterTextChanged { text ->
+            adapter.filter(text?.toString() ?: "")
+        }
+
+        AlertDialog.Builder(ctx)
+            .setTitle(titleRes)
+            .setView(dialogView)
             .setPositiveButton(R.string.save) { _, _ ->
-                prefs.targetPackages = selectedPackages
-                updateTargetAppsSummary(pref, prefs)
+                onSave(selectedSet)
             }
             .setNegativeButton(R.string.cancel, null)
             .show()
@@ -264,6 +350,73 @@ class GhostEngineFragment(private val onPickMediaRequested: () -> Unit) : Prefer
         }
 
         dialog.show()
+    }
+}
+
+data class AppEntry(
+    val label: String,
+    val packageName: String,
+    val icon: Drawable,
+    var isChecked: Boolean
+)
+
+class AppListAdapter(
+    private val allItems: List<AppEntry>,
+    private val onCheckChanged: (AppEntry, Boolean) -> Unit
+) : RecyclerView.Adapter<AppListAdapter.ViewHolder>() {
+
+    private val filteredItems = mutableListOf<AppEntry>().apply { addAll(allItems) }
+
+    fun filter(query: String) {
+        val q = query.trim().lowercase()
+        filteredItems.clear()
+        if (q.isEmpty()) {
+            filteredItems.addAll(allItems)
+        } else {
+            allItems.filterTo(filteredItems) {
+                it.label.lowercase().contains(q) || it.packageName.lowercase().contains(q)
+            }
+        }
+        notifyDataSetChanged()
+    }
+
+    fun selectAll() {
+        allItems.forEach { it.isChecked = true }
+        notifyDataSetChanged()
+    }
+
+    fun clearAll() {
+        allItems.forEach { it.isChecked = false }
+        notifyDataSetChanged()
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_target_app, parent, false)
+        return ViewHolder(view)
+    }
+
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        val item = filteredItems[position]
+        holder.icon.setImageDrawable(item.icon)
+        holder.txtLabel.text = item.label
+        holder.txtPkg.text = item.packageName
+        holder.checkBox.isChecked = item.isChecked
+
+        holder.itemView.setOnClickListener {
+            val newChecked = !item.isChecked
+            item.isChecked = newChecked
+            holder.checkBox.isChecked = newChecked
+            onCheckChanged(item, newChecked)
+        }
+    }
+
+    override fun getItemCount(): Int = filteredItems.size
+
+    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val icon: ImageView = view.findViewById(R.id.img_app_icon)
+        val txtLabel: TextView = view.findViewById(R.id.txt_app_label)
+        val txtPkg: TextView = view.findViewById(R.id.txt_app_package)
+        val checkBox: CheckBox = view.findViewById(R.id.chk_app_selected)
     }
 }
 
