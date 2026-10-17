@@ -3,6 +3,7 @@
 Downloads Ayah APK, 7 offline Tafsir databases, and full 114 Surahs of Al-Mokhtasar audio commentary
 directly into the UN1CA mod directory structure during GitHub Actions CI build.
 Ensures 100% genuine, complete files from official Ayah servers with zero dummy files.
+Deduplicates audio and databases to strictly fit within the target physical super partition.
 Runs entirely in CI runner.
 """
 
@@ -109,10 +110,6 @@ def download_and_extract_book(book_id, url):
                     extracted_path = os.path.join(BOOKS_TARGET_DIR, os.path.basename(db_name))
                     with open(extracted_path, "wb") as f:
                         f.write(z.read(db_name))
-                    alias_path = os.path.join(BOOKS_TARGET_DIR, f"{book_id}.db")
-                    if alias_path != extracted_path:
-                        with open(alias_path, "wb") as f:
-                            f.write(z.read(db_name))
             return True, f"Tafsir {book_id} extracted ({len(data):,} bytes zip)"
         except Exception as e:
             if attempt == 3:
@@ -133,33 +130,41 @@ def download_audio_track(surah_num):
         f"{surah_num:03d}.mp3",
     ]
 
-    local_primary = os.path.join(AUDIO_TARGET_DIR, f"{surah_num:03d}_4.mp3")
-    local_secondary = os.path.join(AUDIO_TARGET_DIR, f"{surah_num:03d}-4.mp3")
+    local_file = os.path.join(AUDIO_TARGET_DIR, f"{surah_num:03d}_4.mp3")
 
-    if os.path.exists(local_primary) and os.path.getsize(local_primary) >= 10240 and        os.path.exists(local_secondary) and os.path.getsize(local_secondary) >= 10240:
-        return True, f"Already exists: {surah_num:03d}"
+    if os.path.exists(local_file) and os.path.getsize(local_file) >= 10240:
+        return True, f"Already exists: {os.path.basename(local_file)}"
 
     for base_url in AUDIO_BASE_URLS:
         for fname in candidate_filenames:
             url = f"{base_url}/{fname}"
-            ok, msg = download_file_with_retry(url, local_primary, retries=3, delay=1, expected_min_size=10240)
+            ok, msg = download_file_with_retry(url, local_file, retries=3, delay=1, expected_min_size=10240)
             if ok:
-                if not os.path.exists(local_secondary):
-                    try:
-                        os.link(local_primary, local_secondary)
-                    except Exception:
-                        try:
-                            shutil.copy2(local_primary, local_secondary)
-                        except Exception:
-                            pass
                 return True, f"Surah {surah_num:03d} -> {url}"
 
     return False, f"Surah {surah_num:03d} failed across all endpoints and candidates"
+
+def cleanup_duplicates():
+    # Remove duplicate audio files (-4.mp3) to save ~175MB in system partition
+    if os.path.exists(AUDIO_TARGET_DIR):
+        for f in os.listdir(AUDIO_TARGET_DIR):
+            if f.endswith("-4.mp3"):
+                try: os.remove(os.path.join(AUDIO_TARGET_DIR, f))
+                except Exception: pass
+
+    # Remove non-dated alias duplicates of DBs to save ~35MB in system partition
+    if os.path.exists(BOOKS_TARGET_DIR):
+        for f in os.listdir(BOOKS_TARGET_DIR):
+            if f.endswith(".db") and not any(char.isdigit() for char in f):
+                try: os.remove(os.path.join(BOOKS_TARGET_DIR, f))
+                except Exception: pass
 
 def main():
     print("=" * 60)
     print("UN1CA Ayah Offline Assets Provisioning (CI Downloader)")
     print("=" * 60)
+
+    cleanup_duplicates()
 
     print("")
     print("[1/3] Downloading Ayah.apk...")
@@ -200,7 +205,6 @@ def main():
             if total_done % 10 == 0 or total_done == 114:
                 print(f" -> Progress: {success_count}/114 audio tracks downloaded ({len(failed_surahs)} failed)...")
 
-    # If any surah failed in parallel, retry sequentially with longer delay
     if failed_surahs:
         print(f" -> Retrying {len(failed_surahs)} failed surahs sequentially...")
         for s in list(failed_surahs):
@@ -217,11 +221,14 @@ def main():
         print(f"CRITICAL ERROR: {len(failed_surahs)} audio tracks could not be downloaded from official servers: {failed_surahs}")
         sys.exit(1)
 
+    cleanup_duplicates()
+
     print("")
     print("=" * 60)
     print("All Ayah offline assets successfully verified and complete 100%!")
     print(f" - APK size: {os.path.getsize(apk_path):,} bytes")
-    print(f" - Tafsir DB files: {len(os.listdir(BOOKS_TARGET_DIR))} files in {BOOKS_TARGET_DIR}")
+    db_files = [f for f in os.listdir(BOOKS_TARGET_DIR) if f.endswith('.db')]
+    print(f" - Tafsir DB files: {len(db_files)} files in {BOOKS_TARGET_DIR}")
     audio_files = [f for f in os.listdir(AUDIO_TARGET_DIR) if f.endswith('.mp3')]
     print(f" - Audio files verified: {len(audio_files)} files in {AUDIO_TARGET_DIR}")
     print("=" * 60)
