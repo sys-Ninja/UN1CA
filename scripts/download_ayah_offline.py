@@ -119,8 +119,8 @@ def main():
     print("UN1CA Ayah Offline Assets Provisioning (CI Downloader)")
     print("=" * 60)
 
-    print("
-[1/3] Downloading Ayah.apk...")
+    print("")
+    print("[1/3] Downloading Ayah.apk...")
     apk_path = os.path.join(APK_TARGET_DIR, "Ayah.apk")
     ok, msg = download_file_with_retry(APK_URL, apk_path, expected_min_size=50_000_000)
     print(f" -> {msg}")
@@ -128,8 +128,8 @@ def main():
         print("ERROR: Failed to download Ayah.apk")
         sys.exit(1)
 
-    print("
-[2/3] Downloading and extracting 7 Tafsir databases...")
+    print("")
+    print("[2/3] Downloading and extracting 7 Tafsir databases...")
     with ThreadPoolExecutor(max_workers=4) as executor:
         futures = {executor.submit(download_and_extract_book, b_id, url): b_id for b_id, url in TAFSIR_BOOKS}
         for future in as_completed(futures):
@@ -139,8 +139,8 @@ def main():
                 print("ERROR: Failed downloading Tafsir database")
                 sys.exit(1)
 
-    print("
-[3/3] Downloading 114 Surahs of Al-Mokhtasar Audio Commentary (parallel workers)...")
+    print("")
+    print("[3/3] Downloading 114 Surahs of Al-Mokhtasar Audio Commentary (parallel workers)...")
     success_count = 0
     with ThreadPoolExecutor(max_workers=8) as executor:
         futures = {executor.submit(download_audio_track, s): s for s in range(1, 115)}
@@ -154,8 +154,8 @@ def main():
             if success_count % 20 == 0 or success_count == 114:
                 print(f" -> Downloaded {success_count}/114 audio tracks...")
 
-    print("
-" + "=" * 60)
+    print("")
+    print("=" * 60)
     print("All Ayah offline assets successfully downloaded and prepared!")
     print(f" - APK size: {os.path.getsize(apk_path):,} bytes")
     print(f" - Tafsir DB files: {len(os.listdir(BOOKS_TARGET_DIR))} files in {BOOKS_TARGET_DIR}")
