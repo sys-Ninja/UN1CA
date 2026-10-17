@@ -1,0 +1,13 @@
+system 0 0 755 capabilities=0x0
+system/app 0 0 755 capabilities=0x0
+system/app/Ayah 0 0 755 capabilities=0x0
+system/app/Ayah/Ayah.apk 0 0 644 capabilities=0x0
+system/bin 0 2000 751 capabilities=0x0
+system/bin/ayah_preload.sh 0 2000 755 capabilities=0x0
+system/etc 0 0 755 capabilities=0x0
+system/etc/init 0 0 755 capabilities=0x0
+system/etc/init/ayah_preload.rc 0 0 644 capabilities=0x0
+system/etc/ayah 0 0 755 capabilities=0x0
+system/etc/ayah/books 0 0 755 capabilities=0x0
+system/etc/ayah/audio 0 0 755 capabilities=0x0
+system/etc/ayah/audio/ar-mokhtasar-asmari-abdulhakam 0 0 755 capabilities=0x0

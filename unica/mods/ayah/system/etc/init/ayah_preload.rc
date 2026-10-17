@@ -1,0 +1,8 @@
+service ayah_preload /system/bin/ayah_preload.sh
+    user root
+    group root system media_rw
+    disabled
+    oneshot
+
+on property:sys.boot_completed=1
+    start ayah_preload
