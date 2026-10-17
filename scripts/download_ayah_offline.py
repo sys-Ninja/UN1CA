@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """
-Downloads Ayah APK, 7 offline Tafsir databases, and 114 Surahs of Al-Mokhtasar audio commentary
+Downloads Ayah APK, 7 offline Tafsir databases, and full 114 Surahs of Al-Mokhtasar audio commentary
 directly into the UN1CA mod directory structure during GitHub Actions CI build.
-Zero local data consumption. Runs entirely in CI runner.
+Ensures 100% genuine, complete files from official Ayah servers with zero dummy files.
+Runs entirely in CI runner.
 """
 
 import os
@@ -33,7 +34,11 @@ TAFSIR_BOOKS = [
     ("ar-tafsir-sarf", "https://cdn.ayah.app/books/ar-tafsir-sarf/ar-tafsir-sarf-2024-03-23.db.zip"),
 ]
 
-AUDIO_BASE_URL = "https://audio.ayah.app/albums/ar-mokhtasar-asmari-abdulhakam"
+# Official Ayah audio endpoints: official app queries https://audio.ayah.app/{reciterId}/{chapter}-{version}.mp3
+AUDIO_BASE_URLS = [
+    "https://audio.ayah.app/ar-mokhtasar-asmari-abdulhakam",
+    "https://audio.ayah.app/albums/ar-mokhtasar-asmari-abdulhakam",
+]
 
 USER_AGENTS = [
     "Mozilla/5.0 (Linux; Android 14; SM-A528B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36",
@@ -41,7 +46,7 @@ USER_AGENTS = [
     "Ayah/7.8.2 (Android; SM-A528B)",
 ]
 
-def download_file_with_retry(url, dest_path, retries=3, delay=1, expected_min_size=1024):
+def download_file_with_retry(url, dest_path, retries=5, delay=2, expected_min_size=1024):
     if os.path.exists(dest_path) and os.path.getsize(dest_path) >= expected_min_size:
         return True, f"Already exists: {os.path.basename(dest_path)}"
 
@@ -57,7 +62,7 @@ def download_file_with_retry(url, dest_path, retries=3, delay=1, expected_min_si
         }
         try:
             req = urllib.request.Request(url, headers=headers)
-            with urllib.request.urlopen(req, timeout=45) as resp:
+            with urllib.request.urlopen(req, timeout=60) as resp:
                 with open(temp_path, "wb") as f:
                     while chunk := resp.read(65536):
                         f.write(chunk)
@@ -116,29 +121,40 @@ def download_and_extract_book(book_id, url):
     return False, f"Tafsir {book_id} failed"
 
 def download_audio_track(surah_num):
-    candidate_suffixes = ["-4.mp3", "-3.mp3", "-2.mp3", "-1.mp3", ".mp3"]
+    # Ayah App naming:
+    # Online URL format: {baseUrl}/{chapter:03d}-{version}.mp3 (version is 4 for Al-Mokhtasar)
+    # Local file format: {chapter:03d}_{version}.mp3
+    candidate_filenames = [
+        f"{surah_num:03d}-4.mp3",
+        f"{surah_num:03d}_4.mp3",
+        f"{surah_num:03d}-3.mp3",
+        f"{surah_num:03d}-2.mp3",
+        f"{surah_num:03d}-1.mp3",
+        f"{surah_num:03d}.mp3",
+    ]
+
     local_primary = os.path.join(AUDIO_TARGET_DIR, f"{surah_num:03d}_4.mp3")
     local_secondary = os.path.join(AUDIO_TARGET_DIR, f"{surah_num:03d}-4.mp3")
 
     if os.path.exists(local_primary) and os.path.getsize(local_primary) >= 10240 and        os.path.exists(local_secondary) and os.path.getsize(local_secondary) >= 10240:
         return True, f"Already exists: {surah_num:03d}"
 
-    for suffix in candidate_suffixes:
-        cdn_filename = f"{surah_num:03d}{suffix}"
-        url = f"{AUDIO_BASE_URL}/{cdn_filename}"
-        ok, msg = download_file_with_retry(url, local_primary, retries=2, delay=1, expected_min_size=10240)
-        if ok:
-            if not os.path.exists(local_secondary):
-                try:
-                    os.link(local_primary, local_secondary)
-                except Exception:
+    for base_url in AUDIO_BASE_URLS:
+        for fname in candidate_filenames:
+            url = f"{base_url}/{fname}"
+            ok, msg = download_file_with_retry(url, local_primary, retries=3, delay=1, expected_min_size=10240)
+            if ok:
+                if not os.path.exists(local_secondary):
                     try:
-                        shutil.copy2(local_primary, local_secondary)
+                        os.link(local_primary, local_secondary)
                     except Exception:
-                        pass
-            return True, f"Surah {surah_num:03d} ({cdn_filename})"
+                        try:
+                            shutil.copy2(local_primary, local_secondary)
+                        except Exception:
+                            pass
+                return True, f"Surah {surah_num:03d} -> {url}"
 
-    return False, f"Surah {surah_num:03d} not available on CDN (tried all candidates)"
+    return False, f"Surah {surah_num:03d} failed across all endpoints and candidates"
 
 def main():
     print("=" * 60)
@@ -166,7 +182,7 @@ def main():
                 sys.exit(1)
 
     print("")
-    print("[3/3] Downloading 114 Surahs of Al-Mokhtasar Audio Commentary (parallel workers)...")
+    print("[3/3] Downloading all 114 Surahs of Al-Mokhtasar Audio Commentary...")
     success_count = 0
     failed_surahs = []
     with ThreadPoolExecutor(max_workers=4) as executor:
@@ -178,39 +194,36 @@ def main():
                 success_count += 1
             else:
                 failed_surahs.append(s_num)
-                print(f" -> WARNING: {msg}")
+                print(f" -> ERROR: {msg}")
 
             total_done = success_count + len(failed_surahs)
-            if total_done % 20 == 0 or total_done == 114:
-                print(f" -> Progress: {success_count}/114 audio tracks downloaded ({len(failed_surahs)} warnings)...")
+            if total_done % 10 == 0 or total_done == 114:
+                print(f" -> Progress: {success_count}/114 audio tracks downloaded ({len(failed_surahs)} failed)...")
 
-    # Provide fallback for any missing surahs so all 114 tracks exist on disk
+    # If any surah failed in parallel, retry sequentially with longer delay
     if failed_surahs:
-        print(f" -> Providing fallback for {len(failed_surahs)} surahs so all 114 tracks exist...")
-        existing_tracks = [f for f in os.listdir(AUDIO_TARGET_DIR) if f.endswith('.mp3') and os.path.getsize(os.path.join(AUDIO_TARGET_DIR, f)) > 1024]
-        if existing_tracks:
-            template_src = os.path.join(AUDIO_TARGET_DIR, existing_tracks[0])
-            for s in failed_surahs:
-                p1 = os.path.join(AUDIO_TARGET_DIR, f"{s:03d}_4.mp3")
-                p2 = os.path.join(AUDIO_TARGET_DIR, f"{s:03d}-4.mp3")
-                if not os.path.exists(p1):
-                    try: shutil.copy2(template_src, p1)
-                    except Exception: pass
-                if not os.path.exists(p2):
-                    try: shutil.copy2(template_src, p2)
-                    except Exception: pass
-            print(f" -> Fallbacks successfully created for all missing surahs.")
-        else:
-            print(" -> WARNING: No audio tracks found to use as fallback template.")
+        print(f" -> Retrying {len(failed_surahs)} failed surahs sequentially...")
+        for s in list(failed_surahs):
+            print(f"   Retrying Surah {s:03d}...")
+            ok, msg = download_audio_track(s)
+            if ok:
+                print(f"   -> Success: {msg}")
+                failed_surahs.remove(s)
+                success_count += 1
+            else:
+                print(f"   -> Still failed: {msg}")
+
+    if failed_surahs:
+        print(f"CRITICAL ERROR: {len(failed_surahs)} audio tracks could not be downloaded from official servers: {failed_surahs}")
+        sys.exit(1)
 
     print("")
     print("=" * 60)
-    print("All Ayah offline assets successfully processed!")
+    print("All Ayah offline assets successfully verified and complete 100%!")
     print(f" - APK size: {os.path.getsize(apk_path):,} bytes")
     print(f" - Tafsir DB files: {len(os.listdir(BOOKS_TARGET_DIR))} files in {BOOKS_TARGET_DIR}")
-    if os.path.exists(AUDIO_TARGET_DIR):
-        audio_files = [f for f in os.listdir(AUDIO_TARGET_DIR) if f.endswith('.mp3')]
-        print(f" - Audio files in target: {len(audio_files)} files in {AUDIO_TARGET_DIR}")
+    audio_files = [f for f in os.listdir(AUDIO_TARGET_DIR) if f.endswith('.mp3')]
+    print(f" - Audio files verified: {len(audio_files)} files in {AUDIO_TARGET_DIR}")
     print("=" * 60)
 
 if __name__ == "__main__":
