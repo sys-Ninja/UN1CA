@@ -22,25 +22,16 @@ fi
 echo "Build-tools: $BUILD_TOOLS"
 echo "Output:      $OUT_APK"
 
-if [ -x "$APP_DIR/gradlew" ]; then
-    GRADLE_CMD="$APP_DIR/gradlew"
-else
-    GRADLE_BIN="$(command -v gradle || true)"
-    if [ -z "$GRADLE_BIN" ]; then
-        GRADLE_VERSION="8.9"
-        GRADLE_HOME="$SRC_DIR/out/gradle-$GRADLE_VERSION"
-        if [ ! -x "$GRADLE_HOME/bin/gradle" ]; then
-            echo "Downloading Gradle $GRADLE_VERSION..."
-            mkdir -p "$SRC_DIR/out"
-            curl -fsSL -o "$SRC_DIR/out/gradle.zip" \
-                "https://services.gradle.org/distributions/gradle-$GRADLE_VERSION-bin.zip"
-            unzip -q -o "$SRC_DIR/out/gradle.zip" -d "$SRC_DIR/out"
-            rm -f "$SRC_DIR/out/gradle.zip"
-        fi
-        GRADLE_BIN="$GRADLE_HOME/bin/gradle"
-    fi
-    GRADLE_CMD="$GRADLE_BIN"
+GRADLE_VERSION="8.9"
+GRADLE_HOME="$SRC_DIR/out/gradle-$GRADLE_VERSION"
+if [ ! -x "$GRADLE_HOME/bin/gradle" ]; then
+    echo "Downloading Gradle $GRADLE_VERSION for guaranteed AGP 8.5.2 compatibility..."
+    mkdir -p "$SRC_DIR/out"
+    curl -fsSL -o "$SRC_DIR/out/gradle.zip"         "https://services.gradle.org/distributions/gradle-$GRADLE_VERSION-bin.zip"
+    unzip -q -o "$SRC_DIR/out/gradle.zip" -d "$SRC_DIR/out"
+    rm -f "$SRC_DIR/out/gradle.zip"
 fi
+GRADLE_CMD="$GRADLE_HOME/bin/gradle"
 
 (cd "$APP_DIR" && "$GRADLE_CMD" --no-daemon assembleRelease)
 
@@ -52,8 +43,7 @@ if [ ! -f "$UNSIGNED" ]; then
 fi
 
 CERT_PREFIX="aosp"
-if [ -s "$SRC_DIR/security/unica_platform.pk8" ] && \
-        [ -s "$SRC_DIR/security/unica_platform.x509.pem" ]; then
+if [ -s "$SRC_DIR/security/unica_platform.pk8" ] &&         [ -s "$SRC_DIR/security/unica_platform.x509.pem" ]; then
     CERT_PREFIX="unica"
 fi
 echo "Signing with ${CERT_PREFIX}_platform key"
@@ -62,10 +52,6 @@ ALIGNED="$APP_DIR/app/build/outputs/apk/release/aligned.apk"
 "$BUILD_TOOLS/zipalign" -f -p 4 "$UNSIGNED" "$ALIGNED"
 
 mkdir -p "$(dirname "$OUT_APK")"
-"$BUILD_TOOLS/apksigner" sign \
-    --key "$SRC_DIR/security/${CERT_PREFIX}_platform.pk8" \
-    --cert "$SRC_DIR/security/${CERT_PREFIX}_platform.x509.pem" \
-    --out "$OUT_APK" \
-    "$ALIGNED"
+"$BUILD_TOOLS/apksigner" sign     --key "$SRC_DIR/security/${CERT_PREFIX}_platform.pk8"     --cert "$SRC_DIR/security/${CERT_PREFIX}_platform.x509.pem"     --out "$OUT_APK"     "$ALIGNED"
 
 echo "Done: $OUT_APK"
