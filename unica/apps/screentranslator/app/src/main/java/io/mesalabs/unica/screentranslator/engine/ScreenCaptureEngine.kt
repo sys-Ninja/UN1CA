@@ -21,6 +21,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.nio.ByteBuffer
 
 class ScreenCaptureEngine(
@@ -41,6 +42,8 @@ class ScreenCaptureEngine(
     private var lastFrameHash = 0L
 
     fun start() {
+        if (virtualDisplay != null) return
+
         val wm = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
         val metrics = DisplayMetrics()
         @Suppress("DEPRECATION")
@@ -157,7 +160,9 @@ class ScreenCaptureEngine(
                         
                         if (diff > 0.4f) {
                             // Large scene change
-                            overlayView.hideTemporarily(1500)
+                            withContext(Dispatchers.Main) {
+                                overlayView.hideTemporarily(1500)
+                            }
                         }
 
                         if (currentHash != lastFrameHash) {
@@ -192,12 +197,18 @@ class ScreenCaptureEngine(
                                 
                                 if (blockAreaRatio > 0.65f) {
                                     // Too much text, likely a full screen menu or dialog changing
-                                    overlayView.hideTemporarily(2000)
+                                    withContext(Dispatchers.Main) {
+                                        overlayView.hideTemporarily(2000)
+                                    }
                                 } else {
-                                    overlayView.setBlocks(translationBlocks)
+                                    withContext(Dispatchers.Main) {
+                                        overlayView.setBlocks(translationBlocks)
+                                    }
                                 }
                             } else {
-                                overlayView.clearSubtitles()
+                                withContext(Dispatchers.Main) {
+                                    overlayView.clearSubtitles()
+                                }
                             }
                         }
                     }
