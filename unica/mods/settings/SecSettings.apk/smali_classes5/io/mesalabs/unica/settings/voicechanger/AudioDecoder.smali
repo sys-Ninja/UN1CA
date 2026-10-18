@@ -13,7 +13,7 @@
 .end method
 
 .method public static decodeToWav(Landroid/content/Context;Landroid/net/Uri;Ljava/io/File;)Z
-    .locals 18
+    .locals 25
 
     move-object/from16 v1, p0
 
