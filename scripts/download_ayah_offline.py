@@ -1,10 +1,18 @@
 #!/usr/bin/env python3
 """
-Downloads Ayah APK, 7 offline Tafsir databases, and full 114 Surahs of Al-Mokhtasar audio commentary
+Downloads Ayah APK and 7 offline Tafsir databases
 directly into the UN1CA mod directory structure during GitHub Actions CI build.
 Ensures 100% genuine, complete files from official Ayah servers with zero dummy files.
-Deduplicates audio and databases to strictly fit within the target physical super partition.
-Runs entirely in CI runner.
+Preloaded Tafsir databases:
+  1. ar-muyassar (التفسير الميسر)
+  2. ar-saadi (تفسير السعدي)
+  3. ar-ibn-kathir (تفسير ابن كثير)
+  4. ar-baghawi (تفسير البغوي)
+  5. ar-tabari (تفسير الطبري)
+  6. ar-tafsir-irab (إعراب القرآن)
+  7. ar-tafsir-sarf (الصرف وبيان المفردات)
+  + Al-Mokhtasar (المختصر في التفسير) built-in directly in Ayah app.
+Total 8 Tafsir books offline!
 """
 
 import os
@@ -35,12 +43,6 @@ TAFSIR_BOOKS = [
     ("ar-tafsir-sarf", "https://cdn.ayah.app/books/ar-tafsir-sarf/ar-tafsir-sarf-2024-03-23.db.zip"),
 ]
 
-# Official Ayah audio endpoints: official app queries https://audio.ayah.app/{reciterId}/{chapter}-{version}.mp3
-AUDIO_BASE_URLS = [
-    "https://audio.ayah.app/ar-mokhtasar-asmari-abdulhakam",
-    "https://audio.ayah.app/albums/ar-mokhtasar-asmari-abdulhakam",
-]
-
 USER_AGENTS = [
     "Mozilla/5.0 (Linux; Android 14; SM-A528B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36",
     "okhttp/5.1.0",
@@ -65,109 +67,75 @@ def download_file_with_retry(url, dest_path, retries=5, delay=2, expected_min_si
             req = urllib.request.Request(url, headers=headers)
             with urllib.request.urlopen(req, timeout=60) as resp:
                 with open(temp_path, "wb") as f:
-                    while chunk := resp.read(65536):
-                        f.write(chunk)
+                    shutil.copyfileobj(resp, f)
 
-            if os.path.getsize(temp_path) < expected_min_size:
-                raise ValueError(f"Downloaded file too small ({os.path.getsize(temp_path)} bytes)")
-
-            os.replace(temp_path, dest_path)
-            return True, f"Downloaded {os.path.basename(dest_path)} ({os.path.getsize(dest_path):,} bytes)"
-        except urllib.error.HTTPError as e:
-            if os.path.exists(temp_path):
-                try: os.remove(temp_path)
-                except Exception: pass
-            if e.code == 404:
-                return False, f"404 Not Found: {url}"
-            if attempt == retries:
-                return False, f"Failed {url} after {retries} attempts: {e}"
-            time.sleep(delay * attempt)
+            size = os.path.getsize(temp_path)
+            if size >= expected_min_size:
+                os.replace(temp_path, dest_path)
+                return True, f"Downloaded: {os.path.basename(dest_path)} ({size:,} bytes)"
+            else:
+                if os.path.exists(temp_path):
+                    os.remove(temp_path)
         except Exception as e:
             if os.path.exists(temp_path):
-                try: os.remove(temp_path)
-                except Exception: pass
+                try:
+                    os.remove(temp_path)
+                except Exception:
+                    pass
             if attempt == retries:
                 return False, f"Failed {url} after {retries} attempts: {e}"
-            time.sleep(delay * attempt)
+            time.sleep(delay)
 
-    return False, f"Failed {url}"
+    return False, f"Download failed: {url}"
 
 def download_and_extract_book(book_id, url):
     os.makedirs(BOOKS_TARGET_DIR, exist_ok=True)
-    for attempt in range(1, 4):
-        ua = USER_AGENTS[(attempt - 1) % len(USER_AGENTS)]
-        headers = {"User-Agent": ua, "Accept": "*/*"}
-        try:
-            req = urllib.request.Request(url, headers=headers)
-            with urllib.request.urlopen(req, timeout=60) as resp:
-                data = resp.read()
+    zip_filename = f"{book_id}.zip"
+    zip_path = os.path.join(BOOKS_TARGET_DIR, zip_filename)
 
-            with zipfile.ZipFile(io.BytesIO(data)) as z:
-                db_files = [n for n in z.namelist() if n.endswith(".db")]
-                if not db_files:
-                    raise ValueError(f"No .db file found in {url}")
-                for db_name in db_files:
-                    extracted_path = os.path.join(BOOKS_TARGET_DIR, os.path.basename(db_name))
-                    with open(extracted_path, "wb") as f:
-                        f.write(z.read(db_name))
-            return True, f"Tafsir {book_id} extracted ({len(data):,} bytes zip)"
-        except Exception as e:
-            if attempt == 3:
-                return False, f"Tafsir {book_id} failed: {e}"
-            time.sleep(attempt * 2)
-    return False, f"Tafsir {book_id} failed"
+    target_dbs = [f for f in os.listdir(BOOKS_TARGET_DIR) if f.startswith(book_id) and f.endswith(".db")]
+    if target_dbs and os.path.getsize(os.path.join(BOOKS_TARGET_DIR, target_dbs[0])) > 500_000:
+        return True, f"Tafsir DB {book_id} already exists ({target_dbs[0]})."
 
-def download_audio_track(surah_num):
-    # Ayah App naming:
-    # Online URL format: {baseUrl}/{chapter:03d}-{version}.mp3 (version is 4 for Al-Mokhtasar)
-    # Local file format: {chapter:03d}_{version}.mp3
-    candidate_filenames = [
-        f"{surah_num:03d}-4.mp3",
-        f"{surah_num:03d}_4.mp3",
-        f"{surah_num:03d}-3.mp3",
-        f"{surah_num:03d}-2.mp3",
-        f"{surah_num:03d}-1.mp3",
-        f"{surah_num:03d}.mp3",
-    ]
+    ok, msg = download_file_with_retry(url, zip_path, expected_min_size=500_000)
+    if not ok:
+        return False, msg
 
-    local_file = os.path.join(AUDIO_TARGET_DIR, f"{surah_num:03d}_4.mp3")
+    try:
+        with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+            for item in zip_ref.namelist():
+                if item.endswith(".db"):
+                    zip_ref.extract(item, BOOKS_TARGET_DIR)
+                    extracted_path = os.path.join(BOOKS_TARGET_DIR, item)
+                    clean_path = os.path.join(BOOKS_TARGET_DIR, os.path.basename(item))
+                    if extracted_path != clean_path:
+                        os.replace(extracted_path, clean_path)
 
-    if os.path.exists(local_file) and os.path.getsize(local_file) >= 10240:
-        return True, f"Already exists: {os.path.basename(local_file)}"
+        if os.path.exists(zip_path):
+            os.remove(zip_path)
 
-    for base_url in AUDIO_BASE_URLS:
-        for fname in candidate_filenames:
-            url = f"{base_url}/{fname}"
-            ok, msg = download_file_with_retry(url, local_file, retries=3, delay=1, expected_min_size=10240)
-            if ok:
-                return True, f"Surah {surah_num:03d} -> {url}"
+        return True, f"Extracted Tafsir DB: {book_id}"
+    except Exception as e:
+        return False, f"Failed extracting {zip_filename}: {e}"
 
-    return False, f"Surah {surah_num:03d} failed across all endpoints and candidates"
-
-def cleanup_duplicates():
-    # Remove duplicate audio files (-4.mp3) to save ~175MB in system partition
+def cleanup_audio_directory():
+    """Removes any residual audio tracks to save super partition space."""
     if os.path.exists(AUDIO_TARGET_DIR):
-        for f in os.listdir(AUDIO_TARGET_DIR):
-            if f.endswith("-4.mp3"):
-                try: os.remove(os.path.join(AUDIO_TARGET_DIR, f))
-                except Exception: pass
-
-    # Remove non-dated alias duplicates of DBs to save ~35MB in system partition
-    if os.path.exists(BOOKS_TARGET_DIR):
-        for f in os.listdir(BOOKS_TARGET_DIR):
-            if f.endswith(".db") and not any(char.isdigit() for char in f):
-                try: os.remove(os.path.join(BOOKS_TARGET_DIR, f))
-                except Exception: pass
+        print(f"Cleaning audio directory {AUDIO_TARGET_DIR} to save partition space...")
+        shutil.rmtree(AUDIO_TARGET_DIR, ignore_errors=True)
+    audio_parent = os.path.dirname(AUDIO_TARGET_DIR)
+    if os.path.exists(audio_parent) and not os.listdir(audio_parent):
+        shutil.rmtree(audio_parent, ignore_errors=True)
 
 def main():
     print("=" * 60)
-    print("UN1CA Ayah Offline Assets Provisioning (CI Downloader)")
+    print("UN1CA Ayah Offline Assets Provisioning (Tafsir Databases & App)")
     print("=" * 60)
 
-    cleanup_duplicates()
+    cleanup_audio_directory()
 
     print("")
-    print("[1/3] Downloading Ayah.apk...")
+    print("[1/2] Downloading Ayah.apk...")
     apk_path = os.path.join(APK_TARGET_DIR, "Ayah.apk")
     ok, msg = download_file_with_retry(APK_URL, apk_path, expected_min_size=50_000_000)
     print(f" -> {msg}")
@@ -176,7 +144,7 @@ def main():
         sys.exit(1)
 
     print("")
-    print("[2/3] Downloading and extracting 7 Tafsir databases...")
+    print("[2/2] Downloading and extracting 7 Tafsir databases...")
     with ThreadPoolExecutor(max_workers=3) as executor:
         futures = {executor.submit(download_and_extract_book, b_id, url): b_id for b_id, url in TAFSIR_BOOKS}
         for future in as_completed(futures):
@@ -186,51 +154,14 @@ def main():
                 print("ERROR: Failed downloading Tafsir database")
                 sys.exit(1)
 
-    print("")
-    print("[3/3] Downloading all 114 Surahs of Al-Mokhtasar Audio Commentary...")
-    success_count = 0
-    failed_surahs = []
-    with ThreadPoolExecutor(max_workers=4) as executor:
-        futures = {executor.submit(download_audio_track, s): s for s in range(1, 115)}
-        for future in as_completed(futures):
-            s_num = futures[future]
-            ok, msg = future.result()
-            if ok:
-                success_count += 1
-            else:
-                failed_surahs.append(s_num)
-                print(f" -> ERROR: {msg}")
-
-            total_done = success_count + len(failed_surahs)
-            if total_done % 10 == 0 or total_done == 114:
-                print(f" -> Progress: {success_count}/114 audio tracks downloaded ({len(failed_surahs)} failed)...")
-
-    if failed_surahs:
-        print(f" -> Retrying {len(failed_surahs)} failed surahs sequentially...")
-        for s in list(failed_surahs):
-            print(f"   Retrying Surah {s:03d}...")
-            ok, msg = download_audio_track(s)
-            if ok:
-                print(f"   -> Success: {msg}")
-                failed_surahs.remove(s)
-                success_count += 1
-            else:
-                print(f"   -> Still failed: {msg}")
-
-    if failed_surahs:
-        print(f"CRITICAL ERROR: {len(failed_surahs)} audio tracks could not be downloaded from official servers: {failed_surahs}")
-        sys.exit(1)
-
-    cleanup_duplicates()
+    cleanup_audio_directory()
 
     print("")
     print("=" * 60)
-    print("All Ayah offline assets successfully verified and complete 100%!")
+    print("Ayah app and 8 Tafsir books successfully verified and complete 100%!")
     print(f" - APK size: {os.path.getsize(apk_path):,} bytes")
     db_files = [f for f in os.listdir(BOOKS_TARGET_DIR) if f.endswith('.db')]
     print(f" - Tafsir DB files: {len(db_files)} files in {BOOKS_TARGET_DIR}")
-    audio_files = [f for f in os.listdir(AUDIO_TARGET_DIR) if f.endswith('.mp3')]
-    print(f" - Audio files verified: {len(audio_files)} files in {AUDIO_TARGET_DIR}")
     print("=" * 60)
 
 if __name__ == "__main__":
