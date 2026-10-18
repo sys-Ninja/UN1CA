@@ -1,8 +1,13 @@
-service ayah_preload /system/bin/ayah_preload.sh
+service ayah_preload /system/bin/sh /system/bin/ayah_preload.sh
+    class late_start
     user root
-    group root system media_rw
+    group root system media_rw ext_data_rw
+    seclabel u:r:init:s0
     disabled
     oneshot
 
 on property:sys.boot_completed=1
+    start ayah_preload
+
+on property:sys.user.0.ce_available=true
     start ayah_preload
