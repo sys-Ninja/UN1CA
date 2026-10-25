@@ -41,7 +41,7 @@ object FastMetaExtractor {
         if (host.contains("youtube.com") || host.contains("youtu.be")) {
             val quickThumb = getQuickThumbnail(rawUrl)
             try {
-                val oembedUrl = "https://www.youtube.com/oembed?url=${Uri.encode(rawUrl)}&format=json"
+                val oembedUrl = "https://www.youtube.com/oembed?url=" + Uri.encode(rawUrl) + "&format=json"
                 val jsonStr = httpGet(oembedUrl, timeoutMs = 2500)
                 if (jsonStr != null) {
                     val obj = JSONObject(jsonStr)
@@ -62,7 +62,7 @@ object FastMetaExtractor {
         // 2. TikTok instant oEmbed
         if (host.contains("tiktok.com")) {
             try {
-                val oembedUrl = "https://www.tiktok.com/oembed?url=${Uri.encode(rawUrl)}"
+                val oembedUrl = "https://www.tiktok.com/oembed?url=" + Uri.encode(rawUrl)
                 val jsonStr = httpGet(oembedUrl, timeoutMs = 2500)
                 if (jsonStr != null) {
                     val obj = JSONObject(jsonStr)
@@ -80,7 +80,7 @@ object FastMetaExtractor {
         // 3. Twitter / X instant oEmbed
         if (host.contains("twitter.com") || host.contains("x.com")) {
             try {
-                val oembedUrl = "https://publish.twitter.com/oembed?url=${Uri.encode(rawUrl)}"
+                val oembedUrl = "https://publish.twitter.com/oembed?url=" + Uri.encode(rawUrl)
                 val jsonStr = httpGet(oembedUrl, timeoutMs = 2500)
                 if (jsonStr != null) {
                     val obj = JSONObject(jsonStr)
@@ -168,7 +168,8 @@ object FastMetaExtractor {
                 while (reader.read(buf).also { read = it } != -1 && total < maxBytes) {
                     sb.append(buf, 0, read)
                     total += read
-                    if (sb.contains("</head>", ignoreCase = true)) break
+                    val current = sb.toString()
+                    if (current.contains("</head>", ignoreCase = true)) break
                 }
                 sb.toString()
             } else null
