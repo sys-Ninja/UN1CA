@@ -147,10 +147,6 @@ class ClipboardMonitorService : Service() {
             // Adult Networks
             "pornhub.com", "xvideos.com", "xnxx.com", "redtube.com", "xhamster.com", "youporn.com",
         )
-            "soundcloud.com",
-            // Bilibili
-            "bilibili.com",
-        )
 
         fun start(ctx: Context) {
             try {

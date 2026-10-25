@@ -20,7 +20,7 @@ enum class DlStatus {
 data class DownloadItem(
     val id: String,
     val url: String,
-    val title: String,
+    var title: String,
     val audioOnly: Boolean,
     val quality: String,
     val thumbnail: String? = null,

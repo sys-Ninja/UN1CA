@@ -97,13 +97,13 @@ object FastMetaExtractor {
         try {
             val html = httpGetPartial(rawUrl, maxBytes = 32768, timeoutMs = 3000)
             if (!html.isNullOrBlank()) {
-                val ogTitle = extractTag(html, "(?:property|name)=[\\"']og:title[\\"'][^>]*content=[\\"']([^\\"']+)[\\"']")
-                    ?: extractTag(html, "content=[\\"']([^\\"']+)[\\"'][^>]*(?:property|name)=[\\"']og:title[\\"']")
-                    ?: extractTag(html, "<title[^>]*>([^<]+)</title>")
+                val ogTitle = extractMetaProperty(html, "og:title")
+                    ?: extractMetaProperty(html, "twitter:title")
+                    ?: extractTitleTag(html)
 
-                val ogImage = extractTag(html, "(?:property|name)=[\\"']og:image[\\"'][^>]*content=[\\"']([^\\"']+)[\\"']")
-                    ?: extractTag(html, "content=[\\"']([^\\"']+)[\\"'][^>]*(?:property|name)=[\\"']og:image[\\"']")
-                    ?: extractTag(html, "(?:rel)=[\\"']image_src[\\"'][^>]*href=[\\"']([^\\"']+)[\\"']")
+                val ogImage = extractMetaProperty(html, "og:image")
+                    ?: extractMetaProperty(html, "twitter:image")
+                    ?: extractTagHref(html, "image_src")
 
                 val cleanTitle = ogTitle?.replace("&amp;", "&")
                     ?.replace("&#39;", "'")
@@ -121,8 +121,28 @@ object FastMetaExtractor {
         FastMeta(site, null, site)
     }
 
-    private fun extractTag(html: String, regexStr: String): String? {
-        val p = Pattern.compile(regexStr, Pattern.CASE_INSENSITIVE)
+    private fun extractMetaProperty(html: String, propName: String): String? {
+        val q = Pattern.quote(propName)
+        val p1 = Pattern.compile("<meta[^>]+(?:property|name)\\s*=\\s*["']" + q + "["'][^>]+content\\s*=\\s*["']([^"']+)["']", Pattern.CASE_INSENSITIVE)
+        val m1 = p1.matcher(html)
+        if (m1.find()) return m1.group(1)?.trim()
+
+        val p2 = Pattern.compile("<meta[^>]+content\\s*=\\s*["']([^"']+)["'][^>]+(?:property|name)\\s*=\\s*["']" + q + "["']", Pattern.CASE_INSENSITIVE)
+        val m2 = p2.matcher(html)
+        if (m2.find()) return m2.group(1)?.trim()
+
+        return null
+    }
+
+    private fun extractTitleTag(html: String): String? {
+        val p = Pattern.compile("<title[^>]*>([^<]+)</title>", Pattern.CASE_INSENSITIVE)
+        val m = p.matcher(html)
+        return if (m.find()) m.group(1)?.trim() else null
+    }
+
+    private fun extractTagHref(html: String, relName: String): String? {
+        val q = Pattern.quote(relName)
+        val p = Pattern.compile("<link[^>]+rel\\s*=\\s*["']" + q + "["'][^>]+href\\s*=\\s*["']([^"']+)["']", Pattern.CASE_INSENSITIVE)
         val m = p.matcher(html)
         return if (m.find()) m.group(1)?.trim() else null
     }
