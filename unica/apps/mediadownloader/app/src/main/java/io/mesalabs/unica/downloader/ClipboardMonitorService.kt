@@ -125,36 +125,28 @@ class ClipboardMonitorService : Service() {
         private const val FOREGROUND_ID = 1002
         const val ACTION_STOP = "io.mesalabs.unica.downloader.STOP_CLIPBOARD_MONITOR"
 
-        val MEDIA_HOSTS = listOf(
+                val MEDIA_HOSTS = listOf(
             // Google / YouTube
             "youtube.com", "youtu.be", "m.youtube.com",
-            // Meta
-            "facebook.com", "fb.watch", "m.facebook.com", "instagram.com",
-            // TikTok — all known short-link and regional domains
+            // Meta / Threads / Instagram / Facebook
+            "facebook.com", "fb.watch", "m.facebook.com", "instagram.com", "threads.net",
+            // TikTok
             "tiktok.com", "vm.tiktok.com", "vt.tiktok.com",
             // Twitter / X
             "twitter.com", "x.com",
-            // Dailymotion
-            "dailymotion.com", "dai.ly",
-            // Vimeo
-            "vimeo.com",
             // Reddit
             "reddit.com", "v.redd.it",
-            // Twitch
-            "twitch.tv",
-            // Pornhub
-            "pornhub.com",
-            // XVideos
-            "xvideos.com",
-            // XNXX
-            "xnxx.com",
-            // RedTube
-            "redtube.com",
-            // xHamster
-            "xhamster.com",
-            // YouPorn
-            "youporn.com",
-            // SoundCloud (audio)
+            // Pinterest
+            "pinterest.com", "pin.it",
+            // Video / Stream Platforms
+            "dailymotion.com", "dai.ly", "vimeo.com", "twitch.tv", "rumble.com", "odysee.com", "bitchute.com",
+            // Music / Audio
+            "soundcloud.com", "bandcamp.com", "mixcloud.com",
+            // Asian / Regional Networks
+            "bilibili.com", "bilibili.tv", "vk.com", "ok.ru", "kwai.com", "likee.video",
+            // Adult Networks
+            "pornhub.com", "xvideos.com", "xnxx.com", "redtube.com", "xhamster.com", "youporn.com",
+        )
             "soundcloud.com",
             // Bilibili
             "bilibili.com",
