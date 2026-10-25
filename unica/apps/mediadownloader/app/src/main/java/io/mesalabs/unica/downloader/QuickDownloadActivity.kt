@@ -23,6 +23,7 @@ class QuickDownloadActivity : AppCompatActivity() {
     private lateinit var binding: SheetQuickDownloadBinding
     private lateinit var dialog: BottomSheetDialog
     private var meta: VideoMeta? = null
+    private var fastMeta: FastMeta? = null
     private var url: String? = null
     private val checkboxes = mutableListOf<CheckBox>()
 
@@ -54,17 +55,11 @@ class QuickDownloadActivity : AppCompatActivity() {
         dialog.show()
 
         // Display initial domain / title
-        val host = try { Uri.parse(url).host?.removePrefix("www.")?.removePrefix("m.") ?: "" } catch (e: Exception) { "" }
+        val host = try { Uri.parse(url).host?.removePrefix("www.")?.removePrefix("m.") ?: "" } catch (_: Exception) { "" }
         binding.title.text = if (host.isNotBlank()) host.uppercase() else url
         binding.subtitle.text = url
         binding.progress.visibility = View.VISIBLE
         binding.actions.visibility = View.VISIBLE
-
-        // Quick instant thumbnail loading without waiting for yt-dlp
-        val quickThumb = DownloadRepo.getQuickThumbnail(url!!)
-        if (quickThumb != null) {
-            binding.thumbnail.load(quickThumb) { crossfade(200) }
-        }
 
         // Configure default quality from settings
         selectedAudioOnly = (prefs.defaultType == "audio")
@@ -101,7 +96,30 @@ class QuickDownloadActivity : AppCompatActivity() {
             dialog.dismiss()
         }
 
+        // 1. Instant extraction (100-200ms like SnapTube)
+        fastExtract(url!!)
+
+        // 2. Full metadata extraction for playlists and streams
         loadMeta(url!!)
+    }
+
+    private fun fastExtract(targetUrl: String) {
+        lifecycleScope.launch {
+            val quickThumb = FastMetaExtractor.getQuickThumbnail(targetUrl)
+            if (quickThumb != null) {
+                binding.thumbnail.load(quickThumb) { crossfade(200) }
+            }
+            val fMeta = FastMetaExtractor.extract(targetUrl)
+            if (fMeta != null && !isFinishing) {
+                fastMeta = fMeta
+                binding.title.text = fMeta.title
+                binding.subtitle.text = fMeta.siteName
+                if (!fMeta.thumbnail.isNullOrBlank()) {
+                    binding.thumbnail.load(fMeta.thumbnail) { crossfade(200) }
+                }
+                binding.progress.visibility = View.GONE
+            }
+        }
     }
 
     private fun updateDownloadButtonText() {
@@ -122,20 +140,17 @@ class QuickDownloadActivity : AppCompatActivity() {
         url = newUrl
 
         meta = null
+        fastMeta = null
         checkboxes.clear()
         binding.playlistGroup.visibility = View.GONE
         binding.progress.visibility = View.VISIBLE
 
-        val host = try { Uri.parse(newUrl).host?.removePrefix("www.")?.removePrefix("m.") ?: "" } catch (e: Exception) { "" }
+        val host = try { Uri.parse(newUrl).host?.removePrefix("www.")?.removePrefix("m.") ?: "" } catch (_: Exception) { "" }
         binding.title.text = if (host.isNotBlank()) host.uppercase() else newUrl
         binding.subtitle.text = newUrl
         binding.thumbnail.setImageDrawable(null)
 
-        val quickThumb = DownloadRepo.getQuickThumbnail(newUrl)
-        if (quickThumb != null) {
-            binding.thumbnail.load(quickThumb) { crossfade(200) }
-        }
-
+        fastExtract(newUrl)
         loadMeta(newUrl)
     }
 
@@ -167,13 +182,13 @@ class QuickDownloadActivity : AppCompatActivity() {
                     meta = m
                     binding.progress.visibility = View.GONE
                     binding.title.text = m.title
-                    val host = try { Uri.parse(url).host?.removePrefix("www.")?.removePrefix("m.") ?: "" } catch (e: Exception) { "" }
+                    val host = try { Uri.parse(url).host?.removePrefix("www.")?.removePrefix("m.") ?: "" } catch (_: Exception) { "" }
                     binding.subtitle.text = host.uppercase()
 
                     if (m.isPlaylist) setupPlaylistUi(m)
                 }
 
-                // Load thumbnail smoothly via Coil
+                // Load high quality thumbnail smoothly via Coil
                 if (!m.thumbnail.isNullOrBlank()) {
                     withContext(Dispatchers.Main) {
                         if (!isFinishing) {
@@ -183,11 +198,10 @@ class QuickDownloadActivity : AppCompatActivity() {
                         }
                     }
                 }
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 withContext(Dispatchers.Main) {
                     if (isFinishing) return@withContext
                     binding.progress.visibility = View.GONE
-                    // Keep optimistic UI ready even if meta probe errored
                 }
             }
         }
@@ -224,6 +238,7 @@ class QuickDownloadActivity : AppCompatActivity() {
             return
         }
         val m = meta
+        val fMeta = fastMeta
         var playlistTitle: String? = null
         var playlistItems: String? = null
 
@@ -248,13 +263,16 @@ class QuickDownloadActivity : AppCompatActivity() {
             }
         }
 
+        val finalTitle = m?.title ?: fMeta?.title ?: u
+        val finalThumb = m?.thumbnail ?: fMeta?.thumbnail ?: FastMetaExtractor.getQuickThumbnail(u)
+
         val item = DownloadItem(
             id = UUID.randomUUID().toString(),
             url = u,
-            title = m?.title ?: u,
+            title = finalTitle,
             audioOnly = selectedAudioOnly,
             quality = selectedQuality,
-            thumbnail = m?.thumbnail ?: DownloadRepo.getQuickThumbnail(u),
+            thumbnail = finalThumb,
             playlistTitle = playlistTitle,
             playlistItems = playlistItems,
         )
