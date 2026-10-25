@@ -6,10 +6,21 @@
     <string name="pref_category_camera">الكاميرا الشبحية</string>
     <string name="pref_ghost_camera_enabled">تفعيل الكاميرا الشبحية</string>
     <string name="pref_ghost_camera_sum">حقن وتغذية فيديو أو صورة مخصصة في الكاميرا الحية</string>
+
     <string name="pref_select_media">اختيار مصدر الوسائط</string>
     <string name="pref_select_media_sum">اختر فيديو MP4 أو صورة من المعرض</string>
-    <string name="pref_show_camera_tool">شريط التبديل العائم</string>
-    <string name="pref_show_camera_tool_sum">إظهار زر عائم سريع للتبديل والتحكم أثناء استخدام الكاميرا</string>
+    <string name="pref_select_media_slot1">وسائط الكاميرا الأمامية (سيلفي / فتحة 1)</string>
+    <string name="pref_select_media_slot1_sum">اختر صورة أو فيديو سيلفي لتغذية الكاميرا الأمامية</string>
+    <string name="pref_select_media_slot2">وسائط الكاميرا الخلفية (البطاقة والمستندات / فتحة 2)</string>
+    <string name="pref_select_media_slot2_sum">اختر صورة أو فيديو للهوية أو المستندات للكاميرا الخلفية</string>
+
+    <string name="pref_show_camera_tool">لوحة التحكم العائمة</string>
+    <string name="pref_show_camera_tool_sum">إظهار لوحة تحكم 4x4 عائمة للتحريك والتكبير والتدوير والتبديل</string>
+
+    <string name="pref_per_app_camera">تخصيص الكاميرا لتطبيقات محددة فقط</string>
+    <string name="pref_per_app_camera_sum">تغذية الكاميرا الافتراضية للتطبيقات المختارة فقط (قائمة بيضاء)</string>
+    <string name="pref_select_camera_target_apps">تحديد التطبيقات المستهدفة للكاميرا</string>
+    <string name="select_camera_apps_dialog_title">اختر تطبيقات الكاميرا الافتراضية</string>
 
     <string name="pref_category_location">الموقع الشبحي غير القابل للكشف</string>
     <string name="pref_stealth_gps_enabled">تفعيل الموقع الشبحي</string>
@@ -20,16 +31,23 @@
 
     <string name="pref_per_app_gps">تخصيص الموقع لتطبيقات محددة فقط</string>
     <string name="pref_per_app_gps_sum">تطبيق الموقع المزيّف على تطبيقات معينة بدلاً من كل الهاتف</string>
-    <string name="pref_select_target_apps">تحديد التطبيقات المستهدفة</string>
+    <string name="pref_select_target_apps">تحديد تطبيقات الموقع</string>
     <string name="select_apps_dialog_title">اختر التطبيقات لتزييف موقعها</string>
     <string name="all_apps_selected">كل التطبيقات</string>
-    <string name="apps_selected_format">تم تحديد %1$d تطبيقات</string>
+    <string name="apps_selected_format">تم تحديد %1 تطبيقات</string>
+
+    <string name="search_apps_hint">ابحث باسم التطبيق أو الحزمة...</string>
+    <string name="select_all">تحديد الكل</string>
+    <string name="clear_all">إلغاء التحديد</string>
 
     <string name="search_location_title">البحث عن موقع</string>
     <string name="search_location_hint">اكتب اسم المدينة أو المعلم...</string>
     <string name="service_running_sum">المحرك الشبحي نشط (حماية التخفي مفعلة)</string>
     <string name="media_selected">تم تحميل مصدر الوسائط بنجاح</string>
     <string name="grant_overlay_permission">يرجى منح إذن الظهور فوق التطبيقات للتحكم العائم</string>
+    <string name="reset_transform_toast">تمت إعادة ضبط أبعاد وزوايا الكاميرا</string>
+    <string name="passthrough_camera_on">تم التبديل للكاميرا الحقيقية</string>
+    <string name="passthrough_camera_off">تم التبديل لبث الكاميرا الشبحية</string>
     <string name="cancel">إلغاء</string>
     <string name="save">حفظ</string>
     <string name="stop">إيقاف</string>

@@ -58,8 +58,7 @@
 .method private static isGlobalActive()Z
     .locals 2
 
-    # Global VC mode is independent of call VC mode (persist.sys.unica.vc.enabled)
-    # Only check the global flag so both modes can work simultaneously or independently
+    # Active if global voice changer is ON or mic audio injection is ON
     const-string v0, "persist.sys.unica.vc.global"
 
     const/4 v1, 0x0
@@ -68,6 +67,15 @@
 
     move-result v0
 
+    if-nez v0, :cond_active_ret
+
+    const-string v0, "persist.sys.unica.vc.inject"
+
+    invoke-static {v0, v1}, Landroid/os/SystemProperties;->getBoolean(Ljava/lang/String;Z)Z
+
+    move-result v0
+
+    :cond_active_ret
     return v0
 .end method
 

@@ -21,6 +21,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.nio.ByteBuffer
 
 class ScreenCaptureEngine(
@@ -40,7 +41,15 @@ class ScreenCaptureEngine(
 
     private var lastFrameHash = 0L
 
+    @Volatile
+    private var isPaused = false
+
     fun start() {
+        if (virtualDisplay != null) {
+            resume()
+            return
+        }
+
         val wm = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
         val metrics = DisplayMetrics()
         @Suppress("DEPRECATION")
@@ -61,7 +70,7 @@ class ScreenCaptureEngine(
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
             mediaProjection.registerCallback(object : android.media.projection.MediaProjection.Callback() {
                 override fun onStop() {
-                    android.util.Log.d("ScreenCaptureEngine", "MediaProjection stopped externally")
+                    Log.d(TAG, "MediaProjection stopped externally")
                 }
             }, android.os.Handler(android.os.Looper.getMainLooper()))
         }
@@ -77,7 +86,17 @@ class ScreenCaptureEngine(
             null
         )
 
+        isPaused = false
         startProcessingLoop()
+    }
+
+    fun pause() {
+        isPaused = true
+        overlayView.clearSubtitles()
+    }
+
+    fun resume() {
+        isPaused = false
     }
 
     private fun sampleBackgroundColor(bitmap: Bitmap, rect: Rect): Pair<Int, Int> {
@@ -86,7 +105,7 @@ class ScreenCaptureEngine(
         var b = 0L
         var count = 0
 
-        val expand = 2
+        val expand = 3
         val left = (rect.left - expand).coerceAtLeast(0)
         val right = (rect.right + expand).coerceAtMost(bitmap.width - 1)
         val top = (rect.top - expand).coerceAtLeast(0)
@@ -113,10 +132,8 @@ class ScreenCaptureEngine(
         val avgR = (r / count).toInt()
         val avgG = (g / count).toInt()
         val avgB = (b / count).toInt()
-        
+
         val bgColor = Color.rgb(avgR, avgG, avgB)
-        
-        // Luminance calculation
         val luminance = (0.299 * avgR + 0.587 * avgG + 0.114 * avgB) / 255.0
         val textColor = if (luminance < 0.5) Color.WHITE else Color.BLACK
 
@@ -131,6 +148,11 @@ class ScreenCaptureEngine(
 
         captureJob = scope.launch {
             while (isActive) {
+                if (isPaused) {
+                    delay(250)
+                    continue
+                }
+
                 try {
                     val image = imageReader?.acquireLatestImage()
                     if (image != null) {
@@ -140,25 +162,24 @@ class ScreenCaptureEngine(
                         val rowStride = planes[0].rowStride
                         val rowPadding = rowStride - pixelStride * screenWidth
 
-                        val bitmap = Bitmap.createBitmap(
+                        val rawBitmap = Bitmap.createBitmap(
                             screenWidth + rowPadding / pixelStride,
                             screenHeight,
                             Bitmap.Config.ARGB_8888
                         )
-                        bitmap.copyPixelsFromBuffer(buffer)
+                        rawBitmap.copyPixelsFromBuffer(buffer)
                         image.close()
 
-                        val currentHash = computeFastSampleHash(bitmap)
-                        
-                        // Dialog & Scene change detection
-                        val diff = if (lastFrameHash != 0L) {
-                            java.lang.Long.bitCount(currentHash xor lastFrameHash).toFloat() / 64f
-                        } else 0f
-                        
-                        if (diff > 0.4f) {
-                            // Large scene change
-                            overlayView.hideTemporarily(1500)
+                        // Exact pixel-perfect 1:1 screen matching:
+                        val bitmap = if (rowPadding == 0) {
+                            rawBitmap
+                        } else {
+                            val cropped = Bitmap.createBitmap(rawBitmap, 0, 0, screenWidth, screenHeight)
+                            rawBitmap.recycle()
+                            cropped
                         }
+
+                        val currentHash = computeFastSampleHash(bitmap)
 
                         if (currentHash != lastFrameHash) {
                             lastFrameHash = currentHash
@@ -166,14 +187,16 @@ class ScreenCaptureEngine(
                             val textBlocks = OnDeviceOcrEngine.processFrame(bitmap)
                             if (textBlocks.isNotEmpty()) {
                                 val translationBlocks = mutableListOf<TranslationBlock>()
-                                var totalBlockArea = 0
 
                                 for (block in textBlocks) {
                                     for (line in block.lines) {
-                                        val translated = OnDeviceTranslationEngine.translate(line.originalText, sourceLang, targetLang)
+                                        val trimmed = line.originalText.trim()
+                                        if (trimmed.length < 2) continue
+
+                                        val translated = OnDeviceTranslationEngine.translate(trimmed, sourceLang, targetLang)
                                         if (translated.isNotBlank()) {
                                             val (bgColor, textColor) = sampleBackgroundColor(bitmap, line.boundingBox)
-                                            
+
                                             translationBlocks.add(
                                                 TranslationBlock(
                                                     rect = line.boundingBox,
@@ -182,23 +205,24 @@ class ScreenCaptureEngine(
                                                     textColor = textColor
                                                 )
                                             )
-                                            totalBlockArea += (line.boundingBox.width() * line.boundingBox.height())
                                         }
                                     }
                                 }
 
-                                val screenArea = screenWidth * screenHeight
-                                val blockAreaRatio = totalBlockArea.toFloat() / screenArea.toFloat()
-                                
-                                if (blockAreaRatio > 0.65f) {
-                                    // Too much text, likely a full screen menu or dialog changing
-                                    overlayView.hideTemporarily(2000)
-                                } else {
-                                    overlayView.setBlocks(translationBlocks)
+                                if (translationBlocks.isNotEmpty()) {
+                                    withContext(Dispatchers.Main) {
+                                        overlayView.setBlocks(translationBlocks)
+                                    }
                                 }
                             } else {
-                                overlayView.clearSubtitles()
+                                withContext(Dispatchers.Main) {
+                                    overlayView.clearSubtitles()
+                                }
                             }
+                        }
+
+                        if (bitmap !== rawBitmap) {
+                            bitmap.recycle()
                         }
                     }
                 } catch (e: Exception) {

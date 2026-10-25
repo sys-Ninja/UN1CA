@@ -8,6 +8,8 @@
     <string name="unica_ghost_select_media_summary">اختر مصدر الكاميرا الوهمية من المعرض</string>
     <string name="unica_ghost_tool_title">زر الكاميرا العائم</string>
     <string name="unica_ghost_tool_summary">عرض شريط تحكم عائم أثناء استخدام الكاميرا للتبديل السريع</string>
+    <string name="unica_ghost_camera_dashboard_title">تحديد التطبيقات وإعدادات الكاميرا المتقدمة</string>
+    <string name="unica_ghost_camera_dashboard_summary">اختر التطبيقات المستهدفة وتخصيص صور السيلفي والبطاقة</string>
     <string name="unica_ghost_gps_category">تزوير الموقع الشبحي</string>
     <string name="unica_ghost_gps_title">تزوير الموقع الخفي غير القابل للكشف</string>
     <string name="unica_ghost_gps_summary">تزوير الإحداثيات مع إخفاء علامات Mock GPS كاملاً</string>

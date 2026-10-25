@@ -8,6 +8,8 @@
     <string name="unica_ghost_select_media_summary">Pick image/video from gallery to use as fake camera feed</string>
     <string name="unica_ghost_tool_title">Floating Camera Tool</string>
     <string name="unica_ghost_tool_summary">Show on-screen pill to switch or pause feed while in camera</string>
+    <string name="unica_ghost_camera_dashboard_title">App Selection &amp; Multi-Slot Setup</string>
+    <string name="unica_ghost_camera_dashboard_summary">Configure per-app whitelist, multi-slot media, and floating controls</string>
     <string name="unica_ghost_gps_category">Stealth GPS</string>
     <string name="unica_ghost_gps_title">Undetectable GPS Mock</string>
     <string name="unica_ghost_gps_summary">Spoof coordinates with hardware satellite signatures (isMock=false)</string>

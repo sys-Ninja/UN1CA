@@ -107,9 +107,9 @@ class ScreenTranslatorService : Service() {
         if (prefs.showFloatingBubble) {
             bubbleController = FloatingBubbleController(this) { isEnabled ->
                 if (isEnabled) {
-                    captureEngine?.start()
+                    captureEngine?.resume()
                 } else {
-                    captureEngine?.stop()
+                    captureEngine?.pause()
                 }
             }
             bubbleController?.show()

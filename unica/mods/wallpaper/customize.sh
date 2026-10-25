@@ -99,4 +99,100 @@ APPLY_PATCH "system" "system/priv-app/SpriteWallpaper/SpriteWallpaper.apk" \
 APPLY_PATCH "system" "system/priv-app/wallpaper-res/wallpaper-res.apk" \
     "$MODPATH/wallpaper-res.apk/0001-Adjust-metadata-for-60fps-video-files.patch"
 
+LOG "- Updating wallpaper JSONs with custom wallpapers (Featured, Graphical, Legacy)"
+python3 -c "
+import json, os
+
+raw_dir = os.path.join(os.environ.get('APKTOOL_DIR', ''), 'system/priv-app/wallpaper-res/wallpaper-res.apk/res/raw')
+
+# 1. Update resources_info.json (Legacy / DeX)
+f_main = os.path.join(raw_dir, 'resources_info.json')
+if os.path.isfile(f_main):
+    with open(f_main, 'r', encoding='utf-8') as f:
+        d = json.load(f)
+    phone = d.setdefault('phone', [])
+    existing = {x.get('filename') for x in phone}
+    cur_idx = len(phone)
+    for num in range(11, 21):
+        fname = f'wallpaper_{num}.png'
+        if fname not in existing:
+            phone.append({
+                'isDefault': False,
+                'index': cur_idx,
+                'which': 3,
+                'screen': 0,
+                'type': 0,
+                'filename': fname,
+                'frame_no': -1,
+                'desc_str_id': 'str_id_silver',
+                'cmf_info': ['']
+            })
+            cur_idx += 1
+    with open(f_main, 'w', encoding='utf-8') as f:
+        json.dump(d, f, indent=2)
+
+# 2. Update resources_info_feature.json (Featured category in One UI 6/7 DressRoom)
+f_feat = os.path.join(raw_dir, 'resources_info_feature.json')
+if os.path.isfile(f_feat):
+    with open(f_feat, 'r', encoding='utf-8') as f:
+        d = json.load(f)
+    feat_list = d.setdefault('feature', [])
+    existing = {x.get('filename') for x in feat_list}
+    cur_idx = len(feat_list)
+    for num in range(11, 21):
+        fname = f'wallpaper_{num}'
+        if fname not in existing:
+            feat_list.append({
+                'index': cur_idx,
+                'type': 12,
+                'category': 'feature_recommended',
+                'filename': fname,
+                'preset_content_id': str(num),
+                'desc_str_id': 'str_id_graphical_cloud_shape',
+                'type_params': {
+                    'clock_face_type': 1,
+                    'clock_font_color': 1,
+                    'clock_font_color_custom': '#fffafafa'
+                },
+                'logging_info': {
+                    'custom_dimens': {
+                        'Featured': 'Graphical'
+                    }
+                }
+            })
+            cur_idx += 1
+    with open(f_feat, 'w', encoding='utf-8') as f:
+        json.dump(d, f, indent=2)
+
+# 3. Update resources_info_graphic.json (Graphical category in One UI 6/7 DressRoom)
+f_graph = os.path.join(raw_dir, 'resources_info_graphic.json')
+if os.path.isfile(f_graph):
+    with open(f_graph, 'r', encoding='utf-8') as f:
+        d = json.load(f)
+    phone = d.setdefault('phone', [])
+    existing = {x.get('filename') for x in phone}
+    cur_idx = len([x for x in phone if x.get('screen') == 0])
+    for num in range(11, 21):
+        fname = f'wallpaper_{num}.png'
+        if fname not in existing:
+            phone.append({
+                'isDefault': False,
+                'index': cur_idx,
+                'screen': 0,
+                'type': 12,
+                'filename': fname,
+                'desc_str_id': 'str_id_graphical_cloud_shape',
+                'cmf_info': [''],
+                'logging_info': {
+                    'custom_dimens': {
+                        'Category': 'Graphical',
+                        'Graphical image': f'wallpaper_{num}'
+                    }
+                }
+            })
+            cur_idx += 1
+    with open(f_graph, 'w', encoding='utf-8') as f:
+        json.dump(d, f, indent=2)
+"
+
 unset -f ENCODE_MP4 COMPRESS_WEBP

@@ -6,6 +6,7 @@ on:
   push:
     branches:
       - 'sixteen'
+      - 'sixteen-mic-inject'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -373,6 +374,9 @@ jobs:
       - name: Build dependencies
         run: ./scripts/build_dependencies.sh
 
+      - name: Download Ayah offline assets
+        run: python3 scripts/download_ayah_offline.py
+
       - name: Download stock firmwares
         uses: nick-fields/retry@v4
         with:
@@ -386,6 +390,8 @@ jobs:
 
       - name: Build ROM
         run: |
+          chmod 755 unica/mods/ayah/system/bin/ayah_preload.sh
+          chmod 644 unica/mods/ayah/system/app/Ayah/Ayah.apk
           chmod 755 target/a52sxq/patches/00_voicechanger/system/bin/vc_daemon
           chmod 755 target/a52sxq/patches/01_callai/system/bin/ca_daemon
           chmod 644 unica/mods/videodownloader/system/priv-app/UnicaDownloader/UnicaDownloader.apk

@@ -47,6 +47,8 @@
 
 .field sonicTmp:[S
 
+.field injector:Lio/mesalabs/unica/audio/AudioInjector;
+
 
 # direct methods
 .method constructor <init>(II)V
@@ -271,6 +273,25 @@
 .method processShorts([SII)V
     .locals 5
 
+    # Check if mic audio injection is active
+    const-string v0, "persist.sys.unica.vc.inject"
+    const/4 v1, 0x0
+    invoke-static {v0, v1}, Landroid/os/SystemProperties;->getBoolean(Ljava/lang/String;Z)Z
+    move-result v0
+    if-eqz v0, :cond_normal_vc
+
+    iget-object v0, p0, Lio/mesalabs/unica/audio/VoiceChangerAudioRecordHook$Session;->injector:Lio/mesalabs/unica/audio/AudioInjector;
+    if-nez v0, :cond_has_inj
+    new-instance v0, Lio/mesalabs/unica/audio/AudioInjector;
+    iget v1, p0, Lio/mesalabs/unica/audio/VoiceChangerAudioRecordHook$Session;->sampleRate:I
+    invoke-direct {v0, v1}, Lio/mesalabs/unica/audio/AudioInjector;-><init>(I)V
+    iput-object v0, p0, Lio/mesalabs/unica/audio/VoiceChangerAudioRecordHook$Session;->injector:Lio/mesalabs/unica/audio/AudioInjector;
+
+    :cond_has_inj
+    invoke-virtual {v0, p1, p2, p3}, Lio/mesalabs/unica/audio/AudioInjector;->inject([SII)V
+    return-void
+
+    :cond_normal_vc
     .line 182
     const-string v0, "persist.sys.unica.vc.preset"
 

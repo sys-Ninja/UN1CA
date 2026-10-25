@@ -48,6 +48,30 @@ class GhostEnginePrefs private constructor(private val context: Context) {
         get() = Settings.System.getInt(resolver, "unica_ghost_camera_tool", 1) == 1
         set(value) { Settings.System.putInt(resolver, "unica_ghost_camera_tool", if (value) 1 else 0) }
 
+    var isPerAppCamera: Boolean
+        get() = Settings.System.getInt(resolver, "unica_ghost_cam_per_app", 0) == 1
+        set(value) { Settings.System.putInt(resolver, "unica_ghost_cam_per_app", if (value) 1 else 0) }
+
+    var cameraTargetPackages: Set<String>
+        get() {
+            val fromSettings = Settings.System.getString(resolver, "unica_ghost_cam_targets")
+            if (!fromSettings.isNullOrEmpty()) {
+                return fromSettings.split(",").map { it.trim() }.filter { it.isNotEmpty() }.toSet()
+            }
+            return sp.getStringSet("camera_target_packages", emptySet()) ?: emptySet()
+        }
+        set(value) {
+            val joined = value.joinToString(",")
+            Settings.System.putString(resolver, "unica_ghost_cam_targets", joined)
+            sp.edit().putStringSet("camera_target_packages", value).apply()
+        }
+
+    fun isCameraTargeted(packageName: String): Boolean {
+        if (!isGhostCameraEnabled) return false
+        if (!isPerAppCamera) return true
+        return cameraTargetPackages.contains(packageName)
+    }
+
     // Stealth GPS Settings (Default: false to decouple GPS from Camera)
     var isStealthGpsEnabled: Boolean
         get() = Settings.System.getInt(resolver, "unica_ghost_gps_enabled", 0) == 1
