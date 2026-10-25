@@ -9,7 +9,6 @@ import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
-import java.util.regex.Pattern
 
 data class FastMeta(
     val title: String,
@@ -21,13 +20,29 @@ object FastMetaExtractor {
     private const val TAG = "FastMetaExtractor"
     private const val USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36"
 
-    private val YT_PATTERN = Pattern.compile("(?:youtu\.be/|youtube\.com/(?:embed/|v/|watch\?v=|watch\?.+&v=))([\w-]{11})")
-
     fun getQuickThumbnail(url: String): String? {
-        val m = YT_PATTERN.matcher(url)
-        if (m.find()) {
-            val id = m.group(1)
-            return "https://i.ytimg.com/vi//hqdefault.jpg"
+        val lower = url.lowercase()
+        val id = when {
+            lower.contains("youtu.be/") -> {
+                url.substringAfter("youtu.be/").substringBefore("?").substringBefore("&").substringBefore("/")
+            }
+            lower.contains("watch?v=") -> {
+                url.substringAfter("watch?v=").substringBefore("&").substringBefore("#")
+            }
+            lower.contains("watch?") && lower.contains("&v=") -> {
+                url.substringAfter("&v=").substringBefore("&").substringBefore("#")
+            }
+            lower.contains("/embed/") -> {
+                url.substringAfter("/embed/").substringBefore("?").substringBefore("/")
+            }
+            lower.contains("/v/") -> {
+                url.substringAfter("/v/").substringBefore("?").substringBefore("/")
+            }
+            else -> null
+        }?.trim()
+
+        if (id != null && id.length in 10..12) {
+            return "https://i.ytimg.com/vi/" + id + "/hqdefault.jpg"
         }
         return null
     }
@@ -42,13 +57,13 @@ object FastMetaExtractor {
             val quickThumb = getQuickThumbnail(rawUrl)
             try {
                 val oembedUrl = "https://www.youtube.com/oembed?url=" + Uri.encode(rawUrl) + "&format=json"
-                val jsonStr = httpGet(oembedUrl, timeoutMs = 2500)
+                val jsonStr = httpGet(oembedUrl, 2500)
                 if (jsonStr != null) {
                     val obj = JSONObject(jsonStr)
                     val title = obj.optString("title").takeIf { it.isNotBlank() } ?: "YouTube Video"
                     val thumb = obj.optString("thumbnail_url").takeIf { it.isNotBlank() } ?: quickThumb
                     val author = obj.optString("author_name")
-                    val sub = if (author.isNotBlank()) "YOUTUBE • " else "YOUTUBE"
+                    val sub = if (author.isNotBlank()) "YOUTUBE • " + author else "YOUTUBE"
                     return@withContext FastMeta(title, thumb, sub)
                 }
             } catch (e: Exception) {
@@ -63,13 +78,13 @@ object FastMetaExtractor {
         if (host.contains("tiktok.com")) {
             try {
                 val oembedUrl = "https://www.tiktok.com/oembed?url=" + Uri.encode(rawUrl)
-                val jsonStr = httpGet(oembedUrl, timeoutMs = 2500)
+                val jsonStr = httpGet(oembedUrl, 2500)
                 if (jsonStr != null) {
                     val obj = JSONObject(jsonStr)
                     val title = obj.optString("title").takeIf { it.isNotBlank() } ?: "TikTok Video"
                     val thumb = obj.optString("thumbnail_url").takeIf { it.isNotBlank() }
                     val author = obj.optString("author_name")
-                    val sub = if (author.isNotBlank()) "TIKTOK • " else "TIKTOK"
+                    val sub = if (author.isNotBlank()) "TIKTOK • " + author else "TIKTOK"
                     return@withContext FastMeta(title, thumb, sub)
                 }
             } catch (e: Exception) {
@@ -81,12 +96,12 @@ object FastMetaExtractor {
         if (host.contains("twitter.com") || host.contains("x.com")) {
             try {
                 val oembedUrl = "https://publish.twitter.com/oembed?url=" + Uri.encode(rawUrl)
-                val jsonStr = httpGet(oembedUrl, timeoutMs = 2500)
+                val jsonStr = httpGet(oembedUrl, 2500)
                 if (jsonStr != null) {
                     val obj = JSONObject(jsonStr)
                     val author = obj.optString("author_name")
-                    val sub = if (author.isNotBlank()) "X / TWITTER • " else "X / TWITTER"
-                    return@withContext FastMeta("Post by ", null, sub)
+                    val sub = if (author.isNotBlank()) "X / TWITTER • " + author else "X / TWITTER"
+                    return@withContext FastMeta("Post by " + author, null, sub)
                 }
             } catch (e: Exception) {
                 Log.w(TAG, "Twitter oembed error", e)
@@ -95,7 +110,7 @@ object FastMetaExtractor {
 
         // 4. Universal Fast HTML / OpenGraph scraper (reads first 32KB of HTML)
         try {
-            val html = httpGetPartial(rawUrl, maxBytes = 32768, timeoutMs = 3000)
+            val html = httpGetPartial(rawUrl, 32768, 3000)
             if (!html.isNullOrBlank()) {
                 val ogTitle = extractMetaProperty(html, "og:title")
                     ?: extractMetaProperty(html, "twitter:title")
@@ -106,7 +121,7 @@ object FastMetaExtractor {
 
                 val cleanTitle = ogTitle?.replace("&amp;", "&")
                     ?.replace("&#39;", "'")
-                    ?.replace("&quot;", """)
+                    ?.replace("&quot;", "\"")
                     ?.trim()
 
                 if (!cleanTitle.isNullOrBlank()) {
@@ -114,7 +129,7 @@ object FastMetaExtractor {
                 }
             }
         } catch (e: Exception) {
-            Log.w(TAG, "HTML probe error for ", e)
+            Log.w(TAG, "HTML probe error for " + rawUrl, e)
         }
 
         FastMeta(site, null, site)
@@ -134,12 +149,15 @@ object FastMetaExtractor {
             if (lowerTag.contains(target)) {
                 val contentIdx = lowerTag.indexOf("content=")
                 if (contentIdx != -1) {
-                    val quoteChar = tag.getOrNull(contentIdx + 8)
-                    if (quoteChar == '"' || quoteChar == ''') {
-                        val endQuote = tag.indexOf(quoteChar, contentIdx + 9)
-                        if (endQuote != -1) {
-                            val value = tag.substring(contentIdx + 9, endQuote).trim()
-                            if (value.isNotEmpty()) return value
+                    val remaining = tag.substring(contentIdx + 8).trimStart()
+                    if (remaining.isNotEmpty()) {
+                        val firstChar = remaining[0]
+                        if (firstChar == '"' || firstChar == '\'') {
+                            val endQuote = remaining.indexOf(firstChar, 1)
+                            if (endQuote != -1) {
+                                val value = remaining.substring(1, endQuote).trim()
+                                if (value.isNotEmpty()) return value
+                            }
                         }
                     }
                 }
