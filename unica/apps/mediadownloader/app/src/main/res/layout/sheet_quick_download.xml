@@ -23,7 +23,7 @@
     <androidx.cardview.widget.CardView
         android:id="@+id/thumbnailCard"
         android:layout_width="match_parent"
-        android:layout_height="190dp"
+        android:layout_height="180dp"
         app:cardCornerRadius="20dp"
         app:cardElevation="0dp"
         app:cardBackgroundColor="?attr/colorSurfaceVariant">
@@ -54,8 +54,8 @@
         android:id="@+id/title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:textSize="18sp"
+        android:layout_marginTop="14dp"
+        android:textSize="17sp"
         android:textStyle="bold"
         android:textColor="?attr/colorOnSurface"
         android:maxLines="2"
@@ -67,11 +67,81 @@
         android:id="@+id/subtitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="2dp"
         android:textSize="13sp"
         android:textColor="?attr/colorOutline"
         android:maxLines="1"
         android:ellipsize="end" />
+
+    <!-- Quality Selection Section -->
+    <LinearLayout
+        android:id="@+id/qualitySection"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="12dp">
+
+        <TextView
+            android:id="@+id/qualityHeader"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/quality_header"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            android:layout_marginBottom="4dp" />
+
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbars="none">
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/qualityChips"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:singleLine="true"
+                app:singleSelection="true"
+                app:selectionRequired="true">
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipBest"
+                    style="@style/Widget.Material3.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:text="@string/quality_best_chip" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip1080"
+                    style="@style/Widget.Material3.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/quality_1080_chip" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip720"
+                    style="@style/Widget.Material3.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/quality_720_chip" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip480"
+                    style="@style/Widget.Material3.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/quality_480_chip" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipAudio"
+                    style="@style/Widget.Material3.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/quality_audio_chip" />
+            </com.google.android.material.chip.ChipGroup>
+        </HorizontalScrollView>
+    </LinearLayout>
 
     <!-- Playlist Section -->
     <LinearLayout
@@ -79,7 +149,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="10dp"
         android:visibility="gone">
 
         <androidx.cardview.widget.CardView
@@ -93,7 +163,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="16dp">
+                android:padding="14dp">
 
                 <TextView
                     android:id="@+id/playlistLabel"
@@ -171,7 +241,7 @@
                 <ScrollView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:maxHeight="160dp">
+                    android:maxHeight="140dp">
 
                     <LinearLayout
                         android:id="@+id/itemsContainer"
@@ -184,47 +254,33 @@
         </androidx.cardview.widget.CardView>
     </LinearLayout>
 
-    <!-- Action Buttons -->
+    <!-- Action Buttons (Optimistic UI: Always accessible) -->
     <LinearLayout
         android:id="@+id/actions"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_marginTop="20dp">
+        android:layout_marginTop="16dp">
 
-        <!-- Primary: Download Video (One UI Blue Pill) -->
+        <!-- Primary: Download with Selected Quality (One UI Pill) -->
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnVideo"
+            android:id="@+id/btnDownload"
             android:layout_width="match_parent"
-            android:layout_height="56dp"
+            android:layout_height="54dp"
             android:text="@string/btn_best_video"
             android:textSize="15sp"
             android:textStyle="bold"
-            app:cornerRadius="28dp"
+            app:cornerRadius="27dp"
             android:icon="@android:drawable/stat_sys_download"
             app:iconGravity="textStart"
             app:iconPadding="10dp"
             style="@style/Widget.Material3.Button" />
 
-        <!-- Secondary: Audio only (Tonal Pill) -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnAudio"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:layout_marginTop="10dp"
-            android:text="@string/btn_audio_only"
-            android:textSize="15sp"
-            app:cornerRadius="28dp"
-            android:icon="@android:drawable/ic_media_play"
-            app:iconGravity="textStart"
-            app:iconPadding="10dp"
-            style="@style/Widget.Material3.Button.TonalButton" />
-
         <!-- Tertiary: View downloads -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnDownloads"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
+            android:layout_height="44dp"
             android:layout_marginTop="4dp"
             android:text="@string/downloads_title"
             android:textSize="14sp"
