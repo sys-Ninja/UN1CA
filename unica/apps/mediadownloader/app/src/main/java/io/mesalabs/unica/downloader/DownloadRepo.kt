@@ -13,7 +13,9 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
 
-enum class DlStatus { QUEUED, RUNNING, DONE, FAILED, CANCELLED }
+enum class DlStatus {
+    QUEUED, RUNNING, DONE, FAILED, CANCELLED
+}
 
 data class DownloadItem(
     val id: String,
@@ -133,30 +135,52 @@ object DownloadRepo {
         }
     }
 
-    private fun isTikTok(url: String): Boolean {
+    fun isTikTok(url: String): Boolean {
         val host = try { Uri.parse(url).host?.lowercase() ?: "" } catch (e: Exception) { "" }
         return host == "tiktok.com" || host.endsWith(".tiktok.com")
     }
 
+    fun isPlaylistUrl(url: String): Boolean {
+        val lower = url.lowercase()
+        return lower.contains("list=") || lower.contains("/playlist") || lower.contains("/sets/")
+    }
+
+    fun getQuickThumbnail(url: String): String? {
+        val ytRegex = Regex("(?:youtu\\.be/|youtube\\.com/(?:embed/|v/|watch\\?v=|watch\\?.+&v=))([\\w-]{11})")
+        val match = ytRegex.find(url)
+        if (match != null) {
+            val id = match.groupValues[1]
+            return "https://i.ytimg.com/vi/${id}/hqdefault.jpg"
+        }
+        return null
+    }
+
     fun fetchMeta(url: String): VideoMeta {
         App.instance.ensureInit()
+        val isPl = isPlaylistUrl(url)
         val req = YoutubeDLRequest(url).apply {
             addOption("--dump-single-json")
-            addOption("--flat-playlist")
             addOption("--no-warnings")
             addOption("--no-check-certificates")
-            addOption("-R", "1")
-            addOption("--socket-timeout", "10")
+            addOption("-R", "2")
+            addOption("--socket-timeout", "25")
+            if (isPl) {
+                addOption("--yes-playlist")
+                addOption("--flat-playlist")
+                addOption("--playlist-end", "100")
+            } else {
+                addOption("--no-playlist")
+            }
+            // Fast extractor arguments for YouTube to avoid JS engine bottlenecks
+            addOption("--extractor-args", "youtube:player_client=android,web;skip=dash,translated_subs")
+            addOption("--user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36")
             if (isTikTok(url)) {
-                addOption("--user-agent",
-                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 " +
-                    "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
                 addOption("--referer", "https://www.tiktok.com/")
             }
         }
         val out = YoutubeDL.getInstance().execute(req).out
         val json = JSONObject(out.substring(out.indexOf('{')))
-        val isPlaylist = json.optString("_type") == "playlist"
+        val isPlaylist = json.optString("_type") == "playlist" || json.has("entries")
         val entries = mutableListOf<Pair<Int, String>>()
         if (isPlaylist) {
             val arr: JSONArray = json.optJSONArray("entries") ?: JSONArray()
@@ -165,10 +189,11 @@ object DownloadRepo {
                 entries.add(i + 1 to e.optString("title", "#${i + 1}"))
             }
         }
+        val thumb = json.optString("thumbnail").takeIf { it.isNotBlank() } ?: getQuickThumbnail(url)
         return VideoMeta(
             url = url,
             title = json.optString("title", url),
-            thumbnail = json.optString("thumbnail").takeIf { it.isNotBlank() },
+            thumbnail = thumb,
             isPlaylist = isPlaylist,
             playlistTitle = if (isPlaylist) json.optString("title") else null,
             entries = entries,
@@ -176,50 +201,62 @@ object DownloadRepo {
     }
 
     fun sanitize(name: String): String =
-        name.replace(Regex("[\\\\/:*?\"<>|]"), "_").trim().take(120).ifBlank { "playlist" }
+        name.replace(Regex("[\\/:*?\"<>|]"), "_").trim().take(120).ifBlank { "playlist" }
 
     fun buildRequest(ctx: Context, item: DownloadItem): YoutubeDLRequest {
         App.instance.ensureInit(ctx)
         val prefs = Prefs.get(ctx)
         val baseDir = File(prefs.downloadDir)
+        val isPl = item.playlistTitle != null || isPlaylistUrl(item.url)
         val outTemplate: String
-        if (item.playlistTitle != null && prefs.organizePlaylists) {
-            val dir = File(baseDir, sanitize(item.playlistTitle))
+        if (isPl && prefs.organizePlaylists) {
+            val folderName = sanitize(item.playlistTitle ?: "Playlist")
+            val dir = File(baseDir, folderName)
             outTemplate = "${dir.absolutePath}/%(playlist_index|0)02d - %(title).100B.%(ext)s"
         } else {
             outTemplate = "${baseDir.absolutePath}/%(title).100B.%(ext)s"
         }
+
         return YoutubeDLRequest(item.url).apply {
             addOption("-o", outTemplate)
             addOption("--no-mtime")
             addOption("--no-warnings")
             addOption("--no-check-certificates")
             addOption("--restrict-filenames")
-            if (item.playlistItems != null) addOption("--playlist-items", item.playlistItems)
-            if (item.playlistTitle != null) {
+            addOption("--user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36")
+
+            if (isPl) {
                 addOption("--yes-playlist")
                 addOption("--ignore-errors")
                 addOption("--no-abort-on-error")
+                if (item.playlistItems != null) {
+                    addOption("--playlist-items", item.playlistItems)
+                }
             } else {
                 addOption("--no-playlist")
             }
+
             if (isTikTok(item.url)) {
-                addOption("--user-agent",
-                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 " +
-                    "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
                 addOption("--referer", "https://www.tiktok.com/")
             }
+
             if (item.audioOnly) {
                 addOption("-x")
                 addOption("--audio-format", "mp3")
                 addOption("--audio-quality", "0")
             } else {
+                // Ensure 100% hardware decoding compatibility on Samsung devices (H.264 + AAC in MP4):
+                addOption("-S", "vcodec:h264,lang,quality,res,fps,hdr:12,acodec:m4a,acodec:aac")
                 val fmt = when (item.quality) {
-                    "best" -> "bestvideo+bestaudio/best"
-                    else -> "bestvideo[height<=${item.quality}]+bestaudio/best[height<=${item.quality}]/best"
+                    "1080" -> "bestvideo[height<=1080]+bestaudio/best[height<=1080]/best"
+                    "720"  -> "bestvideo[height<=720]+bestaudio/best[height<=720]/best"
+                    "480"  -> "bestvideo[height<=480]+bestaudio/best[height<=480]/best"
+                    else   -> "bestvideo+bestaudio/best"
                 }
                 addOption("-f", fmt)
                 addOption("--merge-output-format", "mp4")
+                addOption("--remux-video", "mp4")
+                addOption("--postprocessor-args", "ffmpeg:-movflags +faststart")
             }
         }
     }
