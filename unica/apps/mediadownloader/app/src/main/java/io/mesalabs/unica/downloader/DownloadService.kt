@@ -159,7 +159,12 @@ class DownloadService : Service() {
                     .toList()
 
                 val filePath = newFiles.firstOrNull()
+                val resolvedTitle = if (item.title == item.url || item.title.startsWith("http")) {
+                    filePath?.let { File(it).nameWithoutExtension.replace('_', ' ') } ?: item.title
+                } else item.title
+
                 DownloadRepo.update(item.id) {
+                    it.title = resolvedTitle
                     it.status = DlStatus.DONE
                     it.progress = 100f
                     it.filePath = filePath
@@ -168,7 +173,12 @@ class DownloadService : Service() {
                 nm.cancel(item.id.hashCode())
                 // Scan all new files so Gallery/Studio see them immediately
                 scanFiles(newFiles)
-                notifyDone(item, thumb)
+                val finalItem = if (newFiles.size > 1) {
+                    item.copy(title = "$resolvedTitle (${newFiles.size} items)")
+                } else {
+                    item.copy(title = resolvedTitle)
+                }
+                notifyDone(finalItem, thumb)
                 return
             } catch (e: YoutubeDL.CanceledException) {
                 DownloadRepo.update(item.id) { it.status = DlStatus.CANCELLED }
