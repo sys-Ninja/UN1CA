@@ -26,10 +26,14 @@ class QuickDownloadActivity : AppCompatActivity() {
     private var url: String? = null
     private val checkboxes = mutableListOf<CheckBox>()
 
+    private var selectedQuality: String = "best"
+    private var selectedAudioOnly: Boolean = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        if (!Prefs.get(this).enabled) {
+        val prefs = Prefs.get(this)
+        if (!prefs.enabled) {
             finish()
             return
         }
@@ -49,21 +53,66 @@ class QuickDownloadActivity : AppCompatActivity() {
         // Open Bottom Sheet IMMEDIATELY (0 ms delay)
         dialog.show()
 
-        // Display initial loading state with platform domain
+        // Display initial domain / title
         val host = try { Uri.parse(url).host?.removePrefix("www.")?.removePrefix("m.") ?: "" } catch (e: Exception) { "" }
-        binding.title.text = getString(R.string.notif_preparing)
-        binding.subtitle.text = if (host.isNotBlank()) host.uppercase() else url
+        binding.title.text = if (host.isNotBlank()) host.uppercase() else url
+        binding.subtitle.text = url
         binding.progress.visibility = View.VISIBLE
-        binding.actions.visibility = View.GONE
+        binding.actions.visibility = View.VISIBLE
 
-        binding.btnVideo.setOnClickListener { start(audioOnly = false) }
-        binding.btnAudio.setOnClickListener { start(audioOnly = true) }
+        // Quick instant thumbnail loading without waiting for yt-dlp
+        val quickThumb = DownloadRepo.getQuickThumbnail(url!!)
+        if (quickThumb != null) {
+            binding.thumbnail.load(quickThumb) { crossfade(200) }
+        }
+
+        // Configure default quality from settings
+        selectedAudioOnly = (prefs.defaultType == "audio")
+        selectedQuality = prefs.defaultQuality
+
+        if (selectedAudioOnly) {
+            binding.chipAudio.isChecked = true
+        } else {
+            when (selectedQuality) {
+                "1080" -> binding.chip1080.isChecked = true
+                "720"  -> binding.chip720.isChecked = true
+                "480"  -> binding.chip480.isChecked = true
+                else   -> binding.chipBest.isChecked = true
+            }
+        }
+        updateDownloadButtonText()
+
+        // Handle quality selection changes
+        binding.qualityChips.setOnCheckedStateChangeListener { _, checkedIds ->
+            val checkedId = checkedIds.firstOrNull() ?: R.id.chipBest
+            when (checkedId) {
+                R.id.chip1080 -> { selectedQuality = "1080"; selectedAudioOnly = false }
+                R.id.chip720  -> { selectedQuality = "720";  selectedAudioOnly = false }
+                R.id.chip480  -> { selectedQuality = "480";  selectedAudioOnly = false }
+                R.id.chipAudio -> { selectedQuality = "best"; selectedAudioOnly = true }
+                else -> { selectedQuality = "best"; selectedAudioOnly = false }
+            }
+            updateDownloadButtonText()
+        }
+
+        binding.btnDownload.setOnClickListener { start() }
         binding.btnDownloads.setOnClickListener {
             startActivity(Intent(this, DownloadsActivity::class.java))
             dialog.dismiss()
         }
 
         loadMeta(url!!)
+    }
+
+    private fun updateDownloadButtonText() {
+        binding.btnDownload.text = when {
+            selectedAudioOnly -> getString(R.string.btn_audio_only)
+            selectedQuality == "best" -> getString(R.string.btn_best_video)
+            else -> getString(R.string.btn_download_with_quality, "${selectedQuality}p")
+        }
+        binding.btnDownload.setIconResource(
+            if (selectedAudioOnly) android.R.drawable.ic_media_play else android.R.drawable.stat_sys_download
+        )
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -75,13 +124,17 @@ class QuickDownloadActivity : AppCompatActivity() {
         meta = null
         checkboxes.clear()
         binding.playlistGroup.visibility = View.GONE
-        binding.actions.visibility = View.GONE
         binding.progress.visibility = View.VISIBLE
 
         val host = try { Uri.parse(newUrl).host?.removePrefix("www.")?.removePrefix("m.") ?: "" } catch (e: Exception) { "" }
-        binding.title.text = getString(R.string.notif_preparing)
-        binding.subtitle.text = if (host.isNotBlank()) host.uppercase() else newUrl
+        binding.title.text = if (host.isNotBlank()) host.uppercase() else newUrl
+        binding.subtitle.text = newUrl
         binding.thumbnail.setImageDrawable(null)
+
+        val quickThumb = DownloadRepo.getQuickThumbnail(newUrl)
+        if (quickThumb != null) {
+            binding.thumbnail.load(quickThumb) { crossfade(200) }
+        }
 
         loadMeta(newUrl)
     }
@@ -113,7 +166,6 @@ class QuickDownloadActivity : AppCompatActivity() {
                     if (isFinishing) return@withContext
                     meta = m
                     binding.progress.visibility = View.GONE
-                    binding.actions.visibility = View.VISIBLE
                     binding.title.text = m.title
                     val host = try { Uri.parse(url).host?.removePrefix("www.")?.removePrefix("m.") ?: "" } catch (e: Exception) { "" }
                     binding.subtitle.text = host.uppercase()
@@ -135,8 +187,7 @@ class QuickDownloadActivity : AppCompatActivity() {
                 withContext(Dispatchers.Main) {
                     if (isFinishing) return@withContext
                     binding.progress.visibility = View.GONE
-                    binding.actions.visibility = View.VISIBLE
-                    binding.title.setText(R.string.extract_failed)
+                    // Keep optimistic UI ready even if meta probe errored
                 }
             }
         }
@@ -166,14 +217,13 @@ class QuickDownloadActivity : AppCompatActivity() {
         }
     }
 
-    private fun start(audioOnly: Boolean) {
+    private fun start() {
         val u = url ?: return
         if (!DownloadRepo.hasSpace(this)) {
             Toast.makeText(this, R.string.low_space, Toast.LENGTH_LONG).show()
             return
         }
         val m = meta
-        val prefs = Prefs.get(this)
         var playlistTitle: String? = null
         var playlistItems: String? = null
 
@@ -202,9 +252,9 @@ class QuickDownloadActivity : AppCompatActivity() {
             id = UUID.randomUUID().toString(),
             url = u,
             title = m?.title ?: u,
-            audioOnly = audioOnly,
-            quality = prefs.defaultQuality,
-            thumbnail = m?.thumbnail,
+            audioOnly = selectedAudioOnly,
+            quality = selectedQuality,
+            thumbnail = m?.thumbnail ?: DownloadRepo.getQuickThumbnail(u),
             playlistTitle = playlistTitle,
             playlistItems = playlistItems,
         )
