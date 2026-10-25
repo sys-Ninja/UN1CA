@@ -224,6 +224,16 @@ object DownloadRepo {
             addOption("--no-check-certificates")
             addOption("--restrict-filenames")
             addOption("--user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36")
+            // Anti-freeze, high-speed multi-threading and anti-throttling
+            addOption("-N", "4")
+            addOption("--http-chunk-size", "10M")
+            addOption("--buffer-size", "64K")
+            addOption("--retries", "10")
+            addOption("--fragment-retries", "10")
+            addOption("--file-access-retries", "5")
+            addOption("--retry-sleep", "fragment:exp=1:10")
+            addOption("--geo-bypass")
+            addOption("--extractor-args", "instagram:app_id=ios;twitter:api=syndication;youtube:player_client=android,web;skip=dash,translated_subs")
 
             if (isPl) {
                 addOption("--yes-playlist")
