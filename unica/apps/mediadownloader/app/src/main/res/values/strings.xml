@@ -82,4 +82,12 @@
     <string name="update_failed">Update failed</string>
     <string name="pref_universal_extractor">Universal Mode (All Websites)</string>
     <string name="pref_universal_extractor_sum">Detect media links from any supported website automatically</string>
+    <string name="quality_best_chip">🌟 Best</string>
+    <string name="quality_1080_chip">1080p</string>
+    <string name="quality_720_chip">720p</string>
+    <string name="quality_480_chip">480p</string>
+    <string name="quality_audio_chip">🎵 Audio</string>
+    <string name="btn_download_now">Download</string>
+    <string name="btn_download_with_quality">Download (%1)</string>
+    <string name="quality_header">Quality:</string>
 </resources>
