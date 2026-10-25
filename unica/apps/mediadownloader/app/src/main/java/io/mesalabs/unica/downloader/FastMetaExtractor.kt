@@ -21,13 +21,13 @@ object FastMetaExtractor {
     private const val TAG = "FastMetaExtractor"
     private const val USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36"
 
-    private val YT_PATTERN = Pattern.compile("(?:youtu\\.be/|youtube\\.com/(?:embed/|v/|watch\\?v=|watch\\?.+&v=))([\\w-]{11})")
+    private val YT_PATTERN = Pattern.compile("(?:youtu\.be/|youtube\.com/(?:embed/|v/|watch\?v=|watch\?.+&v=))([\w-]{11})")
 
     fun getQuickThumbnail(url: String): String? {
         val m = YT_PATTERN.matcher(url)
         if (m.find()) {
             val id = m.group(1)
-            return "https://i.ytimg.com/vi/$id/hqdefault.jpg"
+            return "https://i.ytimg.com/vi//hqdefault.jpg"
         }
         return null
     }
@@ -48,7 +48,7 @@ object FastMetaExtractor {
                     val title = obj.optString("title").takeIf { it.isNotBlank() } ?: "YouTube Video"
                     val thumb = obj.optString("thumbnail_url").takeIf { it.isNotBlank() } ?: quickThumb
                     val author = obj.optString("author_name")
-                    val sub = if (author.isNotBlank()) "YOUTUBE • $author" else "YOUTUBE"
+                    val sub = if (author.isNotBlank()) "YOUTUBE • " else "YOUTUBE"
                     return@withContext FastMeta(title, thumb, sub)
                 }
             } catch (e: Exception) {
@@ -69,7 +69,7 @@ object FastMetaExtractor {
                     val title = obj.optString("title").takeIf { it.isNotBlank() } ?: "TikTok Video"
                     val thumb = obj.optString("thumbnail_url").takeIf { it.isNotBlank() }
                     val author = obj.optString("author_name")
-                    val sub = if (author.isNotBlank()) "TIKTOK • $author" else "TIKTOK"
+                    val sub = if (author.isNotBlank()) "TIKTOK • " else "TIKTOK"
                     return@withContext FastMeta(title, thumb, sub)
                 }
             } catch (e: Exception) {
@@ -85,8 +85,8 @@ object FastMetaExtractor {
                 if (jsonStr != null) {
                     val obj = JSONObject(jsonStr)
                     val author = obj.optString("author_name")
-                    val sub = if (author.isNotBlank()) "X / TWITTER • $author" else "X / TWITTER"
-                    return@withContext FastMeta("Post by $author", null, sub)
+                    val sub = if (author.isNotBlank()) "X / TWITTER • " else "X / TWITTER"
+                    return@withContext FastMeta("Post by ", null, sub)
                 }
             } catch (e: Exception) {
                 Log.w(TAG, "Twitter oembed error", e)
@@ -103,11 +103,10 @@ object FastMetaExtractor {
 
                 val ogImage = extractMetaProperty(html, "og:image")
                     ?: extractMetaProperty(html, "twitter:image")
-                    ?: extractTagHref(html, "image_src")
 
                 val cleanTitle = ogTitle?.replace("&amp;", "&")
                     ?.replace("&#39;", "'")
-                    ?.replace("&quot;", "\"")
+                    ?.replace("&quot;", """)
                     ?.trim()
 
                 if (!cleanTitle.isNullOrBlank()) {
@@ -115,36 +114,55 @@ object FastMetaExtractor {
                 }
             }
         } catch (e: Exception) {
-            Log.w(TAG, "HTML probe error for $rawUrl", e)
+            Log.w(TAG, "HTML probe error for ", e)
         }
 
         FastMeta(site, null, site)
     }
 
     private fun extractMetaProperty(html: String, propName: String): String? {
-        val q = Pattern.quote(propName)
-        val p1 = Pattern.compile("<meta[^>]+(?:property|name)\\s*=\\s*["']" + q + "["'][^>]+content\\s*=\\s*["']([^"']+)["']", Pattern.CASE_INSENSITIVE)
-        val m1 = p1.matcher(html)
-        if (m1.find()) return m1.group(1)?.trim()
-
-        val p2 = Pattern.compile("<meta[^>]+content\\s*=\\s*["']([^"']+)["'][^>]+(?:property|name)\\s*=\\s*["']" + q + "["']", Pattern.CASE_INSENSITIVE)
-        val m2 = p2.matcher(html)
-        if (m2.find()) return m2.group(1)?.trim()
-
+        val lowerHtml = html.lowercase()
+        val target = propName.lowercase()
+        var searchIdx = 0
+        while (searchIdx < lowerHtml.length) {
+            val metaIdx = lowerHtml.indexOf("<meta", searchIdx)
+            if (metaIdx == -1) break
+            val closeIdx = lowerHtml.indexOf('>', metaIdx)
+            if (closeIdx == -1) break
+            val tag = html.substring(metaIdx, closeIdx + 1)
+            val lowerTag = lowerHtml.substring(metaIdx, closeIdx + 1)
+            if (lowerTag.contains(target)) {
+                val contentIdx = lowerTag.indexOf("content=")
+                if (contentIdx != -1) {
+                    val quoteChar = tag.getOrNull(contentIdx + 8)
+                    if (quoteChar == '"' || quoteChar == ''') {
+                        val endQuote = tag.indexOf(quoteChar, contentIdx + 9)
+                        if (endQuote != -1) {
+                            val value = tag.substring(contentIdx + 9, endQuote).trim()
+                            if (value.isNotEmpty()) return value
+                        }
+                    }
+                }
+            }
+            searchIdx = closeIdx + 1
+        }
         return null
     }
 
     private fun extractTitleTag(html: String): String? {
-        val p = Pattern.compile("<title[^>]*>([^<]+)</title>", Pattern.CASE_INSENSITIVE)
-        val m = p.matcher(html)
-        return if (m.find()) m.group(1)?.trim() else null
-    }
-
-    private fun extractTagHref(html: String, relName: String): String? {
-        val q = Pattern.quote(relName)
-        val p = Pattern.compile("<link[^>]+rel\\s*=\\s*["']" + q + "["'][^>]+href\\s*=\\s*["']([^"']+)["']", Pattern.CASE_INSENSITIVE)
-        val m = p.matcher(html)
-        return if (m.find()) m.group(1)?.trim() else null
+        val lower = html.lowercase()
+        val start = lower.indexOf("<title")
+        if (start != -1) {
+            val tagClose = lower.indexOf('>', start)
+            if (tagClose != -1) {
+                val end = lower.indexOf("</title>", tagClose)
+                if (end != -1) {
+                    val t = html.substring(tagClose + 1, end).trim()
+                    if (t.isNotEmpty()) return t
+                }
+            }
+        }
+        return null
     }
 
     private fun httpGet(urlStr: String, timeoutMs: Int): String? {
