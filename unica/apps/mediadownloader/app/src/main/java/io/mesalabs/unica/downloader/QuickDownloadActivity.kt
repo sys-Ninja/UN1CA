@@ -77,16 +77,30 @@ class QuickDownloadActivity : AppCompatActivity() {
         }
         updateDownloadButtonText()
 
-        // Handle quality selection changes
-        binding.qualityChips.setOnCheckedStateChangeListener { _, checkedIds ->
-            val checkedId = checkedIds.firstOrNull() ?: R.id.chipBest
-            when (checkedId) {
-                R.id.chip1080 -> { selectedQuality = "1080"; selectedAudioOnly = false }
-                R.id.chip720  -> { selectedQuality = "720";  selectedAudioOnly = false }
-                R.id.chip480  -> { selectedQuality = "480";  selectedAudioOnly = false }
-                R.id.chipAudio -> { selectedQuality = "best"; selectedAudioOnly = true }
-                else -> { selectedQuality = "best"; selectedAudioOnly = false }
-            }
+        // Direct chip click listeners (safe, no SAM resolution issues)
+        binding.chipBest.setOnClickListener {
+            selectedQuality = "best"
+            selectedAudioOnly = false
+            updateDownloadButtonText()
+        }
+        binding.chip1080.setOnClickListener {
+            selectedQuality = "1080"
+            selectedAudioOnly = false
+            updateDownloadButtonText()
+        }
+        binding.chip720.setOnClickListener {
+            selectedQuality = "720"
+            selectedAudioOnly = false
+            updateDownloadButtonText()
+        }
+        binding.chip480.setOnClickListener {
+            selectedQuality = "480"
+            selectedAudioOnly = false
+            updateDownloadButtonText()
+        }
+        binding.chipAudio.setOnClickListener {
+            selectedQuality = "best"
+            selectedAudioOnly = true
             updateDownloadButtonText()
         }
 
@@ -126,7 +140,7 @@ class QuickDownloadActivity : AppCompatActivity() {
         binding.btnDownload.text = when {
             selectedAudioOnly -> getString(R.string.btn_audio_only)
             selectedQuality == "best" -> getString(R.string.btn_best_video)
-            else -> getString(R.string.btn_download_with_quality, "${selectedQuality}p")
+            else -> getString(R.string.btn_download_now) + " (" + selectedQuality + "p)"
         }
         binding.btnDownload.setIconResource(
             if (selectedAudioOnly) android.R.drawable.ic_media_play else android.R.drawable.stat_sys_download
